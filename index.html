@@ -381,7 +381,6 @@
   <div class="modal-bar">
     <button id="backBtn">← Volver a la galería</button>
     <div id="modalTitle"></div>
-    <a id="openDriveLink" href="#" target="_blank" rel="noopener" style="margin-left:auto;color:var(--text-sec);font-size:0.78rem;text-decoration:underline;white-space:nowrap;">Abrir en Drive</a>
   </div>
   <div class="pdf-body" style="position:relative;">
     <div id="pdfLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-sec);font-size:0.85rem;">Cargando documento...</div>
@@ -632,7 +631,6 @@
   const modalTitle = document.getElementById("modalTitle");
   const backBtn = document.getElementById("backBtn");
   const pdfLoading = document.getElementById("pdfLoading");
-  const openDriveLink = document.getElementById("openDriveLink");
 
   function abrirLector(titulo, pdfId) {
     modalTitle.textContent = titulo;
@@ -641,7 +639,6 @@
     // Se usa el visor oficial de Google Drive (/preview), más estable que gview.
     // Requiere que el archivo esté compartido como "Cualquier persona con el enlace".
     const viewerUrl = `https://drive.google.com/file/d/${pdfId}/preview`;
-    openDriveLink.href = `https://drive.google.com/file/d/${pdfId}/view`;
     pdfFrame.src = viewerUrl;
     pdfModal.classList.add("active");
     document.body.style.overflow = "hidden";
@@ -649,7 +646,7 @@
     // Si tarda demasiado en cargar (archivo privado, sin conexión, etc.),
     // avisamos al lector en vez de dejarlo viendo una pantalla en blanco.
     const avisoTimeout = setTimeout(() => {
-      pdfLoading.textContent = "Esto está tardando más de lo normal. Si no carga, usa 'Abrir en Drive' arriba.";
+      pdfLoading.textContent = "Esto está tardando más de lo normal. Intenta recargar la página.";
     }, 6000);
     pdfFrame.onload = () => {
       clearTimeout(avisoTimeout);
