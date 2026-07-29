@@ -312,6 +312,19 @@
     color:#d8d8e2;
     font-style:italic;
   }
+  .coleccion-contador{
+    position:absolute;
+    bottom:14px;
+    right:16px;
+    background:rgba(10,10,12,0.72);
+    border:1px solid rgba(255,255,255,0.15);
+    color:#fff;
+    font-size:0.72rem;
+    font-weight:600;
+    padding:4px 10px;
+    border-radius:20px;
+    backdrop-filter:blur(2px);
+  }
 
   /* VISTA DETALLE DE UNA COLECCIÓN */
   #coleccionHeader{
@@ -794,16 +807,18 @@
     emptyMsg.style.display = "none";
 
     colecciones.forEach(col => {
-      coleccionesWrap.appendChild(crearTarjetaColeccion(col.id, col.nombre, col.frase, col.imagenId));
+      const cantidad = librosDeColeccion(col.id).length;
+      coleccionesWrap.appendChild(crearTarjetaColeccion(col.id, col.nombre, col.frase, col.imagenId, cantidad));
     });
 
     // Los libros sueltos (sin colección) se muestran como una colección más, al final
     if (librosGeneral.length > 0) {
-      coleccionesWrap.appendChild(crearTarjetaColeccion(ID_GENERAL, "General", "Escritos sin colección asignada", librosGeneral[0].portadaId));
+      coleccionesWrap.appendChild(crearTarjetaColeccion(ID_GENERAL, "General", "Escritos sin colección asignada", librosGeneral[0].portadaId, librosGeneral.length));
     }
   }
 
-  function crearTarjetaColeccion(id, nombre, frase, imagenId) {
+  function crearTarjetaColeccion(id, nombre, frase, imagenId, cantidad) {
+    const etiqueta = cantidad === 1 ? "1 escrito" : `${cantidad} escritos`;
     const card = document.createElement("div");
     card.className = "coleccion-card";
     card.innerHTML = `
@@ -812,6 +827,7 @@
         <div class="coleccion-titulo">${escapeHtml(nombre)}</div>
         ${frase ? `<div class="coleccion-frase">${escapeHtml(frase)}</div>` : ""}
       </div>
+      <div class="coleccion-contador">${etiqueta}</div>
     `;
     card.addEventListener("click", () => abrirColeccion(id, nombre, frase));
     return card;
