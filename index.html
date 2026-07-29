@@ -378,6 +378,179 @@
   }
   #crearColeccionBtn:active{ background:var(--accent-hover); }
 
+  /* CONSTRUCTOR DE RECURSOS (admin) */
+  .recurso-row{
+    background:#0e0e13;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    margin-top:10px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .recurso-row select{
+    width:100%;
+    padding:9px 10px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:#15151d;
+    color:var(--text);
+    font-size:0.82rem;
+  }
+  .recurso-row input{
+    width:100%;
+    padding:9px 10px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:#15151d;
+    color:var(--text);
+    font-size:0.82rem;
+  }
+  .recurso-controles{
+    display:flex;
+    gap:6px;
+    justify-content:flex-end;
+  }
+  .recurso-controles button{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    padding:6px 10px;
+    border-radius:6px;
+    font-size:0.75rem;
+    cursor:pointer;
+  }
+  .recurso-controles button:active{ background:#1a1a22; }
+  .recurso-controles .recurso-quitar{ color:#f87171; }
+  #agregarRecursoBtn{
+    margin-top:10px;
+    width:100%;
+    background:transparent;
+    border:1px dashed var(--border);
+    color:var(--text-sec);
+    padding:10px;
+    border-radius:9px;
+    font-size:0.82rem;
+    cursor:pointer;
+  }
+  #agregarRecursoBtn:active{ background:#0e0e13; }
+
+  /* MODAL: ÍNDICE TEMÁTICO */
+  #indiceModal{
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.85);
+    z-index:9998;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  #indiceModal.active{ display:flex; }
+  .indice-caja{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    max-width:480px;
+    width:100%;
+    max-height:80vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .indice-header{
+    padding:16px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .indice-header h3{
+    font-size:1rem;
+    font-family:'Georgia','Times New Roman',serif;
+  }
+  .indice-cerrar{
+    background:transparent;
+    border:none;
+    color:var(--text-sec);
+    font-size:1.2rem;
+    cursor:pointer;
+    padding:4px 8px;
+  }
+  .indice-lista{
+    overflow-y:auto;
+    padding:8px 10px;
+  }
+  .indice-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 10px;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  .indice-item:active{ background:#1a1a22; }
+  .indice-numero{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-size:0.78rem;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .indice-info{ flex:1; min-width:0; }
+  .indice-etiqueta{
+    font-size:0.88rem;
+    font-weight:600;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .indice-tipo{
+    font-size:0.72rem;
+    color:var(--text-sec);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+
+  /* BARRA DE NAVEGACIÓN DENTRO DEL LECTOR (Anterior / Siguiente) */
+  #navBar{
+    display:none;
+    background:#0e0e13;
+    border-bottom:1px solid var(--border);
+    padding:10px 14px;
+    gap:8px;
+    justify-content:space-between;
+    align-items:center;
+  }
+  #navBar.active{ display:flex; }
+  #navBar button{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:0.78rem;
+    cursor:pointer;
+    max-width:48%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  #navBar button:disabled{
+    opacity:0.35;
+    cursor:default;
+  }
+  #navBar button:active:not(:disabled){ background:#1a1a22; }
+
   /* MODAL LECTOR PDF */
   #pdfModal{
     display:none;
@@ -483,10 +656,12 @@
       <label>Enlace de Google Drive (Portada / imagen)</label>
       <input type="text" id="inputPortada" placeholder="https://drive.google.com/file/d/.../view">
 
-      <label>Enlace de Google Drive (PDF del libro)</label>
-      <input type="text" id="inputPdf" placeholder="https://drive.google.com/file/d/.../view">
+      <label>Contenido de la publicación (índice temático)</label>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Agrega uno o varios recursos (texto, audio o video). El orden en que los agregues es el orden del índice.</p>
+      <div id="recursosBuilderContainer"></div>
+      <button type="button" id="agregarRecursoBtn">+ Agregar recurso</button>
 
-      <label>Colección a la que pertenece</label>
+      <label style="margin-top:16px;">Colección a la que pertenece</label>
       <select id="inputColeccionAsignada"></select>
 
       <button id="publishBtn">Publicar</button>
@@ -522,11 +697,26 @@
 
 </main>
 
+<!-- MODAL: ÍNDICE TEMÁTICO -->
+<div id="indiceModal">
+  <div class="indice-caja">
+    <div class="indice-header">
+      <h3 id="indiceTitulo">Índice temático</h3>
+      <button class="indice-cerrar" id="cerrarIndiceBtn">✕</button>
+    </div>
+    <div class="indice-lista" id="indiceLista"></div>
+  </div>
+</div>
+
 <!-- MODAL LECTOR PDF -->
 <div id="pdfModal">
   <div class="modal-bar">
     <button id="backBtn">← Volver a la galería</button>
     <div id="modalTitle"></div>
+  </div>
+  <div id="navBar">
+    <button id="anteriorBtn">← Anterior</button>
+    <button id="siguienteBtn">Siguiente →</button>
   </div>
   <div class="pdf-body" style="position:relative;">
     <div id="pdfLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-sec);font-size:0.85rem;">Cargando documento...</div>
@@ -648,26 +838,90 @@
     }
   });
 
-  // ---------- Publicar libro ----------
+  // ---------- Constructor de recursos (índice temático) ----------
+  let recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "" }];
+  const recursosBuilderContainer = document.getElementById("recursosBuilderContainer");
+
+  function renderRecursosBuilder() {
+    recursosBuilderContainer.innerHTML = "";
+    recursosBuilder.forEach((r, i) => {
+      const row = document.createElement("div");
+      row.className = "recurso-row";
+      row.innerHTML = `
+        <select class="recurso-tipo">
+          <option value="texto" ${r.tipo === "texto" ? "selected" : ""}>Texto (PDF)</option>
+          <option value="audio" ${r.tipo === "audio" ? "selected" : ""}>Audio</option>
+          <option value="video" ${r.tipo === "video" ? "selected" : ""}>Video</option>
+        </select>
+        <input type="text" class="recurso-etiqueta" placeholder="Etiqueta, ej: Mi narrativa sobre la arrogancia" value="${escapeAttr(r.etiqueta)}">
+        <input type="text" class="recurso-enlace" placeholder="Enlace de Google Drive" value="${escapeAttr(r.enlace)}">
+        <div class="recurso-controles">
+          <button type="button" class="recurso-subir" ${i === 0 ? "disabled" : ""}>▲</button>
+          <button type="button" class="recurso-bajar" ${i === recursosBuilder.length - 1 ? "disabled" : ""}>▼</button>
+          <button type="button" class="recurso-quitar">✕ Quitar</button>
+        </div>
+      `;
+      row.querySelector(".recurso-tipo").addEventListener("change", (e) => { recursosBuilder[i].tipo = e.target.value; });
+      row.querySelector(".recurso-etiqueta").addEventListener("input", (e) => { recursosBuilder[i].etiqueta = e.target.value; });
+      row.querySelector(".recurso-enlace").addEventListener("input", (e) => { recursosBuilder[i].enlace = e.target.value; });
+      row.querySelector(".recurso-subir").addEventListener("click", () => {
+        if (i === 0) return;
+        [recursosBuilder[i - 1], recursosBuilder[i]] = [recursosBuilder[i], recursosBuilder[i - 1]];
+        renderRecursosBuilder();
+      });
+      row.querySelector(".recurso-bajar").addEventListener("click", () => {
+        if (i === recursosBuilder.length - 1) return;
+        [recursosBuilder[i + 1], recursosBuilder[i]] = [recursosBuilder[i], recursosBuilder[i + 1]];
+        renderRecursosBuilder();
+      });
+      row.querySelector(".recurso-quitar").addEventListener("click", () => {
+        recursosBuilder.splice(i, 1);
+        if (recursosBuilder.length === 0) recursosBuilder.push({ tipo: "texto", etiqueta: "", enlace: "" });
+        renderRecursosBuilder();
+      });
+      recursosBuilderContainer.appendChild(row);
+    });
+  }
+
+  function escapeAttr(str) {
+    return (str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+  }
+
+  document.getElementById("agregarRecursoBtn").addEventListener("click", () => {
+    recursosBuilder.push({ tipo: "texto", etiqueta: "", enlace: "" });
+    renderRecursosBuilder();
+  });
+
+  renderRecursosBuilder();
+
+  // ---------- Publicar libro (con su índice temático de recursos) ----------
   const publishBtn = document.getElementById("publishBtn");
   publishBtn.addEventListener("click", async () => {
     const titulo = document.getElementById("inputTitulo").value.trim();
     const resumen = document.getElementById("inputResumen").value.trim();
     const portadaUrl = document.getElementById("inputPortada").value.trim();
-    const pdfUrl = document.getElementById("inputPdf").value.trim();
     const coleccionSeleccionada = document.getElementById("inputColeccionAsignada").value;
 
-    if (!titulo || !resumen || !portadaUrl || !pdfUrl) {
-      alert("Por favor completa todos los campos.");
+    if (!titulo || !resumen || !portadaUrl) {
+      alert("Por favor completa título, resumen y portada.");
       return;
     }
     if (!coleccionSeleccionada) {
       alert("Crea primero una colección y luego selecciónala para este libro.");
       return;
     }
+    const recursosIncompletos = recursosBuilder.some(r => !r.etiqueta.trim() || !r.enlace.trim());
+    if (recursosIncompletos) {
+      alert("Completa la etiqueta y el enlace de Drive de cada recurso del índice (o quita los que no vayas a usar).");
+      return;
+    }
 
     const portadaId = extraerIdDrive(portadaUrl);
-    const pdfId = extraerIdDrive(pdfUrl);
+    const recursos = recursosBuilder.map(r => ({
+      tipo: r.tipo,
+      etiqueta: r.etiqueta.trim(),
+      driveId: extraerIdDrive(r.enlace.trim())
+    }));
 
     publishBtn.disabled = true;
     publishBtn.textContent = "Publicando...";
@@ -677,7 +931,7 @@
         titulo,
         resumen,
         portadaId,
-        pdfId,
+        recursos,
         coleccionId: coleccionSeleccionada,
         fecha: serverTimestamp()
       });
@@ -685,7 +939,8 @@
       document.getElementById("inputTitulo").value = "";
       document.getElementById("inputResumen").value = "";
       document.getElementById("inputPortada").value = "";
-      document.getElementById("inputPdf").value = "";
+      recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "" }];
+      renderRecursosBuilder();
     } catch (e) {
       alert("Error al publicar: " + e.message);
     }
@@ -818,7 +1073,7 @@
   }
 
   function crearTarjetaColeccion(id, nombre, frase, imagenId, cantidad) {
-    const etiqueta = cantidad === 1 ? "1 escrito" : `${cantidad} escritos`;
+    const etiqueta = cantidad === 1 ? "1 publicación" : `${cantidad} publicaciones`;
     const card = document.createElement("div");
     card.className = "coleccion-card";
     card.innerHTML = `
@@ -869,6 +1124,14 @@
     });
   }
 
+  // Devuelve la lista de recursos de una publicación, con compatibilidad
+  // hacia atrás para libros antiguos que solo tenían un campo "pdfId".
+  function recursosDeLibro(libro) {
+    if (libro.recursos && libro.recursos.length > 0) return libro.recursos;
+    if (libro.pdfId) return [{ tipo: "texto", etiqueta: libro.titulo, driveId: libro.pdfId }];
+    return [];
+  }
+
   function crearTarjetaLibro(libro) {
     const card = document.createElement("div");
     card.className = "book-card";
@@ -879,11 +1142,11 @@
       <div class="book-info">
         <div class="book-title">${escapeHtml(libro.titulo)}</div>
         <div class="book-summary">${escapeHtml(libro.resumen)}</div>
-        <button class="read-btn">Leer en línea</button>
+        <button class="read-btn">Ver publicación</button>
       </div>
     `;
     card.querySelector(".read-btn").addEventListener("click", () => {
-      abrirLector(libro.titulo, libro.pdfId);
+      abrirPublicacion(libro.titulo, recursosDeLibro(libro));
     });
     return card;
   }
@@ -969,26 +1232,99 @@
     return div.innerHTML;
   }
 
-  // ---------- Modal lector PDF ----------
+  // ---------- Modal: índice temático ----------
+  const indiceModal = document.getElementById("indiceModal");
+  const indiceTitulo = document.getElementById("indiceTitulo");
+  const indiceLista = document.getElementById("indiceLista");
+
+  const ETIQUETAS_TIPO = { texto: "Texto", audio: "Audio", video: "Video" };
+
+  function abrirPublicacion(tituloPublicacion, recursos) {
+    if (!recursos || recursos.length === 0) {
+      alert("Esta publicación todavía no tiene contenido cargado.");
+      return;
+    }
+    if (recursos.length === 1) {
+      abrirRecurso(tituloPublicacion, recursos, 0);
+      return;
+    }
+    // Varios recursos: mostrar el índice temático primero
+    indiceTitulo.textContent = tituloPublicacion;
+    indiceLista.innerHTML = "";
+    recursos.forEach((r, i) => {
+      const item = document.createElement("div");
+      item.className = "indice-item";
+      item.innerHTML = `
+        <div class="indice-numero">${i + 1}</div>
+        <div class="indice-info">
+          <div class="indice-etiqueta">${escapeHtml(r.etiqueta)}</div>
+          <div class="indice-tipo">${ETIQUETAS_TIPO[r.tipo] || r.tipo}</div>
+        </div>
+      `;
+      item.addEventListener("click", () => {
+        cerrarIndice();
+        abrirRecurso(tituloPublicacion, recursos, i);
+      });
+      indiceLista.appendChild(item);
+    });
+    indiceModal.classList.add("active");
+  }
+
+  function cerrarIndice() {
+    indiceModal.classList.remove("active");
+  }
+  document.getElementById("cerrarIndiceBtn").addEventListener("click", cerrarIndice);
+
+  // ---------- Modal lector (PDF / audio / video) ----------
   const pdfModal = document.getElementById("pdfModal");
   const pdfFrame = document.getElementById("pdfFrame");
   const modalTitle = document.getElementById("modalTitle");
   const backBtn = document.getElementById("backBtn");
   const pdfLoading = document.getElementById("pdfLoading");
+  const navBar = document.getElementById("navBar");
+  const anteriorBtn = document.getElementById("anteriorBtn");
+  const siguienteBtn = document.getElementById("siguienteBtn");
 
-  function abrirLector(titulo, pdfId) {
-    modalTitle.textContent = titulo;
+  // Estado de la publicación actualmente abierta, para poder navegar
+  // entre sus recursos con los botones Anterior / Siguiente.
+  let recursosActuales = [];
+  let indiceActual = 0;
+  let tituloPublicacionActual = "";
+
+  function abrirRecurso(tituloPublicacion, recursos, index) {
+    recursosActuales = recursos;
+    indiceActual = index;
+    tituloPublicacionActual = tituloPublicacion;
+
+    const recurso = recursos[index];
+    modalTitle.textContent = recursos.length > 1
+      ? `${tituloPublicacion} — ${recurso.etiqueta}`
+      : tituloPublicacion;
+
     pdfLoading.style.display = "flex";
     pdfLoading.textContent = "Cargando documento...";
-    // Se usa el visor oficial de Google Drive (/preview), más estable que gview.
+    // El mismo visor de Drive (/preview) detecta automáticamente si es un
+    // PDF, un audio o un video, y muestra el reproductor correspondiente.
     // Requiere que el archivo esté compartido como "Cualquier persona con el enlace".
-    const viewerUrl = `https://drive.google.com/file/d/${pdfId}/preview`;
-    pdfFrame.src = viewerUrl;
+    pdfFrame.src = `https://drive.google.com/file/d/${recurso.driveId}/preview`;
     pdfModal.classList.add("active");
     document.body.style.overflow = "hidden";
 
-    // Si tarda demasiado en cargar (archivo privado, sin conexión, etc.),
-    // avisamos al lector en vez de dejarlo viendo una pantalla en blanco.
+    // Barra de Anterior / Siguiente, solo si hay más de un recurso
+    if (recursos.length > 1) {
+      navBar.classList.add("active");
+      anteriorBtn.disabled = index === 0;
+      siguienteBtn.disabled = index === recursos.length - 1;
+      siguienteBtn.textContent = index < recursos.length - 1
+        ? `Seguir con: ${recursos[index + 1].etiqueta} →`
+        : "Siguiente →";
+      anteriorBtn.textContent = index > 0
+        ? `← ${recursos[index - 1].etiqueta}`
+        : "← Anterior";
+    } else {
+      navBar.classList.remove("active");
+    }
+
     const avisoTimeout = setTimeout(() => {
       pdfLoading.textContent = "Esto está tardando más de lo normal. Intenta recargar la página.";
     }, 6000);
@@ -998,10 +1334,19 @@
     };
   }
 
+  anteriorBtn.addEventListener("click", () => {
+    if (indiceActual > 0) abrirRecurso(tituloPublicacionActual, recursosActuales, indiceActual - 1);
+  });
+  siguienteBtn.addEventListener("click", () => {
+    if (indiceActual < recursosActuales.length - 1) abrirRecurso(tituloPublicacionActual, recursosActuales, indiceActual + 1);
+  });
+
   function cerrarLector() {
     pdfModal.classList.remove("active");
     pdfFrame.src = "";
     document.body.style.overflow = "";
+    recursosActuales = [];
+    indiceActual = 0;
   }
 
   backBtn.addEventListener("click", cerrarLector);
