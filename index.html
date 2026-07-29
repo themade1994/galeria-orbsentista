@@ -551,6 +551,97 @@
   }
   #navBar button:active:not(:disabled){ background:#1a1a22; }
 
+  /* CORTINA DESLIZABLE: índice dentro del lector */
+  #indiceDrawerOverlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    z-index:10000;
+  }
+  #indiceDrawerOverlay.abierto{ display:block; }
+  #indiceDrawer{
+    position:fixed;
+    top:0;
+    right:0;
+    height:100%;
+    width:min(82vw, 320px);
+    background:var(--card);
+    border-left:1px solid var(--border);
+    z-index:10001;
+    transform:translateX(100%);
+    transition:transform .25s ease;
+    display:flex;
+    flex-direction:column;
+  }
+  #indiceDrawer.abierto{ transform:translateX(0); }
+  .indice-drawer-header{
+    padding:16px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .indice-drawer-header h3{
+    font-size:0.95rem;
+    font-family:'Georgia','Times New Roman',serif;
+  }
+  .indice-drawer-lista{
+    overflow-y:auto;
+    padding:8px;
+    flex:1;
+  }
+  .indice-drawer-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 8px;
+    border-radius:9px;
+    cursor:pointer;
+  }
+  .indice-drawer-item:active{ background:#1a1a22; }
+  .indice-drawer-numero{
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    color:#fff;
+    font-size:0.72rem;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .indice-drawer-numero.actual{ background:#22c55e; } /* verde: donde estás ahora */
+  .indice-drawer-numero.disponible{ background:#3b82f6; } /* azul: disponible para saltar */
+  .indice-drawer-info{ flex:1; min-width:0; }
+  .indice-drawer-etiqueta{
+    font-size:0.82rem;
+    font-weight:600;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .indice-drawer-etiqueta.actual{ color:#4ade80; }
+  .indice-drawer-tipo{
+    font-size:0.68rem;
+    color:var(--text-sec);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+  #indiceToggleBtn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:0.78rem;
+    cursor:pointer;
+    flex-shrink:0;
+    margin-left:auto;
+  }
+  #indiceToggleBtn:active{ background:#1a1a22; }
+
   /* MODAL LECTOR PDF */
   #pdfModal{
     display:none;
@@ -713,6 +804,7 @@
   <div class="modal-bar">
     <button id="backBtn">← Volver a la galería</button>
     <div id="modalTitle"></div>
+    <button id="indiceToggleBtn" style="display:none;">☰ Índice</button>
   </div>
   <div id="navBar">
     <button id="anteriorBtn">← Anterior</button>
@@ -721,6 +813,15 @@
   <div class="pdf-body" style="position:relative;">
     <div id="pdfLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-sec);font-size:0.85rem;">Cargando documento...</div>
     <iframe id="pdfFrame" src="" allow="fullscreen"></iframe>
+  </div>
+
+  <div id="indiceDrawerOverlay"></div>
+  <div id="indiceDrawer">
+    <div class="indice-drawer-header">
+      <h3>Índice temático</h3>
+      <button class="indice-cerrar" id="cerrarDrawerBtn">✕</button>
+    </div>
+    <div class="indice-drawer-lista" id="indiceDrawerLista"></div>
   </div>
 </div>
 
@@ -1284,6 +1385,11 @@
   const navBar = document.getElementById("navBar");
   const anteriorBtn = document.getElementById("anteriorBtn");
   const siguienteBtn = document.getElementById("siguienteBtn");
+  const indiceToggleBtn = document.getElementById("indiceToggleBtn");
+  const indiceDrawer = document.getElementById("indiceDrawer");
+  const indiceDrawerOverlay = document.getElementById("indiceDrawerOverlay");
+  const indiceDrawerLista = document.getElementById("indiceDrawerLista");
+  const cerrarDrawerBtn = document.getElementById("cerrarDrawerBtn");
 
   // Estado de la publicación actualmente abierta, para poder navegar
   // entre sus recursos con los botones Anterior / Siguiente.
@@ -1310,9 +1416,10 @@
     pdfModal.classList.add("active");
     document.body.style.overflow = "hidden";
 
-    // Barra de Anterior / Siguiente, solo si hay más de un recurso
+    // Barra de Anterior / Siguiente, y botón de índice, solo si hay más de un recurso
     if (recursos.length > 1) {
       navBar.classList.add("active");
+      indiceToggleBtn.style.display = "inline-block";
       anteriorBtn.disabled = index === 0;
       siguienteBtn.disabled = index === recursos.length - 1;
       siguienteBtn.textContent = index < recursos.length - 1
@@ -1321,8 +1428,10 @@
       anteriorBtn.textContent = index > 0
         ? `← ${recursos[index - 1].etiqueta}`
         : "← Anterior";
+      renderIndiceDrawer(recursos, index);
     } else {
       navBar.classList.remove("active");
+      indiceToggleBtn.style.display = "none";
     }
 
     const avisoTimeout = setTimeout(() => {
@@ -1333,6 +1442,40 @@
       pdfLoading.style.display = "none";
     };
   }
+
+  // ---------- Cortina deslizable: índice siempre accesible durante la lectura ----------
+  function renderIndiceDrawer(recursos, indexActual) {
+    indiceDrawerLista.innerHTML = "";
+    recursos.forEach((r, i) => {
+      const esActual = i === indexActual;
+      const item = document.createElement("div");
+      item.className = "indice-drawer-item";
+      item.innerHTML = `
+        <div class="indice-drawer-numero ${esActual ? "actual" : "disponible"}">${i + 1}</div>
+        <div class="indice-drawer-info">
+          <div class="indice-drawer-etiqueta ${esActual ? "actual" : ""}">${escapeHtml(r.etiqueta)}${esActual ? " (estás aquí)" : ""}</div>
+          <div class="indice-drawer-tipo">${ETIQUETAS_TIPO[r.tipo] || r.tipo}</div>
+        </div>
+      `;
+      item.addEventListener("click", () => {
+        cerrarDrawer();
+        abrirRecurso(tituloPublicacionActual, recursosActuales, i);
+      });
+      indiceDrawerLista.appendChild(item);
+    });
+  }
+
+  function abrirDrawer() {
+    indiceDrawer.classList.add("abierto");
+    indiceDrawerOverlay.classList.add("abierto");
+  }
+  function cerrarDrawer() {
+    indiceDrawer.classList.remove("abierto");
+    indiceDrawerOverlay.classList.remove("abierto");
+  }
+  indiceToggleBtn.addEventListener("click", abrirDrawer);
+  cerrarDrawerBtn.addEventListener("click", cerrarDrawer);
+  indiceDrawerOverlay.addEventListener("click", cerrarDrawer);
 
   anteriorBtn.addEventListener("click", () => {
     if (indiceActual > 0) abrirRecurso(tituloPublicacionActual, recursosActuales, indiceActual - 1);
@@ -1347,6 +1490,7 @@
     document.body.style.overflow = "";
     recursosActuales = [];
     indiceActual = 0;
+    cerrarDrawer();
   }
 
   backBtn.addEventListener("click", cerrarLector);
