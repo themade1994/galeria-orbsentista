@@ -267,6 +267,104 @@
     cursor:pointer;
   }
 
+  /* COLECCIONES (pantalla principal) */
+  .colecciones-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+    max-width:900px;
+    margin:0 auto;
+  }
+  .coleccion-card{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/8;
+    border-radius:16px;
+    overflow:hidden;
+    background:var(--card);
+    border:1px solid var(--border);
+    cursor:pointer;
+  }
+  .coleccion-card:active{ transform:scale(0.99); }
+  .coleccion-card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .coleccion-overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,0.88) 10%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0) 100%);
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    padding:18px;
+  }
+  .coleccion-titulo{
+    font-family:'Georgia','Times New Roman',serif;
+    font-size:clamp(1.1rem, 4vw, 1.6rem);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .coleccion-frase{
+    font-size:0.85rem;
+    color:#d8d8e2;
+    font-style:italic;
+  }
+
+  /* VISTA DETALLE DE UNA COLECCIÓN */
+  #coleccionHeader{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  #backToHomeBtn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:9px 14px;
+    border-radius:8px;
+    font-size:0.85rem;
+    font-weight:600;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  #backToHomeBtn:active{ background:var(--accent-hover); }
+  #coleccionHeaderInfo h2{
+    font-family:'Georgia','Times New Roman',serif;
+    font-size:1.2rem;
+  }
+  #coleccionHeaderInfo p{
+    color:var(--text-sec);
+    font-size:0.82rem;
+    font-style:italic;
+    margin-top:2px;
+  }
+  select#inputColeccionAsignada{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#0e0e13;
+    color:var(--text);
+    font-size:0.85rem;
+  }
+  #crearColeccionBtn{
+    margin-top:8px;
+    width:100%;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:12px;
+    border-radius:9px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  #crearColeccionBtn:active{ background:var(--accent-hover); }
+
   /* MODAL LECTOR PDF */
   #pdfModal{
     display:none;
@@ -345,7 +443,24 @@
     </div>
 
     <div id="formSection" style="display:none;">
-      <h2>Publicar nuevo libro</h2>
+      <h2>Crear nueva colección</h2>
+      <label>Nombre de la colección</label>
+      <input type="text" id="inputNombreColeccion" placeholder="Ej: Una noche con el nihilismo">
+
+      <label>Frase o resumen de bienvenida</label>
+      <textarea id="inputFraseColeccion" placeholder="Ej: ¿Deseas conocer la resignación?"></textarea>
+
+      <label>Enlace de Google Drive (imagen horizontal de portada)</label>
+      <input type="text" id="inputImagenColeccion" placeholder="https://drive.google.com/file/d/.../view">
+
+      <button id="crearColeccionBtn">Crear colección</button>
+
+      <div class="admin-list">
+        <h3>Colecciones existentes</h3>
+        <div id="adminColeccionesContainer"></div>
+      </div>
+
+      <h2 style="margin-top:26px;">Publicar nuevo libro</h2>
       <label>Título del libro</label>
       <input type="text" id="inputTitulo" placeholder="Ej: Meditaciones del Exadicto">
 
@@ -358,6 +473,9 @@
       <label>Enlace de Google Drive (PDF del libro)</label>
       <input type="text" id="inputPdf" placeholder="https://drive.google.com/file/d/.../view">
 
+      <label>Colección a la que pertenece</label>
+      <select id="inputColeccionAsignada"></select>
+
       <button id="publishBtn">Publicar</button>
       <button id="logoutBtn" style="margin-top:8px;width:100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:9px;cursor:pointer;">Cerrar sesión</button>
 
@@ -368,11 +486,26 @@
     </div>
   </div>
 
-  <!-- GALERÍA PÚBLICA -->
-  <div id="loadingMsg" class="empty-msg">Cargando galería...</div>
-  <div id="gridContainer" class="grid"></div>
-  <div id="emptyMsg" class="empty-msg" style="display:none;">Aún no hay libros publicados.</div>
-  <div id="errorMsg" class="empty-msg" style="display:none;color:#f87171;">No se pudo cargar la galería. Revisa tu conexión e intenta de nuevo.</div>
+  <!-- VISTA: COLECCIONES (pantalla principal) -->
+  <div id="vistaColecciones">
+    <div id="loadingMsg" class="empty-msg">Cargando galería...</div>
+    <div id="coleccionesWrap" class="colecciones-wrap"></div>
+    <div id="emptyMsg" class="empty-msg" style="display:none;">Aún no hay colecciones publicadas.</div>
+    <div id="errorMsg" class="empty-msg" style="display:none;color:#f87171;">No se pudo cargar la galería. Revisa tu conexión e intenta de nuevo.</div>
+  </div>
+
+  <!-- VISTA: DETALLE DE UNA COLECCIÓN -->
+  <div id="vistaColeccionDetalle" style="display:none;">
+    <div id="coleccionHeader">
+      <button id="backToHomeBtn">← Colecciones</button>
+      <div id="coleccionHeaderInfo">
+        <h2 id="coleccionDetalleTitulo"></h2>
+        <p id="coleccionDetalleFrase"></p>
+      </div>
+    </div>
+    <div id="gridContainer" class="grid"></div>
+    <div id="coleccionVaciaMsg" class="empty-msg" style="display:none;">Aún no hay escritos en esta colección.</div>
+  </div>
 
 </main>
 
@@ -421,6 +554,15 @@
   const db = getFirestore(app);
   const auth = getAuth(app);
   const librosCol = collection(db, "libros");
+  const coleccionesCol = collection(db, "colecciones");
+
+  // Estado en memoria: se llenan con los listeners de Firestore más abajo
+  let libros = [];        // [{id, titulo, resumen, portadaId, pdfId, coleccionId, fecha}]
+  let colecciones = [];   // [{id, nombre, imagenId, frase, fecha}]
+  let vista = "home";     // "home" | "coleccion"
+  let coleccionActualId = null;
+
+  const ID_GENERAL = "__general__"; // colección virtual para libros sin asignar
 
   // ---------- Utilidad: extraer ID de Google Drive ----------
   function extraerIdDrive(url) {
@@ -500,9 +642,14 @@
     const resumen = document.getElementById("inputResumen").value.trim();
     const portadaUrl = document.getElementById("inputPortada").value.trim();
     const pdfUrl = document.getElementById("inputPdf").value.trim();
+    const coleccionSeleccionada = document.getElementById("inputColeccionAsignada").value;
 
     if (!titulo || !resumen || !portadaUrl || !pdfUrl) {
       alert("Por favor completa todos los campos.");
+      return;
+    }
+    if (!coleccionSeleccionada) {
+      alert("Crea primero una colección y luego selecciónala para este libro.");
       return;
     }
 
@@ -518,6 +665,7 @@
         resumen,
         portadaId,
         pdfId,
+        coleccionId: coleccionSeleccionada,
         fecha: serverTimestamp()
       });
 
@@ -533,74 +681,254 @@
     publishBtn.textContent = "Publicar";
   });
 
+  // ---------- Crear colección ----------
+  const crearColeccionBtn = document.getElementById("crearColeccionBtn");
+  crearColeccionBtn.addEventListener("click", async () => {
+    const nombre = document.getElementById("inputNombreColeccion").value.trim();
+    const frase = document.getElementById("inputFraseColeccion").value.trim();
+    const imagenUrl = document.getElementById("inputImagenColeccion").value.trim();
+
+    if (!nombre || !imagenUrl) {
+      alert("Ponle al menos un nombre y una imagen a la colección.");
+      return;
+    }
+
+    const imagenId = extraerIdDrive(imagenUrl);
+
+    crearColeccionBtn.disabled = true;
+    crearColeccionBtn.textContent = "Creando...";
+
+    try {
+      await addDoc(coleccionesCol, {
+        nombre,
+        frase,
+        imagenId,
+        fecha: serverTimestamp()
+      });
+      document.getElementById("inputNombreColeccion").value = "";
+      document.getElementById("inputFraseColeccion").value = "";
+      document.getElementById("inputImagenColeccion").value = "";
+    } catch (e) {
+      alert("Error al crear la colección: " + e.message);
+    }
+
+    crearColeccionBtn.disabled = false;
+    crearColeccionBtn.textContent = "Crear colección";
+  });
+
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     await signOut(auth);
   });
 
   // ---------- Escuchar Firestore en tiempo real ----------
-  const gridContainer = document.getElementById("gridContainer");
+  const coleccionesWrap = document.getElementById("coleccionesWrap");
   const emptyMsg = document.getElementById("emptyMsg");
   const loadingMsg = document.getElementById("loadingMsg");
   const errorMsg = document.getElementById("errorMsg");
   const adminListContainer = document.getElementById("adminListContainer");
+  const adminColeccionesContainer = document.getElementById("adminColeccionesContainer");
+  const gridContainer = document.getElementById("gridContainer");
+  const coleccionVaciaMsg = document.getElementById("coleccionVaciaMsg");
+  const inputColeccionAsignada = document.getElementById("inputColeccionAsignada");
+  const vistaColeccionesEl = document.getElementById("vistaColecciones");
+  const vistaColeccionDetalleEl = document.getElementById("vistaColeccionDetalle");
+  const coleccionDetalleTitulo = document.getElementById("coleccionDetalleTitulo");
+  const coleccionDetalleFrase = document.getElementById("coleccionDetalleFrase");
 
-  const q = query(librosCol, orderBy("fecha", "desc"));
+  let libroSnapshotListo = false;
+  let coleccionSnapshotListo = false;
 
-  onSnapshot(q, (snapshot) => {
+  function marcarListoSiCorresponde() {
+    if (libroSnapshotListo && coleccionSnapshotListo) {
+      loadingMsg.style.display = "none";
+      errorMsg.style.display = "none";
+      renderHome();
+    }
+  }
+
+  const qLibros = query(librosCol, orderBy("fecha", "desc"));
+  onSnapshot(qLibros, (snapshot) => {
+    libros = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    libroSnapshotListo = true;
+    renderAdminListaLibros();
+    if (vista === "home") { marcarListoSiCorresponde(); }
+    else if (vista === "coleccion") { renderColeccionDetalle(coleccionActualId); }
+  }, (error) => {
     loadingMsg.style.display = "none";
-    errorMsg.style.display = "none";
-    gridContainer.innerHTML = "";
-    adminListContainer.innerHTML = "";
+    errorMsg.style.display = "block";
+    console.error("Error al leer los libros:", error);
+  });
 
-    if (snapshot.empty) {
+  const qColecciones = query(coleccionesCol, orderBy("fecha", "desc"));
+  onSnapshot(qColecciones, (snapshot) => {
+    colecciones = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    coleccionSnapshotListo = true;
+    renderAdminListaColecciones();
+    renderSelectColecciones();
+    if (vista === "home") { marcarListoSiCorresponde(); }
+  }, (error) => {
+    loadingMsg.style.display = "none";
+    errorMsg.style.display = "block";
+    console.error("Error al leer las colecciones:", error);
+  });
+
+  // Libros de una colección (o de la "General" virtual, que agrupa los
+  // libros sin colección asignada o cuya colección fue borrada).
+  function librosDeColeccion(colId) {
+    if (colId === ID_GENERAL) {
+      return libros.filter(l => !l.coleccionId || !colecciones.some(c => c.id === l.coleccionId));
+    }
+    return libros.filter(l => l.coleccionId === colId);
+  }
+
+  // ---------- Vista: pantalla principal (colecciones tipo Netflix) ----------
+  function renderHome() {
+    coleccionesWrap.innerHTML = "";
+    const librosGeneral = librosDeColeccion(ID_GENERAL);
+    const hayContenido = colecciones.length > 0 || librosGeneral.length > 0;
+
+    if (!hayContenido) {
       emptyMsg.style.display = "block";
       return;
     }
     emptyMsg.style.display = "none";
 
-    snapshot.forEach((docSnap) => {
-      const libro = docSnap.data();
-      const id = docSnap.id;
+    colecciones.forEach(col => {
+      coleccionesWrap.appendChild(crearTarjetaColeccion(col.id, col.nombre, col.frase, col.imagenId));
+    });
 
-      // --- Tarjeta pública ---
-      const card = document.createElement("div");
-      card.className = "book-card";
-      card.innerHTML = `
-        <div class="cover-wrap">
-          <img src="${imagenDirecta(libro.portadaId)}" data-alt-src="${imagenAlternativa(libro.portadaId)}" data-tried-alt="0" alt="${escapeHtml(libro.titulo)}" loading="lazy" onerror="manejarErrorImagen(this)">
-        </div>
-        <div class="book-info">
-          <div class="book-title">${escapeHtml(libro.titulo)}</div>
-          <div class="book-summary">${escapeHtml(libro.resumen)}</div>
-          <button class="read-btn">Leer en línea</button>
-        </div>
-      `;
-      card.querySelector(".read-btn").addEventListener("click", () => {
-        abrirLector(libro.titulo, libro.pdfId);
-      });
-      gridContainer.appendChild(card);
+    // Los libros sueltos (sin colección) se muestran como una colección más, al final
+    if (librosGeneral.length > 0) {
+      coleccionesWrap.appendChild(crearTarjetaColeccion(ID_GENERAL, "General", "Escritos sin colección asignada", librosGeneral[0].portadaId));
+    }
+  }
 
-      // --- Fila en panel admin ---
+  function crearTarjetaColeccion(id, nombre, frase, imagenId) {
+    const card = document.createElement("div");
+    card.className = "coleccion-card";
+    card.innerHTML = `
+      <img src="${imagenDirecta(imagenId)}" data-alt-src="${imagenAlternativa(imagenId)}" data-tried-alt="0" alt="${escapeHtml(nombre)}" loading="lazy" onerror="manejarErrorImagen(this)">
+      <div class="coleccion-overlay">
+        <div class="coleccion-titulo">${escapeHtml(nombre)}</div>
+        ${frase ? `<div class="coleccion-frase">${escapeHtml(frase)}</div>` : ""}
+      </div>
+    `;
+    card.addEventListener("click", () => abrirColeccion(id, nombre, frase));
+    return card;
+  }
+
+  function abrirColeccion(id, nombre, frase) {
+    vista = "coleccion";
+    coleccionActualId = id;
+    vistaColeccionesEl.style.display = "none";
+    vistaColeccionDetalleEl.style.display = "block";
+    coleccionDetalleTitulo.textContent = nombre;
+    coleccionDetalleFrase.textContent = frase || "";
+    renderColeccionDetalle(id);
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById("backToHomeBtn").addEventListener("click", () => {
+    vista = "home";
+    coleccionActualId = null;
+    vistaColeccionDetalleEl.style.display = "none";
+    vistaColeccionesEl.style.display = "block";
+    renderHome();
+    window.scrollTo(0, 0);
+  });
+
+  // ---------- Vista: detalle de una colección (libros, como antes) ----------
+  function renderColeccionDetalle(colId) {
+    gridContainer.innerHTML = "";
+    const lista = librosDeColeccion(colId);
+
+    if (lista.length === 0) {
+      coleccionVaciaMsg.style.display = "block";
+      return;
+    }
+    coleccionVaciaMsg.style.display = "none";
+
+    lista.forEach(libro => {
+      gridContainer.appendChild(crearTarjetaLibro(libro));
+    });
+  }
+
+  function crearTarjetaLibro(libro) {
+    const card = document.createElement("div");
+    card.className = "book-card";
+    card.innerHTML = `
+      <div class="cover-wrap">
+        <img src="${imagenDirecta(libro.portadaId)}" data-alt-src="${imagenAlternativa(libro.portadaId)}" data-tried-alt="0" alt="${escapeHtml(libro.titulo)}" loading="lazy" onerror="manejarErrorImagen(this)">
+      </div>
+      <div class="book-info">
+        <div class="book-title">${escapeHtml(libro.titulo)}</div>
+        <div class="book-summary">${escapeHtml(libro.resumen)}</div>
+        <button class="read-btn">Leer en línea</button>
+      </div>
+    `;
+    card.querySelector(".read-btn").addEventListener("click", () => {
+      abrirLector(libro.titulo, libro.pdfId);
+    });
+    return card;
+  }
+
+  // ---------- Panel admin: lista de libros (siempre muestra todos) ----------
+  function renderAdminListaLibros() {
+    adminListContainer.innerHTML = "";
+    libros.forEach(libro => {
+      const nombreColeccion = colecciones.find(c => c.id === libro.coleccionId)?.nombre || "General";
       const row = document.createElement("div");
       row.className = "admin-row";
       row.innerHTML = `
-        <span>${escapeHtml(libro.titulo)}</span>
+        <span>${escapeHtml(libro.titulo)} <span style="color:var(--text-sec);">— ${escapeHtml(nombreColeccion)}</span></span>
         <button class="delete-btn">Eliminar publicación</button>
       `;
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar "${libro.titulo}"?`)) {
-          await deleteDoc(doc(db, "libros", id));
+          await deleteDoc(doc(db, "libros", libro.id));
         }
       });
       adminListContainer.appendChild(row);
     });
-  }, (error) => {
-    // Esto se activa si, por ejemplo, las reglas de Firestore bloquean
-    // la lectura, o si no hay conexión a internet.
-    loadingMsg.style.display = "none";
-    errorMsg.style.display = "block";
-    console.error("Error al leer la galería:", error);
-  });
+  }
+
+  // ---------- Panel admin: lista de colecciones ----------
+  function renderAdminListaColecciones() {
+    adminColeccionesContainer.innerHTML = "";
+    colecciones.forEach(col => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+      row.innerHTML = `
+        <span>${escapeHtml(col.nombre)}</span>
+        <button class="delete-btn">Eliminar colección</button>
+      `;
+      row.querySelector(".delete-btn").addEventListener("click", async () => {
+        if (confirm(`¿Eliminar la colección "${col.nombre}"? Los escritos dentro no se borran, pasarán a verse en "General".`)) {
+          await deleteDoc(doc(db, "colecciones", col.id));
+        }
+      });
+      adminColeccionesContainer.appendChild(row);
+    });
+  }
+
+  // ---------- Panel admin: opciones del desplegable al publicar un libro ----------
+  function renderSelectColecciones() {
+    const valorPrevio = inputColeccionAsignada.value;
+    inputColeccionAsignada.innerHTML = "";
+    if (colecciones.length === 0) {
+      inputColeccionAsignada.innerHTML = `<option value="">Crea primero una colección arriba</option>`;
+      return;
+    }
+    colecciones.forEach(col => {
+      const opt = document.createElement("option");
+      opt.value = col.id;
+      opt.textContent = col.nombre;
+      inputColeccionAsignada.appendChild(opt);
+    });
+    if (colecciones.some(c => c.id === valorPrevio)) {
+      inputColeccionAsignada.value = valorPrevio;
+    }
+  }
 
   // Si la imagen principal de Drive falla, se intenta la alternativa una vez.
   // Si ambas fallan, se muestra un ícono de placeholder en vez de un espacio roto.
