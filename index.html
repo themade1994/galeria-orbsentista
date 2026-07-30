@@ -730,6 +730,12 @@
       <label>Enlace de Google Drive (imagen horizontal de portada)</label>
       <input type="text" id="inputImagenColeccion" placeholder="https://drive.google.com/file/d/.../view">
 
+      <label style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+        <input type="checkbox" id="inputProtegerColeccion" style="width:auto;">
+        Proteger esta colección con contraseña
+      </label>
+      <input type="text" id="inputClaveColeccion" placeholder="Contraseña de la colección" style="display:none;margin-top:8px;">
+
       <button id="crearColeccionBtn">Crear colección</button>
 
       <div class="admin-list">
@@ -767,9 +773,12 @@
 
   <!-- VISTA: COLECCIONES (pantalla principal) -->
   <div id="vistaColecciones">
+    <input type="text" id="buscadorInput" placeholder="Buscar colecciones o publicaciones..." style="width:100%;max-width:900px;margin:0 auto 20px;display:block;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:0.9rem;">
     <div id="loadingMsg" class="empty-msg">Cargando galería...</div>
     <div id="coleccionesWrap" class="colecciones-wrap"></div>
+    <div id="resultadosPublicacionesWrap" class="grid" style="margin-top:10px;"></div>
     <div id="emptyMsg" class="empty-msg" style="display:none;">Aún no hay colecciones publicadas.</div>
+    <div id="sinResultadosMsg" class="empty-msg" style="display:none;">No se encontró nada con ese nombre.</div>
     <div id="errorMsg" class="empty-msg" style="display:none;color:#f87171;">No se pudo cargar la galería. Revisa tu conexión e intenta de nuevo.</div>
   </div>
 
@@ -787,6 +796,19 @@
   </div>
 
 </main>
+
+<!-- MODAL: CONTRASEÑA DE COLECCIÓN -->
+<div id="claveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:340px;width:100%;padding:22px;">
+    <h3 id="claveModalTitulo" style="font-family:'Georgia','Times New Roman',serif;font-size:1.05rem;margin-bottom:14px;">Colección protegida</h3>
+    <input type="password" id="claveModalInput" placeholder="Contraseña" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.88rem;">
+    <p id="claveModalError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:8px;">Contraseña incorrecta</p>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button id="claveModalCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
+      <button id="claveModalEntrar" style="flex:1;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">Entrar</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL: ÍNDICE TEMÁTICO -->
 <div id="indiceModal">
@@ -1050,15 +1072,25 @@
     publishBtn.textContent = "Publicar";
   });
 
+  document.getElementById("inputProtegerColeccion").addEventListener("change", (e) => {
+    document.getElementById("inputClaveColeccion").style.display = e.target.checked ? "block" : "none";
+  });
+
   // ---------- Crear colección ----------
   const crearColeccionBtn = document.getElementById("crearColeccionBtn");
   crearColeccionBtn.addEventListener("click", async () => {
     const nombre = document.getElementById("inputNombreColeccion").value.trim();
     const frase = document.getElementById("inputFraseColeccion").value.trim();
     const imagenUrl = document.getElementById("inputImagenColeccion").value.trim();
+    const protegida = document.getElementById("inputProtegerColeccion").checked;
+    const clave = document.getElementById("inputClaveColeccion").value.trim();
 
     if (!nombre || !imagenUrl) {
       alert("Ponle al menos un nombre y una imagen a la colección.");
+      return;
+    }
+    if (protegida && !clave) {
+      alert("Escribe una contraseña, o desmarca la casilla de protección.");
       return;
     }
 
@@ -1072,11 +1104,15 @@
         nombre,
         frase,
         imagenId,
+        clave: protegida ? clave : "",
         fecha: serverTimestamp()
       });
       document.getElementById("inputNombreColeccion").value = "";
       document.getElementById("inputFraseColeccion").value = "";
       document.getElementById("inputImagenColeccion").value = "";
+      document.getElementById("inputProtegerColeccion").checked = false;
+      document.getElementById("inputClaveColeccion").value = "";
+      document.getElementById("inputClaveColeccion").style.display = "none";
     } catch (e) {
       alert("Error al crear la colección: " + e.message);
     }
@@ -1111,7 +1147,7 @@
     if (libroSnapshotListo && coleccionSnapshotListo) {
       loadingMsg.style.display = "none";
       errorMsg.style.display = "none";
-      renderHome();
+      aplicarFiltro();
     }
   }
 
@@ -1164,29 +1200,62 @@
 
     colecciones.forEach(col => {
       const cantidad = librosDeColeccion(col.id).length;
-      coleccionesWrap.appendChild(crearTarjetaColeccion(col.id, col.nombre, col.frase, col.imagenId, cantidad));
+      coleccionesWrap.appendChild(crearTarjetaColeccion(col.id, col.nombre, col.frase, col.imagenId, cantidad, col.clave));
     });
 
     // Los libros sueltos (sin colección) se muestran como una colección más, al final
     if (librosGeneral.length > 0) {
-      coleccionesWrap.appendChild(crearTarjetaColeccion(ID_GENERAL, "General", "Escritos sin colección asignada", librosGeneral[0].portadaId, librosGeneral.length));
+      coleccionesWrap.appendChild(crearTarjetaColeccion(ID_GENERAL, "General", "Escritos sin colección asignada", librosGeneral[0].portadaId, librosGeneral.length, ""));
     }
   }
 
-  function crearTarjetaColeccion(id, nombre, frase, imagenId, cantidad) {
+  function crearTarjetaColeccion(id, nombre, frase, imagenId, cantidad, clave) {
     const etiqueta = cantidad === 1 ? "1 publicación" : `${cantidad} publicaciones`;
     const card = document.createElement("div");
     card.className = "coleccion-card";
     card.innerHTML = `
       <img src="${imagenDirecta(imagenId)}" data-alt-src="${imagenAlternativa(imagenId)}" data-tried-alt="0" alt="${escapeHtml(nombre)}" loading="lazy" onerror="manejarErrorImagen(this)">
       <div class="coleccion-overlay">
-        <div class="coleccion-titulo">${escapeHtml(nombre)}</div>
+        <div class="coleccion-titulo">${clave ? "🔒 " : ""}${escapeHtml(nombre)}</div>
         ${frase ? `<div class="coleccion-frase">${escapeHtml(frase)}</div>` : ""}
       </div>
       <div class="coleccion-contador">${etiqueta}</div>
     `;
-    card.addEventListener("click", () => abrirColeccion(id, nombre, frase));
+    card.addEventListener("click", () => solicitarAccesoColeccion(id, nombre, frase, clave));
     return card;
+  }
+
+  // ---------- Modal de contraseña de colección ----------
+  const claveModal = document.getElementById("claveModal");
+  const claveModalTitulo = document.getElementById("claveModalTitulo");
+  const claveModalInput = document.getElementById("claveModalInput");
+  const claveModalError = document.getElementById("claveModalError");
+
+  function solicitarAccesoColeccion(id, nombre, frase, clave) {
+    if (!clave) {
+      abrirColeccion(id, nombre, frase);
+      return;
+    }
+    claveModalTitulo.textContent = `"${nombre}" está protegida`;
+    claveModalInput.value = "";
+    claveModalError.style.display = "none";
+    claveModal.style.display = "flex";
+    claveModalInput.focus();
+
+    const intentar = () => {
+      if (claveModalInput.value === clave) {
+        claveModal.style.display = "none";
+        abrirColeccion(id, nombre, frase);
+      } else {
+        claveModalError.style.display = "block";
+      }
+    };
+
+    document.getElementById("claveModalEntrar").onclick = intentar;
+    claveModalInput.onkeydown = (e) => { if (e.key === "Enter") intentar(); };
+    document.getElementById("claveModalCancelar").onclick = () => {
+      claveModal.style.display = "none";
+    };
   }
 
   function abrirColeccion(id, nombre, frase) {
@@ -1205,9 +1274,50 @@
     coleccionActualId = null;
     vistaColeccionDetalleEl.style.display = "none";
     vistaColeccionesEl.style.display = "block";
-    renderHome();
+    aplicarFiltro();
     window.scrollTo(0, 0);
   });
+
+  // ---------- Buscador (colecciones y publicaciones) ----------
+  const buscadorInput = document.getElementById("buscadorInput");
+  const resultadosPublicacionesWrap = document.getElementById("resultadosPublicacionesWrap");
+  const sinResultadosMsg = document.getElementById("sinResultadosMsg");
+
+  function normalizar(str) {
+    return (str || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function aplicarFiltro() {
+    const termino = normalizar(buscadorInput.value.trim());
+    resultadosPublicacionesWrap.innerHTML = "";
+
+    if (!termino) {
+      sinResultadosMsg.style.display = "none";
+      renderHome();
+      return;
+    }
+
+    coleccionesWrap.innerHTML = "";
+    const coleccionesEncontradas = colecciones.filter(c => normalizar(c.nombre).includes(termino));
+    const librosEncontrados = libros.filter(l =>
+      normalizar(l.titulo).includes(termino) || normalizar(l.resumen).includes(termino)
+    );
+
+    const hayResultados = coleccionesEncontradas.length > 0 || librosEncontrados.length > 0;
+    emptyMsg.style.display = "none";
+    sinResultadosMsg.style.display = hayResultados ? "none" : "block";
+
+    coleccionesEncontradas.forEach(col => {
+      const cantidad = librosDeColeccion(col.id).length;
+      coleccionesWrap.appendChild(crearTarjetaColeccion(col.id, col.nombre, col.frase, col.imagenId, cantidad, col.clave));
+    });
+
+    librosEncontrados.forEach(libro => {
+      resultadosPublicacionesWrap.appendChild(crearTarjetaLibro(libro));
+    });
+  }
+
+  buscadorInput.addEventListener("input", aplicarFiltro);
 
   // ---------- Vista: detalle de una colección (libros, como antes) ----------
   function renderColeccionDetalle(colId) {
