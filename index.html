@@ -44,10 +44,14 @@
     align-items:center;
     margin-bottom:30px;
   }
+  .orbsy-logo-svg{
+    width:clamp(72px, 16vw, 160px);
+    height:clamp(72px, 16vw, 160px);
+  }
   .orbsy-wordmark{
     font-family:'Space Grotesk', sans-serif;
     font-weight:700;
-    font-size:1.7rem;
+    font-size:clamp(1.7rem, 5vw, 2.6rem);
     letter-spacing:0.01em;
   }
   .orbsy-wordmark .orb{ color:var(--verde); text-shadow:0 0 14px rgba(57,255,140,0.4); }
@@ -326,18 +330,31 @@
   }
   .admin-row{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
+    flex-direction:column;
+    gap:8px;
     padding:10px 0;
     border-bottom:1px solid var(--border);
     font-size:0.85rem;
   }
-  .admin-row span{
-    flex:1;
+  .admin-row-titulo{
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+  }
+  .admin-row-controles{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .mover-select{
+    flex:1;
+    min-width:0;
+    padding:7px 8px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:#0e0e13;
+    color:var(--text);
+    font-size:0.78rem;
   }
   .delete-btn{
     background:#7f1d1d;
@@ -891,7 +908,7 @@
   <!-- VISTA: GALERÍAS (nivel superior, pantalla de inicio) -->
   <div id="vistaGalerias">
     <div class="orbsy-marca">
-      <svg width="56" height="56" viewBox="0 0 200 200" style="margin-bottom:10px;">
+      <svg class="orbsy-logo-svg" viewBox="0 0 200 200" style="margin-bottom:14px;">
         <defs>
           <radialGradient id="esferaGrad" cx="38%" cy="35%" r="70%">
             <stop offset="0%" stop-color="#3a3a44"/>
@@ -998,6 +1015,7 @@
     collection,
     addDoc,
     deleteDoc,
+    updateDoc,
     doc,
     onSnapshot,
     query,
@@ -1409,6 +1427,7 @@
     colecciones = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     coleccionSnapshotListo = true;
     renderAdminListaColecciones();
+    renderAdminListaLibros();
     renderSelectColecciones();
     marcarListoSiCorresponde();
   }, (error) => {
@@ -1422,6 +1441,7 @@
     galerias = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     galeriaSnapshotListo = true;
     renderAdminListaGalerias();
+    renderAdminListaColecciones();
     renderSelectGalerias();
     marcarListoSiCorresponde();
   }, (error) => {
@@ -1692,13 +1712,26 @@
   function renderAdminListaLibros() {
     adminListContainer.innerHTML = "";
     libros.forEach(libro => {
-      const nombreColeccion = colecciones.find(c => c.id === libro.coleccionId)?.nombre || "General";
       const row = document.createElement("div");
       row.className = "admin-row";
+
+      const opciones = [`<option value="">General (sin colección)</option>`]
+        .concat(colecciones.map(c => `<option value="${c.id}" ${libro.coleccionId === c.id ? "selected" : ""}>${escapeHtml(c.nombre)}</option>`));
+      if (!colecciones.some(c => c.id === libro.coleccionId)) {
+        // Si la colección asignada ya no existe, que quede "General" seleccionado
+        opciones[0] = `<option value="" selected>General (sin colección)</option>`;
+      }
+
       row.innerHTML = `
-        <span>${escapeHtml(libro.titulo)} <span style="color:var(--text-sec);">— ${escapeHtml(nombreColeccion)}</span></span>
-        <button class="delete-btn">Eliminar publicación</button>
+        <div class="admin-row-titulo">${escapeHtml(libro.titulo)}</div>
+        <div class="admin-row-controles">
+          <select class="mover-select">${opciones.join("")}</select>
+          <button class="delete-btn">Eliminar</button>
+        </div>
       `;
+      row.querySelector(".mover-select").addEventListener("change", async (e) => {
+        await updateDoc(doc(db, "libros", libro.id), { coleccionId: e.target.value });
+      });
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar "${libro.titulo}"?`)) {
           await deleteDoc(doc(db, "libros", libro.id));
@@ -1712,13 +1745,25 @@
   function renderAdminListaColecciones() {
     adminColeccionesContainer.innerHTML = "";
     colecciones.forEach(col => {
-      const nombreGaleria = galerias.find(g => g.id === col.galeriaId)?.nombre || "General";
       const row = document.createElement("div");
       row.className = "admin-row";
+
+      const opciones = [`<option value="">General (sin galería)</option>`]
+        .concat(galerias.map(g => `<option value="${g.id}" ${col.galeriaId === g.id ? "selected" : ""}>${escapeHtml(g.nombre)}</option>`));
+      if (!galerias.some(g => g.id === col.galeriaId)) {
+        opciones[0] = `<option value="" selected>General (sin galería)</option>`;
+      }
+
       row.innerHTML = `
-        <span>${escapeHtml(col.nombre)} <span style="color:var(--text-sec);">— ${escapeHtml(nombreGaleria)}</span></span>
-        <button class="delete-btn">Eliminar colección</button>
+        <div class="admin-row-titulo">${escapeHtml(col.nombre)}</div>
+        <div class="admin-row-controles">
+          <select class="mover-select">${opciones.join("")}</select>
+          <button class="delete-btn">Eliminar</button>
+        </div>
       `;
+      row.querySelector(".mover-select").addEventListener("change", async (e) => {
+        await updateDoc(doc(db, "colecciones", col.id), { galeriaId: e.target.value });
+      });
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar la colección "${col.nombre}"? Los escritos dentro no se borran, pasarán a verse en "General".`)) {
           await deleteDoc(doc(db, "colecciones", col.id));
