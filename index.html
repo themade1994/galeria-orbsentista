@@ -3,22 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Galería del Orbsentista</title>
+<title>Orbsy</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='52' fill='%23202027'/%3E%3Ccircle cx='168' cy='78' r='16' fill='%2339ff8c'/%3E%3Ccircle cx='40' cy='128' r='14' fill='%2322d3c4'/%3E%3Ccircle cx='118' cy='172' r='12' fill='%239b7cf6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Fraunces:ital,wght@0,600;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a0c;
-    --card:#13131a;
-    --text:#ffffff;
-    --text-sec:#94a3b8;
-    --accent:#4f46e5;
-    --accent-hover:#6366f1;
-    --border:#1f1f29;
+    --bg:#0e0e12;
+    --card:#1a1a20;
+    --text:#e8e8ec;
+    --text-sec:#8b8b96;
+    --accent:#22d3c4;
+    --accent-hover:#3ee4d5;
+    --verde:#39ff8c;
+    --violeta:#9b7cf6;
+    --border:#2a2a32;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{
     background:var(--bg);
     color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    font-family:'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height:100vh;
   }
   header{
@@ -33,9 +38,24 @@
     margin:0 auto;
     padding:36px 16px 60px;
   }
+  .orbsy-marca{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-bottom:30px;
+  }
+  .orbsy-wordmark{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:1.7rem;
+    letter-spacing:0.01em;
+  }
+  .orbsy-wordmark .orb{ color:var(--verde); text-shadow:0 0 14px rgba(57,255,140,0.4); }
+  .orbsy-wordmark .sy{ color:var(--accent); text-shadow:0 0 14px rgba(34,211,196,0.4); }
   .galerias-eyebrow{
     text-align:center;
-    font-size:0.72rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
     letter-spacing:0.25em;
     text-transform:uppercase;
     color:var(--text-sec);
@@ -54,11 +74,11 @@
     cursor:pointer;
   }
   .galeria-tile-img{
+    position:relative;
     width:96px;
     height:96px;
     border-radius:50%;
     overflow:hidden;
-    border:2px solid var(--border);
     margin-bottom:10px;
   }
   .galeria-tile-img img{
@@ -67,7 +87,18 @@
     object-fit:cover;
     display:block;
   }
-  .galeria-tile:active .galeria-tile-img{ border-color:var(--accent); }
+  .galeria-tile-img::after{
+    content:"";
+    position:absolute;
+    inset:-5px;
+    border-radius:50%;
+    border:2px solid var(--verde);
+    border-top-color:transparent;
+    border-right-color:transparent;
+    transform:rotate(-35deg);
+    pointer-events:none;
+  }
+  .galeria-tile:active .galeria-tile-img::after{ border-color:var(--accent); border-top-color:transparent; border-right-color:transparent; }
   .galeria-tile-nombre{
     font-size:0.78rem;
     letter-spacing:0.04em;
@@ -89,8 +120,8 @@
   /* Título dinámico de una galería abierta (letras espaciadas, reutiliza el estilo original) */
   #tituloGaleriaHeader{
     font-size:clamp(1rem, 4vw, 1.6rem);
-    font-weight:900;
-    font-family:'Georgia', 'Times New Roman', serif;
+    font-weight:600;
+    font-family:'Fraunces', serif;
     width:100%;
     display:flex;
     justify-content:center;
@@ -99,8 +130,8 @@
 
   header h1{
     font-size:clamp(1rem, 4vw, 1.6rem);
-    font-weight:900;
-    font-family:'Georgia', 'Times New Roman', serif;
+    font-weight:600;
+    font-family:'Fraunces', serif;
     width:100%;
     display:flex;
     justify-content:space-between;
@@ -125,19 +156,18 @@
     filter:brightness(0.9) contrast(1.1);
   }
   .subtitulo{
-    font-family:'Palatino Linotype','Book Antiqua','Palatino',serif;
-    font-style:normal;
-    font-weight:400;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:500;
     font-size:0.88rem;
-    letter-spacing:0.18em;
-    text-transform:uppercase;
+    letter-spacing:0.06em;
     color:var(--text-sec);
     margin-top:2px;
   }
   .cruz{
     font-size:0.95rem;
     font-style:normal;
-    color:#7c6fa0;
+    color:var(--violeta);
   }
   #adminToggleBtn{
     position:absolute;
@@ -372,7 +402,7 @@
     padding:18px;
   }
   .coleccion-titulo{
-    font-family:'Georgia','Times New Roman',serif;
+    font-family:'Fraunces',serif;
     font-size:clamp(1.1rem, 4vw, 1.6rem);
     font-weight:700;
     margin-bottom:6px;
@@ -417,7 +447,7 @@
   }
   #backToHomeBtn:active{ background:var(--accent-hover); }
   #coleccionHeaderInfo h2{
-    font-family:'Georgia','Times New Roman',serif;
+    font-family:'Fraunces',serif;
     font-size:1.2rem;
   }
   #coleccionHeaderInfo p{
@@ -540,7 +570,7 @@
   }
   .indice-header h3{
     font-size:1rem;
-    font-family:'Georgia','Times New Roman',serif;
+    font-family:'Fraunces',serif;
   }
   .indice-cerrar{
     background:transparent;
@@ -654,7 +684,7 @@
   }
   .indice-drawer-header h3{
     font-size:0.95rem;
-    font-family:'Georgia','Times New Roman',serif;
+    font-family:'Fraunces',serif;
   }
   .indice-drawer-lista{
     overflow-y:auto;
@@ -682,8 +712,8 @@
     justify-content:center;
     flex-shrink:0;
   }
-  .indice-drawer-numero.actual{ background:#22c55e; } /* verde: donde estás ahora */
-  .indice-drawer-numero.disponible{ background:#3b82f6; } /* azul: disponible para saltar */
+  .indice-drawer-numero.actual{ background:#39ff8c; color:#0e0e12; } /* verde Orbsy: donde estás ahora */
+  .indice-drawer-numero.disponible{ background:#22d3c4; color:#0e0e12; } /* turquesa Orbsy: disponible para saltar */
   .indice-drawer-info{ flex:1; min-width:0; }
   .indice-drawer-etiqueta{
     font-size:0.82rem;
@@ -692,7 +722,7 @@
     text-overflow:ellipsis;
     white-space:nowrap;
   }
-  .indice-drawer-etiqueta.actual{ color:#4ade80; }
+  .indice-drawer-etiqueta.actual{ color:#39ff8c; }
   .indice-drawer-tipo{
     font-size:0.68rem;
     color:var(--text-sec);
@@ -860,6 +890,25 @@
 
   <!-- VISTA: GALERÍAS (nivel superior, pantalla de inicio) -->
   <div id="vistaGalerias">
+    <div class="orbsy-marca">
+      <svg width="56" height="56" viewBox="0 0 200 200" style="margin-bottom:10px;">
+        <defs>
+          <radialGradient id="esferaGrad" cx="38%" cy="35%" r="70%">
+            <stop offset="0%" stop-color="#3a3a44"/>
+            <stop offset="55%" stop-color="#202027"/>
+            <stop offset="100%" stop-color="#121216"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(-18 100 100)"/>
+        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(42 100 100)"/>
+        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(102 100 100)"/>
+        <circle cx="100" cy="100" r="52" fill="url(#esferaGrad)" stroke="#3d3d47" stroke-width="1"/>
+        <circle cx="168" cy="78" r="10" fill="#39ff8c"/>
+        <circle cx="40" cy="128" r="8.5" fill="#22d3c4"/>
+        <circle cx="118" cy="172" r="7" fill="#9b7cf6"/>
+      </svg>
+      <div class="orbsy-wordmark"><span class="orb">orb</span><span class="sy">SY</span></div>
+    </div>
     <div class="galerias-eyebrow">Tus galerías</div>
     <div id="loadingMsgGalerias" class="empty-msg">Cargando...</div>
     <div id="galeriasGrid" class="galerias-grid"></div>
@@ -895,7 +944,7 @@
 <!-- MODAL: CONTRASEÑA DE COLECCIÓN -->
 <div id="claveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:340px;width:100%;padding:22px;">
-    <h3 id="claveModalTitulo" style="font-family:'Georgia','Times New Roman',serif;font-size:1.05rem;margin-bottom:14px;">Colección protegida</h3>
+    <h3 id="claveModalTitulo" style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:14px;">Colección protegida</h3>
     <input type="password" id="claveModalInput" placeholder="Contraseña" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.88rem;">
     <p id="claveModalError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:8px;">Contraseña incorrecta</p>
     <div style="display:flex;gap:8px;margin-top:16px;">
