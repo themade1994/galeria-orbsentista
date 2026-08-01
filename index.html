@@ -32,6 +32,97 @@
     border-bottom:1px solid var(--border);
     position:relative;
   }
+  /* FONDOS PERSONALIZADOS (galería y colección) */
+  .con-fondo{
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    transition:background-image .3s ease;
+  }
+
+  /* BOTÓN FLOTANTE DE HERRAMIENTAS (estilo barra lateral Samsung) */
+  #herramientasToggleBtn{
+    position:fixed;
+    right:0;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:600;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-right:none;
+    color:var(--accent);
+    width:34px;
+    height:64px;
+    border-radius:14px 0 0 14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.1rem;
+    cursor:pointer;
+    box-shadow:-2px 0 10px rgba(0,0,0,0.35);
+  }
+  #herramientasToggleBtn:active{ background:#20202a; }
+
+  #herramientasOverlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    z-index:998;
+  }
+  #herramientasOverlay.abierto{ display:block; }
+
+  #herramientasDrawer{
+    position:fixed;
+    top:0;
+    right:0;
+    height:100%;
+    width:min(80vw, 300px);
+    background:var(--card);
+    border-left:1px solid var(--border);
+    z-index:999;
+    transform:translateX(100%);
+    transition:transform .28s ease;
+    display:flex;
+    flex-direction:column;
+  }
+  #herramientasDrawer.abierto{ transform:translateX(0); }
+  .herramientas-header{
+    padding:18px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .herramientas-header h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1rem;
+    font-weight:700;
+  }
+  .herramientas-header h3 .orb{ color:var(--verde); }
+  .herramientas-header h3 .sy{ color:var(--accent); }
+  .herramientas-vacio{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:30px;
+    color:var(--text-sec);
+    font-size:0.85rem;
+    line-height:1.5;
+  }
+  .herramientas-lista{ padding:10px; flex:1; overflow-y:auto; }
+  .herramienta-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 10px;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  .herramienta-item:active{ background:#20202a; }
+
   /* PANTALLA: GALERÍAS (nivel superior, diseño propio) */
   #vistaGalerias{
     max-width:900px;
@@ -815,6 +906,16 @@
 
 <button id="adminToggleBtn" style="position:fixed;top:14px;right:14px;z-index:500;">Admin</button>
 
+<button id="herramientasToggleBtn">⚙</button>
+<div id="herramientasOverlay"></div>
+<div id="herramientasDrawer">
+  <div class="herramientas-header">
+    <h3><span class="orb">orb</span><span class="sy">SY</span> · Herramientas</h3>
+    <button class="indice-cerrar" id="cerrarHerramientasBtn">✕</button>
+  </div>
+  <div class="herramientas-vacio">Aún no hay ninguna herramienta agregada.<br>Pronto vas a poder acceder aquí a tus otras apps, como Café Abierto y Póker Café.</div>
+</div>
+
 <header id="headerColecciones" style="display:none;">
   <button id="backToGaleriasBtn" style="position:absolute;left:16px;top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:6px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Galerías</button>
   <h1 id="tituloGaleriaHeader" aria-label="Galería"></h1>
@@ -844,6 +945,9 @@
       <label>Enlace de Google Drive (imagen de portada)</label>
       <input type="text" id="inputImagenGaleria" placeholder="https://drive.google.com/file/d/.../view">
 
+      <label>Enlace de Google Drive (imagen de fondo, opcional)</label>
+      <input type="text" id="inputFondoGaleria" placeholder="https://drive.google.com/file/d/.../view">
+
       <button id="crearGaleriaBtn">Crear galería</button>
 
       <div class="admin-list">
@@ -863,6 +967,9 @@
 
       <label>Enlace de Google Drive (imagen horizontal de portada)</label>
       <input type="text" id="inputImagenColeccion" placeholder="https://drive.google.com/file/d/.../view">
+
+      <label>Enlace de Google Drive (imagen de fondo, opcional — si no la pones, hereda la de la galería)</label>
+      <input type="text" id="inputFondoColeccion" placeholder="https://drive.google.com/file/d/.../view">
 
       <label style="display:flex;align-items:center;gap:8px;margin-top:10px;">
         <input type="checkbox" id="inputProtegerColeccion" style="width:auto;">
@@ -1278,6 +1385,7 @@
   crearGaleriaBtn.addEventListener("click", async () => {
     const nombre = document.getElementById("inputNombreGaleria").value.trim();
     const imagenUrl = document.getElementById("inputImagenGaleria").value.trim();
+    const fondoUrl = document.getElementById("inputFondoGaleria").value.trim();
 
     if (!nombre || !imagenUrl) {
       alert("Ponle un nombre y una imagen de portada a la galería.");
@@ -1285,6 +1393,7 @@
     }
 
     const imagenId = extraerIdDrive(imagenUrl);
+    const fondoId = fondoUrl ? extraerIdDrive(fondoUrl) : "";
 
     crearGaleriaBtn.disabled = true;
     crearGaleriaBtn.textContent = "Creando...";
@@ -1293,10 +1402,12 @@
       await addDoc(galeriasCol, {
         nombre,
         imagenId,
+        fondoId,
         fecha: serverTimestamp()
       });
       document.getElementById("inputNombreGaleria").value = "";
       document.getElementById("inputImagenGaleria").value = "";
+      document.getElementById("inputFondoGaleria").value = "";
     } catch (e) {
       alert("Error al crear la galería: " + e.message);
     }
@@ -1316,6 +1427,7 @@
     const galeriaSeleccionada = document.getElementById("inputGaleriaAsignada").value;
     const frase = document.getElementById("inputFraseColeccion").value.trim();
     const imagenUrl = document.getElementById("inputImagenColeccion").value.trim();
+    const fondoUrl = document.getElementById("inputFondoColeccion").value.trim();
     const protegida = document.getElementById("inputProtegerColeccion").checked;
     const clave = document.getElementById("inputClaveColeccion").value.trim();
 
@@ -1333,6 +1445,7 @@
     }
 
     const imagenId = extraerIdDrive(imagenUrl);
+    const fondoId = fondoUrl ? extraerIdDrive(fondoUrl) : "";
 
     crearColeccionBtn.disabled = true;
     crearColeccionBtn.textContent = "Creando...";
@@ -1343,12 +1456,14 @@
         galeriaId: galeriaSeleccionada,
         frase,
         imagenId,
+        fondoId,
         clave: protegida ? clave : "",
         fecha: serverTimestamp()
       });
       document.getElementById("inputNombreColeccion").value = "";
       document.getElementById("inputFraseColeccion").value = "";
       document.getElementById("inputImagenColeccion").value = "";
+      document.getElementById("inputFondoColeccion").value = "";
       document.getElementById("inputProtegerColeccion").checked = false;
       document.getElementById("inputClaveColeccion").value = "";
       document.getElementById("inputClaveColeccion").style.display = "none";
@@ -1504,6 +1619,22 @@
     return tile;
   }
 
+  // ---------- Fondos personalizados (galería y colección) ----------
+  function aplicarFondo(elemento, driveId) {
+    if (driveId) {
+      elemento.classList.add("con-fondo");
+      elemento.style.backgroundImage = `linear-gradient(rgba(14,14,18,0.86), rgba(14,14,18,0.86)), url(${imagenDirecta(driveId)})`;
+    } else {
+      elemento.classList.remove("con-fondo");
+      elemento.style.backgroundImage = "";
+    }
+  }
+
+  function quitarFondo(elemento) {
+    elemento.classList.remove("con-fondo");
+    elemento.style.backgroundImage = "";
+  }
+
   function abrirGaleria(id, nombre) {
     vista = "colecciones";
     galeriaActualId = id;
@@ -1513,6 +1644,8 @@
     tituloGaleriaHeaderEl.innerHTML = generarTituloEspaciado(nombre);
     tituloGaleriaHeaderEl.setAttribute("aria-label", nombre);
     document.getElementById("buscadorInput").value = "";
+    const galeriaActual = galerias.find(g => g.id === id);
+    aplicarFondo(vistaColeccionesEl, galeriaActual ? galeriaActual.fondoId : "");
     aplicarFiltro();
     window.scrollTo(0, 0);
   }
@@ -1525,6 +1658,8 @@
     vistaColeccionesEl.style.display = "none";
     vistaColeccionDetalleEl.style.display = "none";
     vistaGaleriasEl.style.display = "block";
+    quitarFondo(vistaColeccionesEl);
+    quitarFondo(vistaColeccionDetalleEl);
     renderGalerias();
     window.scrollTo(0, 0);
   });
@@ -1610,6 +1745,14 @@
     coleccionDetalleTitulo.textContent = nombre;
     coleccionDetalleFrase.textContent = frase || "";
     renderColeccionDetalle(id);
+
+    const coleccionActual = colecciones.find(c => c.id === id);
+    const galeriaActual = galerias.find(g => g.id === galeriaActualId);
+    const fondoEfectivo = (coleccionActual && coleccionActual.fondoId)
+      ? coleccionActual.fondoId
+      : (galeriaActual ? galeriaActual.fondoId : "");
+    aplicarFondo(vistaColeccionDetalleEl, fondoEfectivo);
+
     window.scrollTo(0, 0);
   }
 
@@ -1617,6 +1760,7 @@
     vista = "colecciones";
     coleccionActualId = null;
     vistaColeccionDetalleEl.style.display = "none";
+    quitarFondo(vistaColeccionDetalleEl);
     vistaColeccionesEl.style.display = "block";
     aplicarFiltro();
     window.scrollTo(0, 0);
@@ -1849,6 +1993,24 @@
       );
     }
   };
+
+  // ---------- Panel flotante de herramientas (otras apps) ----------
+  const herramientasToggleBtn = document.getElementById("herramientasToggleBtn");
+  const herramientasDrawer = document.getElementById("herramientasDrawer");
+  const herramientasOverlay = document.getElementById("herramientasOverlay");
+  const cerrarHerramientasBtn = document.getElementById("cerrarHerramientasBtn");
+
+  function abrirHerramientas() {
+    herramientasDrawer.classList.add("abierto");
+    herramientasOverlay.classList.add("abierto");
+  }
+  function cerrarHerramientas() {
+    herramientasDrawer.classList.remove("abierto");
+    herramientasOverlay.classList.remove("abierto");
+  }
+  herramientasToggleBtn.addEventListener("click", abrirHerramientas);
+  cerrarHerramientasBtn.addEventListener("click", cerrarHerramientas);
+  herramientasOverlay.addEventListener("click", cerrarHerramientas);
 
   function escapeHtml(str) {
     const div = document.createElement("div");
