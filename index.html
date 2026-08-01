@@ -1520,8 +1520,10 @@
   document.getElementById("backToGaleriasBtn").addEventListener("click", () => {
     vista = "galerias";
     galeriaActualId = null;
+    coleccionActualId = null;
     headerColeccionesEl.style.display = "none";
     vistaColeccionesEl.style.display = "none";
+    vistaColeccionDetalleEl.style.display = "none";
     vistaGaleriasEl.style.display = "block";
     renderGalerias();
     window.scrollTo(0, 0);
