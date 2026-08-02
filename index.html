@@ -123,6 +123,211 @@
   }
   .herramienta-item:active{ background:#20202a; }
 
+  /* ORBSY NOTES */
+  #notasToggleBtn{
+    background:transparent;
+    border:1px solid var(--violeta);
+    color:var(--violeta);
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:0.78rem;
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  #notasToggleBtn:active{ background:#1a1420; }
+  #notasToggleBtn svg{ width:15px; height:15px; }
+
+  #notasOverlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    z-index:10002;
+  }
+  #notasOverlay.abierto{ display:block; }
+
+  #notasDrawer{
+    position:fixed;
+    top:0;
+    right:0;
+    height:100%;
+    width:min(92vw, 380px);
+    background:#000;
+    border-left:1px solid var(--border);
+    z-index:10003;
+    transform:translateX(100%);
+    transition:transform .28s ease;
+    display:flex;
+    flex-direction:column;
+  }
+  #notasDrawer.abierto{ transform:translateX(0); }
+
+  .notas-header{
+    padding:14px 16px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-shrink:0;
+  }
+  .notas-header .marca-notas{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:0.92rem;
+  }
+  .notas-header .marca-notas .orb{ color:var(--verde); }
+  .notas-header .marca-notas .sy{ color:var(--accent); }
+  .notas-header .marca-notas .notes{ color:var(--violeta); font-weight:500; }
+  .notas-header .ref-publicacion{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.65rem;
+    color:var(--text-sec);
+    margin-top:3px;
+    max-width:220px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .notas-cuerpo{
+    flex:1;
+    display:flex;
+    overflow:hidden;
+  }
+  .notas-hoja{
+    flex:1;
+    padding:16px;
+    overflow-y:auto;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:0.95rem;
+    line-height:1.6;
+    color:#f2f2f5;
+    outline:none;
+  }
+  .notas-hoja[data-vacio="true"]::before{
+    content:attr(data-placeholder);
+    color:#55555f;
+    font-style:italic;
+  }
+  .notas-hoja h3{
+    font-family:'Fraunces', serif;
+    font-style:normal;
+    font-weight:600;
+    font-size:1.25rem;
+    margin:6px 0;
+  }
+  .notas-hoja ol, .notas-hoja ul{ padding-left:22px; margin:6px 0; }
+  .notas-hoja .ref-insertada{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-style:normal;
+    font-size:0.7rem;
+    color:var(--turquesa);
+    border-left:2px solid var(--violeta);
+    padding:4px 8px;
+    margin:8px 0;
+    word-break:break-all;
+  }
+
+  .notas-barra{
+    width:46px;
+    flex-shrink:0;
+    border-left:1px solid var(--border);
+    background:#0b0b0e;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:10px 0;
+    gap:4px;
+    overflow-y:auto;
+  }
+  .notas-barra button{
+    width:34px;
+    height:34px;
+    border-radius:8px;
+    background:transparent;
+    border:none;
+    color:var(--text-sec);
+    font-size:0.85rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .notas-barra button.activo{ background:var(--violeta); color:#fff; }
+  .notas-barra button:active{ background:#20202a; }
+  .notas-barra .separador-barra{
+    width:24px;
+    height:1px;
+    background:var(--border);
+    margin:6px 0;
+  }
+
+  .notas-pie{
+    flex-shrink:0;
+    padding:12px 16px;
+    border-top:1px solid var(--border);
+    display:flex;
+    gap:8px;
+  }
+  .notas-pie button{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    font-size:0.78rem;
+    cursor:pointer;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text-sec);
+  }
+  .notas-pie button.principal{
+    border-color:var(--violeta);
+    color:var(--violeta);
+  }
+  .notas-pie button:active{ background:#1a1420; }
+
+  /* Lista de notas guardadas (desde el panel Herramientas) */
+  .notas-guardadas-lista{ padding:10px; overflow-y:auto; flex:1; }
+  .nota-guardada-item{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:10px;
+  }
+  .nota-guardada-titulo{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:0.88rem;
+    margin-bottom:4px;
+  }
+  .nota-guardada-preview{
+    font-size:0.78rem;
+    color:var(--text-sec);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    margin-bottom:8px;
+  }
+  .nota-guardada-controles{ display:flex; gap:6px; }
+  .nota-guardada-controles button{
+    flex:1;
+    padding:7px;
+    border-radius:7px;
+    font-size:0.7rem;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text-sec);
+    cursor:pointer;
+  }
+  .nota-guardada-controles button.eliminar{ color:#f87171; border-color:#7f1d1d; }
+
   /* PANTALLA: GALERÍAS (nivel superior, diseño propio) */
   #vistaGalerias{
     max-width:900px;
@@ -904,6 +1109,20 @@
 </head>
 <body>
 
+<!-- Definición reutilizable del ícono meteorito (orbSY notes) -->
+<svg width="0" height="0" style="position:absolute;">
+  <defs>
+    <g id="meteorito-icono">
+      <linearGradient id="estelaGradGlobal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#9b7cf6" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#9b7cf6" stop-opacity="0.9"/>
+      </linearGradient>
+      <path d="M 148 44 L 190 30 L 108 96 Z" fill="url(#estelaGradGlobal)"/>
+      <polygon points="98,92 122,100 130,124 116,148 88,150 68,130 72,104" fill="#9b7cf6" stroke="#9b7cf6" stroke-width="2"/>
+    </g>
+  </defs>
+</svg>
+
 <button id="adminToggleBtn" style="position:fixed;top:14px;right:14px;z-index:500;">Admin</button>
 
 <button id="herramientasToggleBtn">⚙</button>
@@ -913,7 +1132,37 @@
     <h3><span class="orb">orb</span><span class="sy">SY</span> · Herramientas</h3>
     <button class="indice-cerrar" id="cerrarHerramientasBtn">✕</button>
   </div>
-  <div class="herramientas-vacio">Aún no hay ninguna herramienta agregada.<br>Pronto vas a poder acceder aquí a tus otras apps, como Café Abierto y Póker Café.</div>
+
+  <div id="herramientasMenu" style="padding:10px;">
+    <div class="herramienta-item" id="abrirNotasGuardadasBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#meteorito-icono"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">orbSY notes</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Tus apuntes guardados</div>
+      </div>
+    </div>
+    <div class="herramienta-item" style="opacity:0.45;cursor:default;">
+      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">☕</div>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Café Abierto</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Próximamente</div>
+      </div>
+    </div>
+    <div class="herramienta-item" style="opacity:0.45;cursor:default;">
+      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">🃏</div>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Póker Café</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Próximamente</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="notasGuardadasVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <div class="notas-guardadas-lista" id="notasGuardadasLista"></div>
+  </div>
 </div>
 
 <header id="headerColecciones" style="display:none;">
@@ -1095,6 +1344,10 @@
     <button id="backBtn">← Volver a la galería</button>
     <div id="modalTitle"></div>
     <button id="indiceToggleBtn" style="display:none;">☰ Índice</button>
+    <button id="notasToggleBtn">
+      <svg viewBox="0 0 200 200"><use href="#meteorito-icono"/></svg>
+      Notas
+    </button>
   </div>
   <div id="navBar">
     <button id="anteriorBtn">← Anterior</button>
@@ -1112,6 +1365,40 @@
       <button class="indice-cerrar" id="cerrarDrawerBtn">✕</button>
     </div>
     <div class="indice-drawer-lista" id="indiceDrawerLista"></div>
+  </div>
+</div>
+
+<!-- CORTINA: orbSY notes (editor de la publicación abierta) -->
+<div id="notasOverlay"></div>
+<div id="notasDrawer">
+  <div class="notas-header">
+    <div>
+      <div class="marca-notas"><span class="orb">orb</span><span class="sy">SY</span> <span class="notes">notes</span></div>
+      <div class="ref-publicacion" id="notasRefPublicacion"></div>
+    </div>
+    <button class="indice-cerrar" id="cerrarNotasBtn">✕</button>
+  </div>
+  <div class="notas-cuerpo">
+    <div class="notas-hoja" id="notasHoja" contenteditable="true" data-placeholder="Escribe tus apuntes sobre esta publicación..."></div>
+    <div class="notas-barra">
+      <button id="notaBtnNegrita" title="Negrita"><b>B</b></button>
+      <button id="notaBtnCursiva" title="Cursiva"><i>I</i></button>
+      <div class="separador-barra"></div>
+      <button id="notaBtnTitulo" title="Tamaño título">T+</button>
+      <button id="notaBtnTexto" title="Tamaño texto">T-</button>
+      <div class="separador-barra"></div>
+      <button id="notaBtnAlinear" title="Alineación">☰</button>
+      <div class="separador-barra"></div>
+      <button id="notaBtnNumeros" title="Numeración 1,2,3">1.</button>
+      <button id="notaBtnLetras" title="Numeración a,b,c">a.</button>
+      <button id="notaBtnVinetas" title="Viñetas">•</button>
+      <div class="separador-barra"></div>
+      <button id="notaBtnReferencia" title="Insertar referencia actual">🔗</button>
+    </div>
+  </div>
+  <div class="notas-pie">
+    <button id="notaBtnExportar">Exportar .txt</button>
+    <button class="principal" id="notaBtnListo">Listo</button>
   </div>
 </div>
 
@@ -1849,7 +2136,7 @@
       </div>
     `;
     card.querySelector(".read-btn").addEventListener("click", () => {
-      abrirPublicacion(libro.titulo, recursosDeLibro(libro));
+      abrirPublicacion(libro.id, libro.titulo, recursosDeLibro(libro));
     });
     return card;
   }
@@ -2003,6 +2290,8 @@
   function abrirHerramientas() {
     herramientasDrawer.classList.add("abierto");
     herramientasOverlay.classList.add("abierto");
+    document.getElementById("notasGuardadasVista").style.display = "none";
+    document.getElementById("herramientasMenu").style.display = "block";
   }
   function cerrarHerramientas() {
     herramientasDrawer.classList.remove("abierto");
@@ -2011,6 +2300,284 @@
   herramientasToggleBtn.addEventListener("click", abrirHerramientas);
   cerrarHerramientasBtn.addEventListener("click", cerrarHerramientas);
   herramientasOverlay.addEventListener("click", cerrarHerramientas);
+
+  // ---------- orbSY notes: almacenamiento local (por dispositivo) ----------
+  const CLAVE_NOTAS = "orbsy_notes";
+
+  function leerTodasLasNotas() {
+    try {
+      return JSON.parse(localStorage.getItem(CLAVE_NOTAS)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function guardarTodasLasNotas(obj) {
+    try {
+      localStorage.setItem(CLAVE_NOTAS, JSON.stringify(obj));
+    } catch (e) {
+      console.error("No se pudo guardar la nota localmente:", e);
+    }
+  }
+
+  const notasHoja = document.getElementById("notasHoja");
+  const notasDrawer = document.getElementById("notasDrawer");
+  const notasOverlay = document.getElementById("notasOverlay");
+  const notasRefPublicacion = document.getElementById("notasRefPublicacion");
+  const notaBtnReferencia = document.getElementById("notaBtnReferencia");
+
+  let notaLibroIdActivo = "";
+  let notaTituloActivo = "";
+  let notaModoStandalone = false;
+
+  function actualizarPlaceholderNota() {
+    const vacio = notasHoja.innerText.trim() === "";
+    notasHoja.setAttribute("data-vacio", vacio ? "true" : "false");
+  }
+
+  function cargarNotaDePublicacion(libroId, tituloPublicacion) {
+    notaLibroIdActivo = libroId;
+    notaTituloActivo = tituloPublicacion;
+    notaModoStandalone = false;
+    notaBtnReferencia.style.display = "flex";
+    const todas = leerTodasLasNotas();
+    const nota = todas[libroId];
+    notasHoja.innerHTML = nota ? nota.contenidoHTML : "";
+    notasRefPublicacion.textContent = tituloPublicacion;
+    actualizarPlaceholderNota();
+  }
+
+  function abrirEditorNotaStandalone(libroId) {
+    const todas = leerTodasLasNotas();
+    const nota = todas[libroId];
+    if (!nota) return;
+    notaLibroIdActivo = libroId;
+    notaTituloActivo = nota.titulo;
+    notaModoStandalone = true;
+    notaBtnReferencia.style.display = "none";
+    notasHoja.innerHTML = nota.contenidoHTML;
+    notasRefPublicacion.textContent = nota.titulo;
+    actualizarPlaceholderNota();
+    abrirNotas();
+  }
+
+  function guardarNotaActual() {
+    if (!notaLibroIdActivo) return;
+    const todas = leerTodasLasNotas();
+    const textoPlano = notasHoja.innerText.trim();
+    if (textoPlano === "") {
+      // Si la nota quedó vacía, no la guardamos (y borramos cualquier rastro previo)
+      delete todas[notaLibroIdActivo];
+    } else {
+      todas[notaLibroIdActivo] = {
+        titulo: notaTituloActivo,
+        contenidoHTML: notasHoja.innerHTML,
+        fecha: Date.now()
+      };
+    }
+    guardarTodasLasNotas(todas);
+  }
+
+  notasHoja.addEventListener("input", () => {
+    actualizarPlaceholderNota();
+    guardarNotaActual();
+  });
+
+  function abrirNotas() {
+    notasDrawer.classList.add("abierto");
+    notasOverlay.classList.add("abierto");
+  }
+  function cerrarNotas() {
+    guardarNotaActual();
+    notasDrawer.classList.remove("abierto");
+    notasOverlay.classList.remove("abierto");
+    if (notaModoStandalone) {
+      renderNotasGuardadas();
+    }
+  }
+  document.getElementById("notasToggleBtn").addEventListener("click", abrirNotas);
+  document.getElementById("cerrarNotasBtn").addEventListener("click", cerrarNotas);
+  document.getElementById("notaBtnListo").addEventListener("click", cerrarNotas);
+  notasOverlay.addEventListener("click", cerrarNotas);
+
+  // ---------- Barra vertical: herramientas de formato ----------
+  function enfocarHoja() { notasHoja.focus(); }
+
+  document.getElementById("notaBtnNegrita").addEventListener("click", () => {
+    enfocarHoja(); document.execCommand("bold"); guardarNotaActual();
+  });
+  document.getElementById("notaBtnCursiva").addEventListener("click", () => {
+    enfocarHoja(); document.execCommand("italic"); guardarNotaActual();
+  });
+  document.getElementById("notaBtnTitulo").addEventListener("click", () => {
+    enfocarHoja(); document.execCommand("formatBlock", false, "H3"); guardarNotaActual();
+  });
+  document.getElementById("notaBtnTexto").addEventListener("click", () => {
+    enfocarHoja(); document.execCommand("formatBlock", false, "P"); guardarNotaActual();
+  });
+
+  const ALINEACIONES = ["justifyLeft", "justifyCenter", "justifyRight", "justifyFull"];
+  let alineacionIndice = 0;
+  document.getElementById("notaBtnAlinear").addEventListener("click", () => {
+    enfocarHoja();
+    alineacionIndice = (alineacionIndice + 1) % ALINEACIONES.length;
+    document.execCommand(ALINEACIONES[alineacionIndice]);
+    guardarNotaActual();
+  });
+
+  document.getElementById("notaBtnNumeros").addEventListener("click", () => {
+    enfocarHoja(); document.execCommand("insertOrderedList"); guardarNotaActual();
+  });
+  document.getElementById("notaBtnVinetas").addEventListener("click", () => {
+    enfocarHoja(); document.execCommand("insertUnorderedList"); guardarNotaActual();
+  });
+  document.getElementById("notaBtnLetras").addEventListener("click", () => {
+    enfocarHoja();
+    document.execCommand("insertOrderedList");
+    // Buscamos el <ol> recién creado alrededor del cursor y le damos estilo a,b,c...
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0) {
+      let nodo = sel.getRangeAt(0).startContainer;
+      while (nodo && nodo.nodeName !== "OL" && nodo !== notasHoja) nodo = nodo.parentNode;
+      if (nodo && nodo.nodeName === "OL") nodo.style.listStyleType = "lower-alpha";
+    }
+    guardarNotaActual();
+  });
+
+  document.getElementById("notaBtnReferencia").addEventListener("click", () => {
+    if (notaModoStandalone || recursosActuales.length === 0) return;
+    const recurso = recursosActuales[indiceActual];
+    const enlace = recurso.fuente === "youtube"
+      ? `https://youtu.be/${recurso.driveId}`
+      : `https://drive.google.com/file/d/${recurso.driveId}/view`;
+    enfocarHoja();
+    document.execCommand("insertHTML", false, `<span class="ref-insertada">↳ ${escapeHtml(recurso.etiqueta)} — ${enlace}</span><br>`);
+    guardarNotaActual();
+  });
+
+  // ---------- Exportar a texto plano ----------
+  function extraerTextoPlano(elemento) {
+    let lineas = [];
+    function recorrer(nodo, prefijoLista) {
+      if (nodo.nodeType === Node.TEXT_NODE) {
+        return nodo.textContent;
+      }
+      if (nodo.nodeType !== Node.ELEMENT_NODE) return "";
+
+      if (nodo.nodeName === "OL" || nodo.nodeName === "UL") {
+        const esLetras = nodo.style.listStyleType === "lower-alpha";
+        const esNumeros = nodo.nodeName === "OL" && !esLetras;
+        let i = 0;
+        Array.from(nodo.children).forEach(li => {
+          const texto = Array.from(li.childNodes).map(n => recorrer(n)).join("");
+          let marca = "- ";
+          if (esNumeros) { i++; marca = `${i}. `; }
+          else if (esLetras) { marca = `${String.fromCharCode(97 + i)}. `; i++; }
+          lineas.push(marca + texto.trim());
+        });
+        return "";
+      }
+      if (["P", "DIV", "H3"].includes(nodo.nodeName)) {
+        const texto = Array.from(nodo.childNodes).map(n => recorrer(n)).join("");
+        if (texto.trim() !== "") lineas.push(texto.trim());
+        return "";
+      }
+      if (nodo.nodeName === "BR") {
+        return "\n";
+      }
+      return Array.from(nodo.childNodes).map(n => recorrer(n)).join("");
+    }
+    Array.from(elemento.childNodes).forEach(n => recorrer(n));
+    return lineas.join("\n\n");
+  }
+
+  function descargarTxt(nombreArchivo, contenido) {
+    const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nombreArchivo;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById("notaBtnExportar").addEventListener("click", () => {
+    const texto = extraerTextoPlano(notasHoja);
+    if (texto.trim() === "") {
+      alert("Esta nota todavía está vacía.");
+      return;
+    }
+    const nombreArchivo = (notaTituloActivo || "nota-orbsy").replace(/[^a-z0-9áéíóúñ\s-]/gi, "").trim() + ".txt";
+    descargarTxt(nombreArchivo, `${notaTituloActivo}\n\n${texto}`);
+  });
+
+  // ---------- Vista: lista de notas guardadas (desde Herramientas) ----------
+  const herramientasMenu = document.getElementById("herramientasMenu");
+  const notasGuardadasVista = document.getElementById("notasGuardadasVista");
+  const notasGuardadasLista = document.getElementById("notasGuardadasLista");
+
+  document.getElementById("abrirNotasGuardadasBtn").addEventListener("click", () => {
+    herramientasMenu.style.display = "none";
+    notasGuardadasVista.style.display = "flex";
+    renderNotasGuardadas();
+  });
+  document.getElementById("volverAHerramientasBtn").addEventListener("click", () => {
+    notasGuardadasVista.style.display = "none";
+    herramientasMenu.style.display = "block";
+  });
+
+  function renderNotasGuardadas() {
+    const todas = leerTodasLasNotas();
+    const entradas = Object.entries(todas).sort((a, b) => b[1].fecha - a[1].fecha);
+    notasGuardadasLista.innerHTML = "";
+
+    if (entradas.length === 0) {
+      notasGuardadasLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes notas guardadas en este dispositivo.</div>`;
+      return;
+    }
+
+    entradas.forEach(([libroId, nota]) => {
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      const previewTexto = notasHojaAPreview(nota.contenidoHTML);
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">${escapeHtml(nota.titulo)}</div>
+        <div class="nota-guardada-preview">${escapeHtml(previewTexto)}</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-nota">Abrir</button>
+          <button class="exportar-nota">Exportar</button>
+          <button class="eliminar">Eliminar</button>
+        </div>
+      `;
+      item.querySelector(".abrir-nota").addEventListener("click", () => {
+        cerrarHerramientas();
+        abrirEditorNotaStandalone(libroId);
+      });
+      item.querySelector(".exportar-nota").addEventListener("click", () => {
+        const temp = document.createElement("div");
+        temp.innerHTML = nota.contenidoHTML;
+        const texto = extraerTextoPlano(temp);
+        const nombreArchivo = nota.titulo.replace(/[^a-z0-9áéíóúñ\s-]/gi, "").trim() + ".txt";
+        descargarTxt(nombreArchivo, `${nota.titulo}\n\n${texto}`);
+      });
+      item.querySelector(".eliminar").addEventListener("click", () => {
+        if (confirm(`¿Eliminar tu nota de "${nota.titulo}"?`)) {
+          const todasActualizadas = leerTodasLasNotas();
+          delete todasActualizadas[libroId];
+          guardarTodasLasNotas(todasActualizadas);
+          renderNotasGuardadas();
+        }
+      });
+      notasGuardadasLista.appendChild(item);
+    });
+  }
+
+  function notasHojaAPreview(html) {
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    return temp.innerText.trim().slice(0, 120);
+  }
 
   function escapeHtml(str) {
     const div = document.createElement("div");
@@ -2025,13 +2592,13 @@
 
   const ETIQUETAS_TIPO = { texto: "Texto", audio: "Audio", video: "Video" };
 
-  function abrirPublicacion(tituloPublicacion, recursos) {
+  function abrirPublicacion(libroId, tituloPublicacion, recursos) {
     if (!recursos || recursos.length === 0) {
       alert("Esta publicación todavía no tiene contenido cargado.");
       return;
     }
     if (recursos.length === 1) {
-      abrirRecurso(tituloPublicacion, recursos, 0);
+      abrirRecurso(libroId, tituloPublicacion, recursos, 0);
       return;
     }
     // Varios recursos: mostrar el índice temático primero
@@ -2049,7 +2616,7 @@
       `;
       item.addEventListener("click", () => {
         cerrarIndice();
-        abrirRecurso(tituloPublicacion, recursos, i);
+        abrirRecurso(libroId, tituloPublicacion, recursos, i);
       });
       indiceLista.appendChild(item);
     });
@@ -2077,15 +2644,17 @@
   const cerrarDrawerBtn = document.getElementById("cerrarDrawerBtn");
 
   // Estado de la publicación actualmente abierta, para poder navegar
-  // entre sus recursos con los botones Anterior / Siguiente.
+  // entre sus recursos con los botones Anterior / Siguiente, y asociar notas.
   let recursosActuales = [];
   let indiceActual = 0;
   let tituloPublicacionActual = "";
+  let libroIdActual = "";
 
-  function abrirRecurso(tituloPublicacion, recursos, index) {
+  function abrirRecurso(libroId, tituloPublicacion, recursos, index) {
     recursosActuales = recursos;
     indiceActual = index;
     tituloPublicacionActual = tituloPublicacion;
+    libroIdActual = libroId;
 
     const recurso = recursos[index];
     modalTitle.textContent = recursos.length > 1
@@ -2102,6 +2671,7 @@
       : `https://drive.google.com/file/d/${recurso.driveId}/preview`;
     pdfModal.classList.add("active");
     document.body.style.overflow = "hidden";
+    cargarNotaDePublicacion(libroId, tituloPublicacion);
 
     // Barra de Anterior / Siguiente, y botón de índice, solo si hay más de un recurso
     if (recursos.length > 1) {
@@ -2146,7 +2716,7 @@
       `;
       item.addEventListener("click", () => {
         cerrarDrawer();
-        abrirRecurso(tituloPublicacionActual, recursosActuales, i);
+        abrirRecurso(libroIdActual, tituloPublicacionActual, recursosActuales, i);
       });
       indiceDrawerLista.appendChild(item);
     });
@@ -2165,10 +2735,10 @@
   indiceDrawerOverlay.addEventListener("click", cerrarDrawer);
 
   anteriorBtn.addEventListener("click", () => {
-    if (indiceActual > 0) abrirRecurso(tituloPublicacionActual, recursosActuales, indiceActual - 1);
+    if (indiceActual > 0) abrirRecurso(libroIdActual, tituloPublicacionActual, recursosActuales, indiceActual - 1);
   });
   siguienteBtn.addEventListener("click", () => {
-    if (indiceActual < recursosActuales.length - 1) abrirRecurso(tituloPublicacionActual, recursosActuales, indiceActual + 1);
+    if (indiceActual < recursosActuales.length - 1) abrirRecurso(libroIdActual, tituloPublicacionActual, recursosActuales, indiceActual + 1);
   });
 
   function cerrarLector() {
