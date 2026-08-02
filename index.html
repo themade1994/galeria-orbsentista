@@ -329,6 +329,94 @@
   }
   .nota-guardada-controles button.eliminar{ color:#f87171; border-color:#7f1d1d; }
 
+  /* TALLER: secciones coloreadas por tipo (galerías / colecciones / publicaciones) */
+  .taller-seccion{
+    border-left:3px solid var(--border);
+    padding-left:14px;
+    margin-bottom:8px;
+    border-radius:4px;
+  }
+  .taller-seccion-header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 12px;
+    border-radius:8px;
+    margin-bottom:14px;
+  }
+  .taller-seccion-header .taller-icono{ width:20px; height:20px; flex-shrink:0; }
+  .taller-seccion-header .taller-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.62rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    display:block;
+    opacity:0.85;
+  }
+  .taller-seccion-header h2{
+    color:#fff;
+    font-size:1.05rem;
+    font-weight:700;
+    margin:2px 0 0;
+  }
+  .taller-galerias{ border-left-color:var(--verde); }
+  .taller-galerias .taller-seccion-header{ background:rgba(57,255,140,0.10); }
+  .taller-galerias .taller-eyebrow{ color:var(--verde); }
+
+  .taller-colecciones{ border-left-color:var(--turquesa); }
+  .taller-colecciones .taller-seccion-header{ background:rgba(34,211,196,0.10); }
+  .taller-colecciones .taller-eyebrow{ color:var(--turquesa); }
+
+  .taller-publicaciones{ border-left-color:var(--violeta); }
+  .taller-publicaciones .taller-seccion-header{ background:rgba(155,124,246,0.10); }
+  .taller-publicaciones .taller-eyebrow{ color:var(--violeta); }
+
+  /* Íconos propios (candado y llave del Taller) */
+  .icono-candado, .icono-taller{ display:inline-block; vertical-align:middle; }
+
+  /* Títulos/resúmenes con más carácter editorial */
+  .etiqueta-seccion-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.62rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:3px;
+  }
+
+  /* FONDO CON MOTIVOS DE GALAXIA (sutil, solo en zonas vacías) */
+  .estrella-decor{
+    position:fixed;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:0;
+  }
+  #vistaGalerias{ position:relative; z-index:1; }
+
+  .capa-estrellas{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    overflow:hidden;
+  }
+  .estrella-punto{
+    position:absolute;
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    opacity:0.55;
+    box-shadow:0 0 6px currentColor;
+  }
+  .constelacion{
+    position:absolute;
+    opacity:0.35;
+  }
+  #coleccionesWrap, #galeriasGrid, .orbsy-marca, .galerias-eyebrow, #buscadorInput{
+    position:relative;
+    z-index:1;
+  }
+
   /* PANTALLA: GALERÍAS (nivel superior, diseño propio) */
   #vistaGalerias{
     max-width:900px;
@@ -527,14 +615,16 @@
     flex:1;
   }
   .book-title{
-    font-size:1rem;
+    font-family:'Fraunces', serif;
+    font-size:1.05rem;
     font-weight:600;
     line-height:1.3;
+    letter-spacing:0.01em;
   }
   .book-summary{
     font-size:0.82rem;
     color:var(--text-sec);
-    line-height:1.4;
+    line-height:1.5;
     display:-webkit-box;
     -webkit-line-clamp:4;
     -webkit-box-orient:vertical;
@@ -731,12 +821,15 @@
     font-family:'Fraunces',serif;
     font-size:clamp(1.1rem, 4vw, 1.6rem);
     font-weight:700;
+    letter-spacing:0.005em;
     margin-bottom:6px;
+    text-shadow:0 2px 10px rgba(0,0,0,0.5);
   }
   .coleccion-frase{
     font-size:0.85rem;
     color:#d8d8e2;
     font-style:italic;
+    line-height:1.4;
   }
   .coleccion-contador{
     position:absolute;
@@ -1193,8 +1286,41 @@
       <path d="M 148 44 L 190 30 L 108 96 Z" fill="url(#estelaGradGlobal)"/>
       <polygon points="98,92 122,100 130,124 116,148 88,150 68,130 72,104" fill="#9b7cf6" stroke="#9b7cf6" stroke-width="2"/>
     </g>
+
+    <!-- Candado propio: anillo abierto + cuerpo, mismo lenguaje del logo -->
+    <g id="icono-candado-svg">
+      <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="#e8e8ec" stroke-width="9" stroke-linecap="round"/>
+      <rect x="62" y="92" width="76" height="60" rx="10" fill="#e8e8ec"/>
+      <circle cx="100" cy="118" r="7" fill="#0e0e12"/>
+      <rect x="94" y="120" width="12" height="16" rx="4" fill="#0e0e12"/>
+    </g>
+
+    <!-- Ícono del Taller: llave inglesa estilizada con brillo, mismo lenguaje del meteorito -->
+    <g id="icono-taller-svg">
+      <linearGradient id="tallerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#39ff8c"/>
+        <stop offset="100%" stop-color="#22d3c4"/>
+      </linearGradient>
+      <path d="M 60 140 L 110 90 A 28 28 0 1 1 130 70 L 140 60 L 155 75 L 145 85 L 150 100 L 135 115 L 120 110 L 80 150 A 14 14 0 1 1 60 140 Z"
+            fill="url(#tallerGrad)" opacity="0.92"/>
+    </g>
+
+    <!-- Ícono de galería: esfera con anillo, versión reducida del logo -->
+    <g id="icono-galeria-svg">
+      <circle cx="100" cy="100" r="46" fill="#202027" stroke="#39ff8c" stroke-width="3"/>
+      <circle cx="100" cy="100" r="46" fill="none" stroke="#39ff8c" stroke-width="3" stroke-dasharray="8 10" transform="rotate(-30 100 100)" opacity="0.6"/>
+      <circle cx="140" cy="70" r="9" fill="#39ff8c"/>
+    </g>
+
+    <!-- Ícono de colección: portada con esquinas y una franja, tipo carrete/tarjeta -->
+    <g id="icono-coleccion-svg">
+      <rect x="50" y="65" width="100" height="70" rx="8" fill="none" stroke="#22d3c4" stroke-width="6"/>
+      <line x1="50" y1="115" x2="150" y2="115" stroke="#22d3c4" stroke-width="6"/>
+      <circle cx="72" cy="90" r="6" fill="#22d3c4"/>
+    </g>
   </defs>
 </svg>
+
 
 <button id="adminToggleBtn" style="position:fixed;top:14px;right:14px;z-index:500;">Admin</button>
 
@@ -1261,12 +1387,23 @@
 
     <div id="formSection" style="display:none;">
       <div id="tallerHeader" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:16px;">
-        <h2 style="margin:0;">🛠 Taller</h2>
+        <h2 style="margin:0;display:flex;align-items:center;gap:8px;">
+          <svg class="icono-taller" viewBox="0 0 200 200" width="22" height="22"><use href="#icono-taller-svg"/></svg>
+          Taller
+        </h2>
         <button id="tallerToggleBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);width:34px;height:34px;border-radius:8px;font-size:0.9rem;cursor:pointer;">▲</button>
       </div>
 
       <div id="tallerContenido">
-      <h2>Crear nueva galería</h2>
+
+      <div class="taller-seccion taller-galerias">
+        <div class="taller-seccion-header">
+          <svg class="taller-icono" viewBox="0 0 200 200"><use href="#icono-galeria-svg"/></svg>
+          <div>
+            <span class="taller-eyebrow">Galerías</span>
+            <h2>Crear nueva galería</h2>
+          </div>
+        </div>
       <label>Nombre de la galería</label>
       <input type="text" id="inputNombreGaleria" placeholder="Ej: Orbsentismo, MICSES...">
 
@@ -1285,8 +1422,16 @@
         <h3>Galerías existentes</h3>
         <div id="adminGaleriasContainer"></div>
       </div>
+      </div>
 
-      <h2 style="margin-top:26px;">Crear nueva colección</h2>
+      <div class="taller-seccion taller-colecciones" style="margin-top:28px;">
+        <div class="taller-seccion-header">
+          <svg class="taller-icono" viewBox="0 0 200 200"><use href="#icono-coleccion-svg"/></svg>
+          <div>
+            <span class="taller-eyebrow">Colecciones</span>
+            <h2>Crear nueva colección</h2>
+          </div>
+        </div>
       <label>Nombre de la colección</label>
       <input type="text" id="inputNombreColeccion" placeholder="Ej: Una noche con el nihilismo">
 
@@ -1317,8 +1462,16 @@
         <h3>Colecciones existentes</h3>
         <div id="adminColeccionesContainer"></div>
       </div>
+      </div>
 
-      <h2 style="margin-top:26px;">Publicar nuevo libro</h2>
+      <div class="taller-seccion taller-publicaciones" style="margin-top:28px;">
+        <div class="taller-seccion-header">
+          <svg class="taller-icono" viewBox="0 0 200 200"><use href="#meteorito-icono"/></svg>
+          <div>
+            <span class="taller-eyebrow">Publicaciones</span>
+            <h2>Publicar nuevo libro</h2>
+          </div>
+        </div>
       <label>Título del libro</label>
       <input type="text" id="inputTitulo" placeholder="Ej: Meditaciones del Exadicto">
 
@@ -1352,11 +1505,39 @@
         <div id="adminListContainer"></div>
       </div>
       </div>
+      </div>
     </div>
   </div>
 
   <!-- VISTA: GALERÍAS (nivel superior, pantalla de inicio) -->
   <div id="vistaGalerias">
+    <!-- Motivos de galaxia sutiles, solo decorativos -->
+    <div class="capa-estrellas" aria-hidden="true">
+      <span class="estrella-punto" style="top:8%; left:6%; background:#39ff8c;"></span>
+      <span class="estrella-punto" style="top:14%; left:18%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:6%; right:12%; background:#22d3c4;"></span>
+      <span class="estrella-punto" style="top:22%; right:6%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="bottom:10%; left:9%; background:#9b7cf6;"></span>
+      <span class="estrella-punto" style="bottom:18%; left:22%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="bottom:8%; right:8%; background:#39ff8c;"></span>
+      <span class="estrella-punto" style="bottom:26%; right:20%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <svg class="constelacion" style="top:4%; right:4%;" viewBox="0 0 120 90" width="90" height="70">
+        <line x1="10" y1="60" x2="45" y2="20" stroke="#22d3c4" stroke-width="1"/>
+        <line x1="45" y1="20" x2="90" y2="35" stroke="#22d3c4" stroke-width="1"/>
+        <line x1="90" y1="35" x2="105" y2="10" stroke="#22d3c4" stroke-width="1"/>
+        <circle cx="10" cy="60" r="2.5" fill="#22d3c4"/>
+        <circle cx="45" cy="20" r="2.5" fill="#22d3c4"/>
+        <circle cx="90" cy="35" r="2.5" fill="#22d3c4"/>
+        <circle cx="105" cy="10" r="2.5" fill="#22d3c4"/>
+      </svg>
+      <svg class="constelacion" style="bottom:6%; left:5%;" viewBox="0 0 120 90" width="80" height="60">
+        <line x1="8" y1="15" x2="40" y2="45" stroke="#39ff8c" stroke-width="1"/>
+        <line x1="40" y1="45" x2="80" y2="30" stroke="#39ff8c" stroke-width="1"/>
+        <circle cx="8" cy="15" r="2.5" fill="#39ff8c"/>
+        <circle cx="40" cy="45" r="2.5" fill="#39ff8c"/>
+        <circle cx="80" cy="30" r="2.5" fill="#39ff8c"/>
+      </svg>
+    </div>
     <div class="orbsy-marca">
       <svg class="orbsy-logo-svg" viewBox="0 0 200 200" style="margin-bottom:14px;">
         <defs>
@@ -2280,7 +2461,7 @@
     card.innerHTML = `
       <img src="${imagenDirecta(imagenId)}" data-alt-src="${imagenAlternativa(imagenId)}" data-tried-alt="0" alt="${escapeHtml(nombre)}" loading="lazy" onerror="manejarErrorImagen(this)">
       <div class="coleccion-overlay">
-        <div class="coleccion-titulo">${clave ? "🔒 " : ""}${escapeHtml(nombre)}</div>
+        <div class="coleccion-titulo">${clave ? `<svg class="icono-candado" viewBox="0 0 200 200" width="15" height="15" style="vertical-align:-2px;margin-right:4px;"><use href="#icono-candado-svg"/></svg>` : ""}${escapeHtml(nombre)}</div>
         ${frase ? `<div class="coleccion-frase">${escapeHtml(frase)}</div>` : ""}
       </div>
       <div class="coleccion-contador">${etiqueta}</div>
@@ -2488,7 +2669,7 @@
       }
 
       row.innerHTML = `
-        <div class="admin-row-titulo">${col.clave ? "🔒 " : ""}${escapeHtml(col.nombre)}</div>
+        <div class="admin-row-titulo">${col.clave ? `<svg class="icono-candado" viewBox="0 0 200 200" width="13" height="13" style="vertical-align:-1px;margin-right:4px;"><use href="#icono-candado-svg"/></svg>` : ""}${escapeHtml(col.nombre)}</div>
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
           <button class="editar-btn">Editar</button>
