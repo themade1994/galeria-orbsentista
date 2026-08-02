@@ -14,6 +14,7 @@
     --text:#e8e8ec;
     --text-sec:#8b8b96;
     --accent:#22d3c4;
+    --turquesa:#22d3c4;
     --accent-hover:#3ee4d5;
     --verde:#39ff8c;
     --violeta:#9b7cf6;
@@ -811,7 +812,7 @@
     color:var(--text);
     font-size:0.82rem;
   }
-  .recurso-row input{
+  .recurso-row input, .recurso-row textarea{
     width:100%;
     padding:9px 10px;
     border-radius:7px;
@@ -819,6 +820,8 @@
     background:#15151d;
     color:var(--text);
     font-size:0.82rem;
+    font-family:inherit;
+    resize:vertical;
   }
   .recurso-controles{
     display:flex;
@@ -1055,6 +1058,64 @@
   }
   #indiceToggleBtn:active{ background:#1a1a22; }
 
+  #reflexionToggleBtn{
+    background:transparent;
+    border:1px solid var(--turquesa);
+    color:var(--turquesa);
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:0.78rem;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  #reflexionToggleBtn:active{ background:#0e2422; }
+
+  /* VISOR DE GALERÍA DE IMÁGENES */
+  #galeriaImagenesViewer{
+    position:absolute;
+    inset:0;
+    align-items:center;
+    justify-content:center;
+    background:#000;
+  }
+  #galeriaImagenesViewer img{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+  }
+  .galeria-img-nav{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(20,20,24,0.6);
+    border:none;
+    color:#fff;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    font-size:1.2rem;
+    cursor:pointer;
+  }
+  .galeria-img-nav:disabled{ opacity:0.25; }
+  .galeria-img-nav.izq{ left:14px; }
+  .galeria-img-nav.der{ right:14px; }
+  .galeria-img-dots{
+    position:absolute;
+    bottom:18px;
+    left:0;
+    right:0;
+    display:flex;
+    justify-content:center;
+    gap:6px;
+  }
+  .galeria-img-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.35);
+  }
+  .galeria-img-dot.activo{ background:var(--turquesa); }
+
   /* MODAL LECTOR PDF */
   #pdfModal{
     display:none;
@@ -1251,6 +1312,9 @@
       <label style="margin-top:16px;">Colección a la que pertenece</label>
       <select id="inputColeccionAsignada"></select>
 
+      <label style="margin-top:16px;">Pregunta de reflexión (opcional, sin calificación)</label>
+      <textarea id="inputPreguntaReflexion" placeholder="Ej: ¿Dónde has visto esta misma arrogancia en tu propia vida?"></textarea>
+
       <button id="publishBtn">Publicar</button>
       <button id="logoutBtn" style="margin-top:8px;width:100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:9px;cursor:pointer;">Cerrar sesión</button>
 
@@ -1344,6 +1408,7 @@
     <button id="backBtn">← Volver a la galería</button>
     <div id="modalTitle"></div>
     <button id="indiceToggleBtn" style="display:none;">☰ Índice</button>
+    <button id="reflexionToggleBtn" style="display:none;">🪞 Reflexión</button>
     <button id="notasToggleBtn">
       <svg viewBox="0 0 200 200"><use href="#meteorito-icono"/></svg>
       Notas
@@ -1356,6 +1421,13 @@
   <div class="pdf-body" style="position:relative;">
     <div id="pdfLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-sec);font-size:0.85rem;">Cargando documento...</div>
     <iframe id="pdfFrame" src="" allow="fullscreen"></iframe>
+
+    <div id="galeriaImagenesViewer" style="display:none;">
+      <img id="galeriaImagenesImg" src="" alt="Imagen de la galería">
+      <button id="imagenAnteriorBtn" class="galeria-img-nav izq">←</button>
+      <button id="imagenSiguienteBtn" class="galeria-img-nav der">→</button>
+      <div id="galeriaImagenesDots" class="galeria-img-dots"></div>
+    </div>
   </div>
 
   <div id="indiceDrawerOverlay"></div>
@@ -1546,11 +1618,13 @@
     recursosBuilder.forEach((r, i) => {
       const row = document.createElement("div");
       row.className = "recurso-row";
+      const esImagenes = r.tipo === "imagenes";
       row.innerHTML = `
         <select class="recurso-tipo">
           <option value="texto" ${r.tipo === "texto" ? "selected" : ""}>Texto (PDF)</option>
           <option value="audio" ${r.tipo === "audio" ? "selected" : ""}>Audio</option>
           <option value="video" ${r.tipo === "video" ? "selected" : ""}>Video</option>
+          <option value="imagenes" ${r.tipo === "imagenes" ? "selected" : ""}>Galería de imágenes</option>
         </select>
         ${r.tipo === "video" ? `
         <select class="recurso-fuente">
@@ -1558,7 +1632,11 @@
           <option value="youtube" ${r.fuente === "youtube" ? "selected" : ""}>Fuente: YouTube (no listado)</option>
         </select>` : ""}
         <input type="text" class="recurso-etiqueta" placeholder="Etiqueta, ej: Mi narrativa sobre la arrogancia" value="${escapeAttr(r.etiqueta)}">
+        ${esImagenes ? `
+        <textarea class="recurso-enlaces-multiples" placeholder="Un enlace de Drive por línea (una imagen cada uno)" rows="4">${escapeAttr(r.enlacesMultiples || "")}</textarea>
+        ` : `
         <input type="text" class="recurso-enlace" placeholder="${r.tipo === 'video' && r.fuente === 'youtube' ? 'Enlace de YouTube' : 'Enlace de Google Drive'}" value="${escapeAttr(r.enlace)}">
+        `}
         <div class="recurso-controles">
           <button type="button" class="recurso-subir" ${i === 0 ? "disabled" : ""}>▲</button>
           <button type="button" class="recurso-bajar" ${i === recursosBuilder.length - 1 ? "disabled" : ""}>▼</button>
@@ -1577,7 +1655,10 @@
         });
       }
       row.querySelector(".recurso-etiqueta").addEventListener("input", (e) => { recursosBuilder[i].etiqueta = e.target.value; });
-      row.querySelector(".recurso-enlace").addEventListener("input", (e) => { recursosBuilder[i].enlace = e.target.value; });
+      const enlaceInput = row.querySelector(".recurso-enlace");
+      if (enlaceInput) enlaceInput.addEventListener("input", (e) => { recursosBuilder[i].enlace = e.target.value; });
+      const enlacesMultiplesInput = row.querySelector(".recurso-enlaces-multiples");
+      if (enlacesMultiplesInput) enlacesMultiplesInput.addEventListener("input", (e) => { recursosBuilder[i].enlacesMultiples = e.target.value; });
       row.querySelector(".recurso-subir").addEventListener("click", () => {
         if (i === 0) return;
         [recursosBuilder[i - 1], recursosBuilder[i]] = [recursosBuilder[i], recursosBuilder[i - 1]];
@@ -1624,14 +1705,31 @@
       alert("Crea primero una colección y luego selecciónala para este libro.");
       return;
     }
-    const recursosIncompletos = recursosBuilder.some(r => !r.etiqueta.trim() || !r.enlace.trim());
+    const recursosIncompletos = recursosBuilder.some(r => {
+      if (!r.etiqueta.trim()) return true;
+      if (r.tipo === "imagenes") return !(r.enlacesMultiples || "").trim();
+      return !r.enlace.trim();
+    });
     if (recursosIncompletos) {
-      alert("Completa la etiqueta y el enlace de Drive de cada recurso del índice (o quita los que no vayas a usar).");
+      alert("Completa la etiqueta y el/los enlace(s) de cada recurso del índice (o quita los que no vayas a usar).");
       return;
     }
 
     const portadaId = extraerIdDrive(portadaUrl);
+    const preguntaReflexion = document.getElementById("inputPreguntaReflexion").value.trim();
     const recursos = recursosBuilder.map(r => {
+      if (r.tipo === "imagenes") {
+        const imagenes = (r.enlacesMultiples || "")
+          .split("\n")
+          .map(linea => linea.trim())
+          .filter(linea => linea !== "")
+          .map(linea => extraerIdDrive(linea));
+        return {
+          tipo: "imagenes",
+          etiqueta: r.etiqueta.trim(),
+          imagenes
+        };
+      }
       const esYoutube = r.tipo === "video" && r.fuente === "youtube";
       return {
         tipo: r.tipo,
@@ -1650,6 +1748,7 @@
         resumen,
         portadaId,
         recursos,
+        preguntaReflexion,
         coleccionId: coleccionSeleccionada,
         fecha: serverTimestamp()
       });
@@ -1657,6 +1756,7 @@
       document.getElementById("inputTitulo").value = "";
       document.getElementById("inputResumen").value = "";
       document.getElementById("inputPortada").value = "";
+      document.getElementById("inputPreguntaReflexion").value = "";
       recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
       renderRecursosBuilder();
     } catch (e) {
@@ -2136,7 +2236,7 @@
       </div>
     `;
     card.querySelector(".read-btn").addEventListener("click", () => {
-      abrirPublicacion(libro.id, libro.titulo, recursosDeLibro(libro));
+      abrirPublicacion(libro.id, libro.titulo, recursosDeLibro(libro), libro.preguntaReflexion || "");
     });
     return card;
   }
@@ -2590,13 +2690,14 @@
   const indiceTitulo = document.getElementById("indiceTitulo");
   const indiceLista = document.getElementById("indiceLista");
 
-  const ETIQUETAS_TIPO = { texto: "Texto", audio: "Audio", video: "Video" };
+  const ETIQUETAS_TIPO = { texto: "Texto", audio: "Audio", video: "Video", imagenes: "Galería de imágenes" };
 
-  function abrirPublicacion(libroId, tituloPublicacion, recursos) {
+  function abrirPublicacion(libroId, tituloPublicacion, recursos, preguntaReflexion) {
     if (!recursos || recursos.length === 0) {
       alert("Esta publicación todavía no tiene contenido cargado.");
       return;
     }
+    preguntaReflexionActual = preguntaReflexion || "";
     if (recursos.length === 1) {
       abrirRecurso(libroId, tituloPublicacion, recursos, 0);
       return;
@@ -2623,12 +2724,14 @@
     indiceModal.classList.add("active");
   }
 
+  let preguntaReflexionActual = "";
+
   function cerrarIndice() {
     indiceModal.classList.remove("active");
   }
   document.getElementById("cerrarIndiceBtn").addEventListener("click", cerrarIndice);
 
-  // ---------- Modal lector (PDF / audio / video) ----------
+  // ---------- Modal lector (PDF / audio / video / imágenes) ----------
   const pdfModal = document.getElementById("pdfModal");
   const pdfFrame = document.getElementById("pdfFrame");
   const modalTitle = document.getElementById("modalTitle");
@@ -2642,6 +2745,10 @@
   const indiceDrawerOverlay = document.getElementById("indiceDrawerOverlay");
   const indiceDrawerLista = document.getElementById("indiceDrawerLista");
   const cerrarDrawerBtn = document.getElementById("cerrarDrawerBtn");
+  const reflexionToggleBtn = document.getElementById("reflexionToggleBtn");
+  const galeriaImagenesViewer = document.getElementById("galeriaImagenesViewer");
+  const galeriaImagenesImg = document.getElementById("galeriaImagenesImg");
+  const galeriaImagenesDots = document.getElementById("galeriaImagenesDots");
 
   // Estado de la publicación actualmente abierta, para poder navegar
   // entre sus recursos con los botones Anterior / Siguiente, y asociar notas.
@@ -2649,6 +2756,7 @@
   let indiceActual = 0;
   let tituloPublicacionActual = "";
   let libroIdActual = "";
+  let imagenesActualIndex = 0;
 
   function abrirRecurso(libroId, tituloPublicacion, recursos, index) {
     recursosActuales = recursos;
@@ -2661,14 +2769,36 @@
       ? `${tituloPublicacion} — ${recurso.etiqueta}`
       : tituloPublicacion;
 
-    pdfLoading.style.display = "flex";
-    pdfLoading.textContent = "Cargando documento...";
-    // El mismo visor de Drive (/preview) detecta automáticamente si es un
-    // PDF, un audio o un video, y muestra el reproductor correspondiente.
-    // Requiere que el archivo esté compartido como "Cualquier persona con el enlace".
-    pdfFrame.src = recurso.fuente === "youtube"
-      ? `https://www.youtube.com/embed/${recurso.driveId}`
-      : `https://drive.google.com/file/d/${recurso.driveId}/preview`;
+    reflexionToggleBtn.style.display = preguntaReflexionActual ? "inline-block" : "none";
+
+    if (recurso.tipo === "imagenes") {
+      // Galería de imágenes: visor propio con anterior/siguiente y deslizar,
+      // en vez del iframe de Drive.
+      pdfFrame.style.display = "none";
+      pdfLoading.style.display = "none";
+      galeriaImagenesViewer.style.display = "flex";
+      imagenesActualIndex = 0;
+      renderImagenGaleria(recurso.imagenes);
+    } else {
+      galeriaImagenesViewer.style.display = "none";
+      pdfFrame.style.display = "block";
+      pdfLoading.style.display = "flex";
+      pdfLoading.textContent = "Cargando documento...";
+      // El mismo visor de Drive (/preview) detecta automáticamente si es un
+      // PDF, un audio o un video, y muestra el reproductor correspondiente.
+      // Requiere que el archivo esté compartido como "Cualquier persona con el enlace".
+      pdfFrame.src = recurso.fuente === "youtube"
+        ? `https://www.youtube.com/embed/${recurso.driveId}`
+        : `https://drive.google.com/file/d/${recurso.driveId}/preview`;
+      const avisoTimeout = setTimeout(() => {
+        pdfLoading.textContent = "Esto está tardando más de lo normal. Intenta recargar la página.";
+      }, 6000);
+      pdfFrame.onload = () => {
+        clearTimeout(avisoTimeout);
+        pdfLoading.style.display = "none";
+      };
+    }
+
     pdfModal.classList.add("active");
     document.body.style.overflow = "hidden";
     cargarNotaDePublicacion(libroId, tituloPublicacion);
@@ -2690,15 +2820,69 @@
       navBar.classList.remove("active");
       indiceToggleBtn.style.display = "none";
     }
-
-    const avisoTimeout = setTimeout(() => {
-      pdfLoading.textContent = "Esto está tardando más de lo normal. Intenta recargar la página.";
-    }, 6000);
-    pdfFrame.onload = () => {
-      clearTimeout(avisoTimeout);
-      pdfLoading.style.display = "none";
-    };
   }
+
+  // ---------- Visor de galería de imágenes ----------
+  function renderImagenGaleria(imagenes) {
+    galeriaImagenesImg.src = imagenDirecta(imagenes[imagenesActualIndex]);
+    galeriaImagenesDots.innerHTML = "";
+    imagenes.forEach((img, i) => {
+      const dot = document.createElement("span");
+      dot.className = "galeria-img-dot" + (i === imagenesActualIndex ? " activo" : "");
+      galeriaImagenesDots.appendChild(dot);
+    });
+    document.getElementById("imagenAnteriorBtn").disabled = imagenesActualIndex === 0;
+    document.getElementById("imagenSiguienteBtn").disabled = imagenesActualIndex === imagenes.length - 1;
+  }
+
+  document.getElementById("imagenAnteriorBtn").addEventListener("click", () => {
+    const recurso = recursosActuales[indiceActual];
+    if (imagenesActualIndex > 0) {
+      imagenesActualIndex--;
+      renderImagenGaleria(recurso.imagenes);
+    }
+  });
+  document.getElementById("imagenSiguienteBtn").addEventListener("click", () => {
+    const recurso = recursosActuales[indiceActual];
+    if (imagenesActualIndex < recurso.imagenes.length - 1) {
+      imagenesActualIndex++;
+      renderImagenGaleria(recurso.imagenes);
+    }
+  });
+
+  // Deslizar con el dedo (swipe) para pasar de imagen
+  let touchInicioX = 0;
+  galeriaImagenesViewer.addEventListener("touchstart", (e) => {
+    touchInicioX = e.changedTouches[0].clientX;
+  });
+  galeriaImagenesViewer.addEventListener("touchend", (e) => {
+    const deltaX = e.changedTouches[0].clientX - touchInicioX;
+    const recurso = recursosActuales[indiceActual];
+    if (!recurso || recurso.tipo !== "imagenes") return;
+    if (deltaX > 50 && imagenesActualIndex > 0) {
+      imagenesActualIndex--;
+      renderImagenGaleria(recurso.imagenes);
+    } else if (deltaX < -50 && imagenesActualIndex < recurso.imagenes.length - 1) {
+      imagenesActualIndex++;
+      renderImagenGaleria(recurso.imagenes);
+    }
+  });
+
+  // ---------- Botón de reflexión ----------
+  reflexionToggleBtn.addEventListener("click", () => {
+    if (!preguntaReflexionActual) return;
+    if (!confirm(`"${preguntaReflexionActual}"\n\n¿Responder ahora en orbSY notes?`)) return;
+    cargarNotaDePublicacion(libroIdActual, tituloPublicacionActual);
+    // Si la nota está vacía o no empieza ya con esta pregunta, la insertamos como encabezado
+    const yaTieneLaPregunta = notasHoja.innerText.trim().startsWith(preguntaReflexionActual.trim().slice(0, 30));
+    if (!yaTieneLaPregunta) {
+      const encabezado = `<h3>Reflexión: ${escapeHtml(preguntaReflexionActual)}</h3>` + notasHoja.innerHTML;
+      notasHoja.innerHTML = encabezado;
+      actualizarPlaceholderNota();
+      guardarNotaActual();
+    }
+    abrirNotas();
+  });
 
   // ---------- Cortina deslizable: índice siempre accesible durante la lectura ----------
   function renderIndiceDrawer(recursos, indexActual) {
