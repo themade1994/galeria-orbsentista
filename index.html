@@ -665,6 +665,18 @@
   }
   .delete-btn:active{ background:#991b1b; }
 
+  .editar-btn{
+    background:transparent;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    padding:7px 10px;
+    border-radius:7px;
+    font-size:0.75rem;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .editar-btn:active{ background:#0e2422; }
+
   .login-box{
     display:flex;
     gap:8px;
@@ -1248,6 +1260,12 @@
     </div>
 
     <div id="formSection" style="display:none;">
+      <div id="tallerHeader" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:16px;">
+        <h2 style="margin:0;">🛠 Taller</h2>
+        <button id="tallerToggleBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);width:34px;height:34px;border-radius:8px;font-size:0.9rem;cursor:pointer;">▲</button>
+      </div>
+
+      <div id="tallerContenido">
       <h2>Crear nueva galería</h2>
       <label>Nombre de la galería</label>
       <input type="text" id="inputNombreGaleria" placeholder="Ej: Orbsentismo, MICSES...">
@@ -1258,7 +1276,10 @@
       <label>Enlace de Google Drive (imagen de fondo, opcional)</label>
       <input type="text" id="inputFondoGaleria" placeholder="https://drive.google.com/file/d/.../view">
 
-      <button id="crearGaleriaBtn">Crear galería</button>
+      <div style="display:flex;gap:8px;">
+        <button id="crearGaleriaBtn" style="flex:1;">Crear galería</button>
+        <button id="cancelarEdicionGaleriaBtn" style="display:none;flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:0 14px;border-radius:9px;">Cancelar</button>
+      </div>
 
       <div class="admin-list">
         <h3>Galerías existentes</h3>
@@ -1287,7 +1308,10 @@
       </label>
       <input type="text" id="inputClaveColeccion" placeholder="Contraseña de la colección" style="display:none;margin-top:8px;">
 
-      <button id="crearColeccionBtn">Crear colección</button>
+      <div style="display:flex;gap:8px;">
+        <button id="crearColeccionBtn" style="flex:1;">Crear colección</button>
+        <button id="cancelarEdicionColeccionBtn" style="display:none;flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:0 14px;border-radius:9px;">Cancelar</button>
+      </div>
 
       <div class="admin-list">
         <h3>Colecciones existentes</h3>
@@ -1305,22 +1329,28 @@
       <input type="text" id="inputPortada" placeholder="https://drive.google.com/file/d/.../view">
 
       <label>Contenido de la publicación (índice temático)</label>
-      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Agrega uno o varios recursos (texto, audio o video). El orden en que los agregues es el orden del índice.</p>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Agrega uno o varios recursos (texto, audio, video o galería de imágenes). El orden en que los agregues es el orden del índice.</p>
       <div id="recursosBuilderContainer"></div>
       <button type="button" id="agregarRecursoBtn">+ Agregar recurso</button>
 
       <label style="margin-top:16px;">Colección a la que pertenece</label>
       <select id="inputColeccionAsignada"></select>
 
-      <label style="margin-top:16px;">Pregunta de reflexión (opcional, sin calificación)</label>
-      <textarea id="inputPreguntaReflexion" placeholder="Ej: ¿Dónde has visto esta misma arrogancia en tu propia vida?"></textarea>
+      <label style="margin-top:16px;">Cuestionario de reflexión (opcional, sin calificación)</label>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Agrega una o varias preguntas. Aparecerán al final del índice temático de esta publicación.</p>
+      <div id="preguntasBuilderContainer"></div>
+      <button type="button" id="agregarPreguntaBtn">+ Agregar pregunta</button>
 
-      <button id="publishBtn">Publicar</button>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button id="publishBtn" style="flex:1;">Publicar</button>
+        <button id="cancelarEdicionLibroBtn" style="display:none;flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:0 14px;border-radius:9px;">Cancelar</button>
+      </div>
       <button id="logoutBtn" style="margin-top:8px;width:100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:9px;cursor:pointer;">Cerrar sesión</button>
 
       <div class="admin-list">
         <h3>Libros publicados</h3>
         <div id="adminListContainer"></div>
+      </div>
       </div>
     </div>
   </div>
@@ -1689,8 +1719,92 @@
 
   renderRecursosBuilder();
 
+  // ---------- Constructor de preguntas de reflexión (cuestionario) ----------
+  let preguntasBuilder = [];
+  const preguntasBuilderContainer = document.getElementById("preguntasBuilderContainer");
+
+  function renderPreguntasBuilder() {
+    preguntasBuilderContainer.innerHTML = "";
+    preguntasBuilder.forEach((texto, i) => {
+      const row = document.createElement("div");
+      row.className = "recurso-row";
+      row.innerHTML = `
+        <textarea class="pregunta-texto" placeholder="Ej: ¿Dónde has visto esto en tu propia vida?" rows="2">${escapeAttr(texto)}</textarea>
+        <div class="recurso-controles">
+          <button type="button" class="pregunta-quitar">✕ Quitar</button>
+        </div>
+      `;
+      row.querySelector(".pregunta-texto").addEventListener("input", (e) => { preguntasBuilder[i] = e.target.value; });
+      row.querySelector(".pregunta-quitar").addEventListener("click", () => {
+        preguntasBuilder.splice(i, 1);
+        renderPreguntasBuilder();
+      });
+      preguntasBuilderContainer.appendChild(row);
+    });
+  }
+
+  document.getElementById("agregarPreguntaBtn").addEventListener("click", () => {
+    preguntasBuilder.push("");
+    renderPreguntasBuilder();
+  });
+
+  renderPreguntasBuilder();
+
   // ---------- Publicar libro (con su índice temático de recursos) ----------
   const publishBtn = document.getElementById("publishBtn");
+  const cancelarEdicionLibroBtn = document.getElementById("cancelarEdicionLibroBtn");
+  let libroEnEdicionId = null;
+
+  function cargarLibroParaEditar(libro) {
+    libroEnEdicionId = libro.id;
+    document.getElementById("inputTitulo").value = libro.titulo || "";
+    document.getElementById("inputResumen").value = libro.resumen || "";
+    document.getElementById("inputPortada").value = libro.portadaId ? `https://drive.google.com/file/d/${libro.portadaId}/view` : "";
+    document.getElementById("inputColeccionAsignada").value = libro.coleccionId || "";
+
+    const recursosOriginales = recursosDeLibro(libro);
+    recursosBuilder = recursosOriginales.map(r => {
+      if (r.tipo === "imagenes") {
+        return {
+          tipo: "imagenes",
+          etiqueta: r.etiqueta,
+          enlacesMultiples: (r.imagenes || []).map(id => `https://drive.google.com/file/d/${id}/view`).join("\n")
+        };
+      }
+      return {
+        tipo: r.tipo,
+        etiqueta: r.etiqueta,
+        fuente: r.fuente || "drive",
+        enlace: r.fuente === "youtube" ? `https://youtu.be/${r.driveId}` : `https://drive.google.com/file/d/${r.driveId}/view`
+      };
+    });
+    if (recursosBuilder.length === 0) recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
+    renderRecursosBuilder();
+
+    preguntasBuilder = Array.isArray(libro.preguntasReflexion) ? [...libro.preguntasReflexion] : (libro.preguntaReflexion ? [libro.preguntaReflexion] : []);
+    renderPreguntasBuilder();
+
+    publishBtn.textContent = "Guardar cambios";
+    cancelarEdicionLibroBtn.style.display = "block";
+    tallerContenido.style.display = "block";
+    tallerToggleBtn.textContent = "▲";
+    document.getElementById("inputTitulo").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function cancelarEdicionLibro() {
+    libroEnEdicionId = null;
+    document.getElementById("inputTitulo").value = "";
+    document.getElementById("inputResumen").value = "";
+    document.getElementById("inputPortada").value = "";
+    recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
+    renderRecursosBuilder();
+    preguntasBuilder = [];
+    renderPreguntasBuilder();
+    publishBtn.textContent = "Publicar";
+    cancelarEdicionLibroBtn.style.display = "none";
+  }
+  cancelarEdicionLibroBtn.addEventListener("click", cancelarEdicionLibro);
+
   publishBtn.addEventListener("click", async () => {
     const titulo = document.getElementById("inputTitulo").value.trim();
     const resumen = document.getElementById("inputResumen").value.trim();
@@ -1716,7 +1830,7 @@
     }
 
     const portadaId = extraerIdDrive(portadaUrl);
-    const preguntaReflexion = document.getElementById("inputPreguntaReflexion").value.trim();
+    const preguntasReflexion = preguntasBuilder.map(p => p.trim()).filter(p => p !== "");
     const recursos = recursosBuilder.map(r => {
       if (r.tipo === "imagenes") {
         const imagenes = (r.enlacesMultiples || "")
@@ -1740,35 +1854,74 @@
     });
 
     publishBtn.disabled = true;
-    publishBtn.textContent = "Publicando...";
+    publishBtn.textContent = libroEnEdicionId ? "Guardando..." : "Publicando...";
+
+    const datosLibro = {
+      titulo,
+      resumen,
+      portadaId,
+      recursos,
+      preguntasReflexion,
+      coleccionId: coleccionSeleccionada
+    };
 
     try {
-      await addDoc(librosCol, {
-        titulo,
-        resumen,
-        portadaId,
-        recursos,
-        preguntaReflexion,
-        coleccionId: coleccionSeleccionada,
-        fecha: serverTimestamp()
-      });
-
-      document.getElementById("inputTitulo").value = "";
-      document.getElementById("inputResumen").value = "";
-      document.getElementById("inputPortada").value = "";
-      document.getElementById("inputPreguntaReflexion").value = "";
-      recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
-      renderRecursosBuilder();
+      if (libroEnEdicionId) {
+        await updateDoc(doc(db, "libros", libroEnEdicionId), datosLibro);
+        cancelarEdicionLibro();
+      } else {
+        await addDoc(librosCol, { ...datosLibro, fecha: serverTimestamp() });
+        document.getElementById("inputTitulo").value = "";
+        document.getElementById("inputResumen").value = "";
+        document.getElementById("inputPortada").value = "";
+        recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
+        renderRecursosBuilder();
+        preguntasBuilder = [];
+        renderPreguntasBuilder();
+      }
     } catch (e) {
       alert("Error al publicar: " + e.message);
     }
 
     publishBtn.disabled = false;
-    publishBtn.textContent = "Publicar";
+    if (!libroEnEdicionId) publishBtn.textContent = "Publicar";
   });
 
-  // ---------- Crear galería ----------
+  // ---------- Taller: colapsar/expandir el contenido de configuración ----------
+  const tallerContenido = document.getElementById("tallerContenido");
+  const tallerToggleBtn = document.getElementById("tallerToggleBtn");
+  document.getElementById("tallerHeader").addEventListener("click", () => {
+    const colapsado = tallerContenido.style.display === "none";
+    tallerContenido.style.display = colapsado ? "block" : "none";
+    tallerToggleBtn.textContent = colapsado ? "▲" : "▼";
+  });
+
   const crearGaleriaBtn = document.getElementById("crearGaleriaBtn");
+  const cancelarEdicionGaleriaBtn = document.getElementById("cancelarEdicionGaleriaBtn");
+  let galeriaEnEdicionId = null;
+
+  function cargarGaleriaParaEditar(gal) {
+    galeriaEnEdicionId = gal.id;
+    document.getElementById("inputNombreGaleria").value = gal.nombre || "";
+    document.getElementById("inputImagenGaleria").value = gal.imagenId ? `https://drive.google.com/file/d/${gal.imagenId}/view` : "";
+    document.getElementById("inputFondoGaleria").value = gal.fondoId ? `https://drive.google.com/file/d/${gal.fondoId}/view` : "";
+    crearGaleriaBtn.textContent = "Guardar cambios";
+    cancelarEdicionGaleriaBtn.style.display = "block";
+    tallerContenido.style.display = "block";
+    tallerToggleBtn.textContent = "▲";
+    document.getElementById("inputNombreGaleria").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function cancelarEdicionGaleria() {
+    galeriaEnEdicionId = null;
+    document.getElementById("inputNombreGaleria").value = "";
+    document.getElementById("inputImagenGaleria").value = "";
+    document.getElementById("inputFondoGaleria").value = "";
+    crearGaleriaBtn.textContent = "Crear galería";
+    cancelarEdicionGaleriaBtn.style.display = "none";
+  }
+  cancelarEdicionGaleriaBtn.addEventListener("click", cancelarEdicionGaleria);
+
   crearGaleriaBtn.addEventListener("click", async () => {
     const nombre = document.getElementById("inputNombreGaleria").value.trim();
     const imagenUrl = document.getElementById("inputImagenGaleria").value.trim();
@@ -1783,24 +1936,29 @@
     const fondoId = fondoUrl ? extraerIdDrive(fondoUrl) : "";
 
     crearGaleriaBtn.disabled = true;
-    crearGaleriaBtn.textContent = "Creando...";
+    crearGaleriaBtn.textContent = galeriaEnEdicionId ? "Guardando..." : "Creando...";
 
     try {
-      await addDoc(galeriasCol, {
-        nombre,
-        imagenId,
-        fondoId,
-        fecha: serverTimestamp()
-      });
-      document.getElementById("inputNombreGaleria").value = "";
-      document.getElementById("inputImagenGaleria").value = "";
-      document.getElementById("inputFondoGaleria").value = "";
+      if (galeriaEnEdicionId) {
+        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId });
+        cancelarEdicionGaleria();
+      } else {
+        await addDoc(galeriasCol, {
+          nombre,
+          imagenId,
+          fondoId,
+          fecha: serverTimestamp()
+        });
+        document.getElementById("inputNombreGaleria").value = "";
+        document.getElementById("inputImagenGaleria").value = "";
+        document.getElementById("inputFondoGaleria").value = "";
+      }
     } catch (e) {
-      alert("Error al crear la galería: " + e.message);
+      alert("Error al guardar la galería: " + e.message);
     }
 
     crearGaleriaBtn.disabled = false;
-    crearGaleriaBtn.textContent = "Crear galería";
+    if (!galeriaEnEdicionId) crearGaleriaBtn.textContent = "Crear galería";
   });
 
   document.getElementById("inputProtegerColeccion").addEventListener("change", (e) => {
@@ -1809,6 +1967,40 @@
 
   // ---------- Crear colección ----------
   const crearColeccionBtn = document.getElementById("crearColeccionBtn");
+  const cancelarEdicionColeccionBtn = document.getElementById("cancelarEdicionColeccionBtn");
+  let coleccionEnEdicionId = null;
+
+  function cargarColeccionParaEditar(col) {
+    coleccionEnEdicionId = col.id;
+    document.getElementById("inputNombreColeccion").value = col.nombre || "";
+    document.getElementById("inputGaleriaAsignada").value = col.galeriaId || "";
+    document.getElementById("inputFraseColeccion").value = col.frase || "";
+    document.getElementById("inputImagenColeccion").value = col.imagenId ? `https://drive.google.com/file/d/${col.imagenId}/view` : "";
+    document.getElementById("inputFondoColeccion").value = col.fondoId ? `https://drive.google.com/file/d/${col.fondoId}/view` : "";
+    document.getElementById("inputProtegerColeccion").checked = !!col.clave;
+    document.getElementById("inputClaveColeccion").value = col.clave || "";
+    document.getElementById("inputClaveColeccion").style.display = col.clave ? "block" : "none";
+    crearColeccionBtn.textContent = "Guardar cambios";
+    cancelarEdicionColeccionBtn.style.display = "block";
+    tallerContenido.style.display = "block";
+    tallerToggleBtn.textContent = "▲";
+    document.getElementById("inputNombreColeccion").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function cancelarEdicionColeccion() {
+    coleccionEnEdicionId = null;
+    document.getElementById("inputNombreColeccion").value = "";
+    document.getElementById("inputFraseColeccion").value = "";
+    document.getElementById("inputImagenColeccion").value = "";
+    document.getElementById("inputFondoColeccion").value = "";
+    document.getElementById("inputProtegerColeccion").checked = false;
+    document.getElementById("inputClaveColeccion").value = "";
+    document.getElementById("inputClaveColeccion").style.display = "none";
+    crearColeccionBtn.textContent = "Crear colección";
+    cancelarEdicionColeccionBtn.style.display = "none";
+  }
+  cancelarEdicionColeccionBtn.addEventListener("click", cancelarEdicionColeccion);
+
   crearColeccionBtn.addEventListener("click", async () => {
     const nombre = document.getElementById("inputNombreColeccion").value.trim();
     const galeriaSeleccionada = document.getElementById("inputGaleriaAsignada").value;
@@ -1835,31 +2027,37 @@
     const fondoId = fondoUrl ? extraerIdDrive(fondoUrl) : "";
 
     crearColeccionBtn.disabled = true;
-    crearColeccionBtn.textContent = "Creando...";
+    crearColeccionBtn.textContent = coleccionEnEdicionId ? "Guardando..." : "Creando...";
+
+    const datosColeccion = {
+      nombre,
+      galeriaId: galeriaSeleccionada,
+      frase,
+      imagenId,
+      fondoId,
+      clave: protegida ? clave : ""
+    };
 
     try {
-      await addDoc(coleccionesCol, {
-        nombre,
-        galeriaId: galeriaSeleccionada,
-        frase,
-        imagenId,
-        fondoId,
-        clave: protegida ? clave : "",
-        fecha: serverTimestamp()
-      });
-      document.getElementById("inputNombreColeccion").value = "";
-      document.getElementById("inputFraseColeccion").value = "";
-      document.getElementById("inputImagenColeccion").value = "";
-      document.getElementById("inputFondoColeccion").value = "";
-      document.getElementById("inputProtegerColeccion").checked = false;
-      document.getElementById("inputClaveColeccion").value = "";
-      document.getElementById("inputClaveColeccion").style.display = "none";
+      if (coleccionEnEdicionId) {
+        await updateDoc(doc(db, "colecciones", coleccionEnEdicionId), datosColeccion);
+        cancelarEdicionColeccion();
+      } else {
+        await addDoc(coleccionesCol, { ...datosColeccion, fecha: serverTimestamp() });
+        document.getElementById("inputNombreColeccion").value = "";
+        document.getElementById("inputFraseColeccion").value = "";
+        document.getElementById("inputImagenColeccion").value = "";
+        document.getElementById("inputFondoColeccion").value = "";
+        document.getElementById("inputProtegerColeccion").checked = false;
+        document.getElementById("inputClaveColeccion").value = "";
+        document.getElementById("inputClaveColeccion").style.display = "none";
+      }
     } catch (e) {
-      alert("Error al crear la colección: " + e.message);
+      alert("Error al guardar la colección: " + e.message);
     }
 
     crearColeccionBtn.disabled = false;
-    crearColeccionBtn.textContent = "Crear colección";
+    if (!coleccionEnEdicionId) crearColeccionBtn.textContent = "Crear colección";
   });
 
   document.getElementById("logoutBtn").addEventListener("click", async () => {
@@ -2236,7 +2434,7 @@
       </div>
     `;
     card.querySelector(".read-btn").addEventListener("click", () => {
-      abrirPublicacion(libro.id, libro.titulo, recursosDeLibro(libro), libro.preguntaReflexion || "");
+      abrirPublicacion(libro.id, libro.titulo, recursosDeLibro(libro), libro.preguntasReflexion || (libro.preguntaReflexion ? [libro.preguntaReflexion] : []));
     });
     return card;
   }
@@ -2259,12 +2457,14 @@
         <div class="admin-row-titulo">${escapeHtml(libro.titulo)}</div>
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
+          <button class="editar-btn">Editar</button>
           <button class="delete-btn">Eliminar</button>
         </div>
       `;
       row.querySelector(".mover-select").addEventListener("change", async (e) => {
         await updateDoc(doc(db, "libros", libro.id), { coleccionId: e.target.value });
       });
+      row.querySelector(".editar-btn").addEventListener("click", () => cargarLibroParaEditar(libro));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar "${libro.titulo}"?`)) {
           await deleteDoc(doc(db, "libros", libro.id));
@@ -2288,15 +2488,17 @@
       }
 
       row.innerHTML = `
-        <div class="admin-row-titulo">${escapeHtml(col.nombre)}</div>
+        <div class="admin-row-titulo">${col.clave ? "🔒 " : ""}${escapeHtml(col.nombre)}</div>
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
+          <button class="editar-btn">Editar</button>
           <button class="delete-btn">Eliminar</button>
         </div>
       `;
       row.querySelector(".mover-select").addEventListener("change", async (e) => {
         await updateDoc(doc(db, "colecciones", col.id), { galeriaId: e.target.value });
       });
+      row.querySelector(".editar-btn").addEventListener("click", () => cargarColeccionParaEditar(col));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar la colección "${col.nombre}"? Los escritos dentro no se borran, pasarán a verse en "General".`)) {
           await deleteDoc(doc(db, "colecciones", col.id));
@@ -2313,9 +2515,13 @@
       const row = document.createElement("div");
       row.className = "admin-row";
       row.innerHTML = `
-        <span>${escapeHtml(gal.nombre)}</span>
-        <button class="delete-btn">Eliminar galería</button>
+        <div class="admin-row-titulo">${escapeHtml(gal.nombre)}</div>
+        <div class="admin-row-controles">
+          <button class="editar-btn">Editar</button>
+          <button class="delete-btn">Eliminar galería</button>
+        </div>
       `;
+      row.querySelector(".editar-btn").addEventListener("click", () => cargarGaleriaParaEditar(gal));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar la galería "${gal.nombre}"? Las colecciones dentro no se borran, pasarán a verse en "General".`)) {
           await deleteDoc(doc(db, "galerias", gal.id));
@@ -2692,12 +2898,12 @@
 
   const ETIQUETAS_TIPO = { texto: "Texto", audio: "Audio", video: "Video", imagenes: "Galería de imágenes" };
 
-  function abrirPublicacion(libroId, tituloPublicacion, recursos, preguntaReflexion) {
+  function abrirPublicacion(libroId, tituloPublicacion, recursos, preguntasReflexion) {
     if (!recursos || recursos.length === 0) {
       alert("Esta publicación todavía no tiene contenido cargado.");
       return;
     }
-    preguntaReflexionActual = preguntaReflexion || "";
+    preguntasReflexionActuales = Array.isArray(preguntasReflexion) ? preguntasReflexion.filter(p => p && p.trim()) : [];
     if (recursos.length === 1) {
       abrirRecurso(libroId, tituloPublicacion, recursos, 0);
       return;
@@ -2721,10 +2927,47 @@
       });
       indiceLista.appendChild(item);
     });
+
+    if (preguntasReflexionActuales.length > 0) {
+      const separador = document.createElement("div");
+      separador.style.cssText = "padding:14px 10px 6px;font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--turquesa);border-top:1px solid var(--border);margin-top:8px;";
+      separador.textContent = "Cuestionario de reflexión";
+      indiceLista.appendChild(separador);
+      preguntasReflexionActuales.forEach((pregunta) => {
+        const item = document.createElement("div");
+        item.className = "indice-item";
+        item.innerHTML = `
+          <div class="indice-numero" style="background:var(--turquesa);">🪞</div>
+          <div class="indice-info">
+            <div class="indice-etiqueta">${escapeHtml(pregunta)}</div>
+            <div class="indice-tipo">Responder en orbSY notes</div>
+          </div>
+        `;
+        item.addEventListener("click", () => {
+          cerrarIndice();
+          responderPregunta(libroId, tituloPublicacion, pregunta);
+        });
+        indiceLista.appendChild(item);
+      });
+    }
+
     indiceModal.classList.add("active");
   }
 
-  let preguntaReflexionActual = "";
+  let preguntasReflexionActuales = [];
+
+  // Inserta la pregunta como encabezado en orbSY notes (si no está ya) y abre el editor
+  function responderPregunta(libroId, tituloPublicacion, pregunta) {
+    cargarNotaDePublicacion(libroId, tituloPublicacion);
+    const yaTieneLaPregunta = notasHoja.innerHTML.includes(escapeHtml(pregunta).slice(0, 40));
+    if (!yaTieneLaPregunta) {
+      const encabezado = `<h3>Reflexión: ${escapeHtml(pregunta)}</h3><p></p>` + notasHoja.innerHTML;
+      notasHoja.innerHTML = encabezado;
+      actualizarPlaceholderNota();
+      guardarNotaActual();
+    }
+    abrirNotas();
+  }
 
   function cerrarIndice() {
     indiceModal.classList.remove("active");
@@ -2769,7 +3012,8 @@
       ? `${tituloPublicacion} — ${recurso.etiqueta}`
       : tituloPublicacion;
 
-    reflexionToggleBtn.style.display = preguntaReflexionActual ? "inline-block" : "none";
+    reflexionToggleBtn.style.display = preguntasReflexionActuales.length > 0 ? "inline-block" : "none";
+    reflexionToggleBtn.textContent = preguntasReflexionActuales.length > 1 ? `🪞 Reflexión (${preguntasReflexionActuales.length})` : "🪞 Reflexión";
 
     if (recurso.tipo === "imagenes") {
       // Galería de imágenes: visor propio con anterior/siguiente y deslizar,
@@ -2868,20 +3112,37 @@
     }
   });
 
-  // ---------- Botón de reflexión ----------
+  // ---------- Botón de reflexión: abre el cuestionario en la cortina de índice ----------
   reflexionToggleBtn.addEventListener("click", () => {
-    if (!preguntaReflexionActual) return;
-    if (!confirm(`"${preguntaReflexionActual}"\n\n¿Responder ahora en orbSY notes?`)) return;
-    cargarNotaDePublicacion(libroIdActual, tituloPublicacionActual);
-    // Si la nota está vacía o no empieza ya con esta pregunta, la insertamos como encabezado
-    const yaTieneLaPregunta = notasHoja.innerText.trim().startsWith(preguntaReflexionActual.trim().slice(0, 30));
-    if (!yaTieneLaPregunta) {
-      const encabezado = `<h3>Reflexión: ${escapeHtml(preguntaReflexionActual)}</h3>` + notasHoja.innerHTML;
-      notasHoja.innerHTML = encabezado;
-      actualizarPlaceholderNota();
-      guardarNotaActual();
+    if (preguntasReflexionActuales.length === 0) return;
+    if (recursosActuales.length > 1) {
+      // Ya viene armado por renderIndiceDrawer junto al índice; solo hay que abrir la cortina
+      abrirDrawer();
+    } else {
+      // Publicación de un solo recurso: mostramos solo el cuestionario en la cortina
+      indiceDrawerLista.innerHTML = "";
+      const separador = document.createElement("div");
+      separador.style.cssText = "padding:10px 8px 6px;font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--turquesa);";
+      separador.textContent = "Cuestionario de reflexión";
+      indiceDrawerLista.appendChild(separador);
+      preguntasReflexionActuales.forEach((pregunta) => {
+        const item = document.createElement("div");
+        item.className = "indice-drawer-item";
+        item.innerHTML = `
+          <div class="indice-drawer-numero" style="background:var(--turquesa);">🪞</div>
+          <div class="indice-drawer-info">
+            <div class="indice-drawer-etiqueta">${escapeHtml(pregunta)}</div>
+            <div class="indice-drawer-tipo">Responder</div>
+          </div>
+        `;
+        item.addEventListener("click", () => {
+          cerrarDrawer();
+          responderPregunta(libroIdActual, tituloPublicacionActual, pregunta);
+        });
+        indiceDrawerLista.appendChild(item);
+      });
+      abrirDrawer();
     }
-    abrirNotas();
   });
 
   // ---------- Cortina deslizable: índice siempre accesible durante la lectura ----------
@@ -2904,6 +3165,29 @@
       });
       indiceDrawerLista.appendChild(item);
     });
+
+    if (preguntasReflexionActuales.length > 0) {
+      const separador = document.createElement("div");
+      separador.style.cssText = "padding:14px 8px 6px;font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--turquesa);border-top:1px solid var(--border);margin-top:6px;";
+      separador.textContent = "Cuestionario de reflexión";
+      indiceDrawerLista.appendChild(separador);
+      preguntasReflexionActuales.forEach((pregunta) => {
+        const item = document.createElement("div");
+        item.className = "indice-drawer-item";
+        item.innerHTML = `
+          <div class="indice-drawer-numero" style="background:var(--turquesa);">🪞</div>
+          <div class="indice-drawer-info">
+            <div class="indice-drawer-etiqueta">${escapeHtml(pregunta)}</div>
+            <div class="indice-drawer-tipo">Responder</div>
+          </div>
+        `;
+        item.addEventListener("click", () => {
+          cerrarDrawer();
+          responderPregunta(libroIdActual, tituloPublicacionActual, pregunta);
+        });
+        indiceDrawerLista.appendChild(item);
+      });
+    }
   }
 
   function abrirDrawer() {
