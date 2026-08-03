@@ -1851,6 +1851,11 @@
   const galeriasCol = collection(db, "galerias");
   const usuariosCol = collection(db, "usuarios");
 
+  // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
+  // (Declarado aquí arriba porque "vista" lo necesita para inicializarse)
+  const parametrosUrl = new URLSearchParams(location.search);
+  let uidPerfilObjetivo = parametrosUrl.get("u");
+
   // Estado en memoria: se llenan con los listeners de Firestore más abajo
   let libros = [];        // [{id, titulo, resumen, portadaId, coleccionId, recursos, fecha}]
   let colecciones = [];   // [{id, nombre, imagenId, frase, clave, galeriaId, fecha}]
@@ -1908,10 +1913,6 @@
   // estar autenticado para poder publicar o borrar libros.
   let isAdmin = false;
   let uidActual = null;
-
-  // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
-  const parametrosUrl = new URLSearchParams(location.search);
-  let uidPerfilObjetivo = parametrosUrl.get("u");
 
   const COLORES_GALAXIA = { verde: "#39ff8c", turquesa: "#22d3c4", violeta: "#9b7cf6", gris: "#c7c7cf" };
   const ID_PERFIL_GENERAL = "__perfil_general__"; // agrupa contenido sin dueño asignado
