@@ -816,6 +816,7 @@
     flex-direction:column;
     justify-content:flex-end;
     padding:18px;
+    overflow:hidden;
   }
   .coleccion-titulo{
     font-family:'Fraunces',serif;
@@ -830,6 +831,11 @@
     color:#d8d8e2;
     font-style:italic;
     line-height:1.4;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
   .coleccion-contador{
     position:absolute;
