@@ -293,6 +293,37 @@
 
   /* Lista de notas guardadas (desde el panel Herramientas) */
   .notas-guardadas-lista{ padding:10px; overflow-y:auto; flex:1; }
+
+  .plantilla-campo-copiable{
+    display:flex;
+    gap:6px;
+    align-items:flex-start;
+  }
+  .plantilla-campo-copiable input,
+  .plantilla-campo-copiable textarea{
+    flex:1;
+  }
+  .copiar-campo-btn{
+    flex:0 0 auto;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    font-size:0.68rem;
+    padding:0 10px;
+    border-radius:8px;
+    cursor:pointer;
+    white-space:nowrap;
+    align-self:stretch;
+  }
+  .copiar-campo-btn.copiado{
+    color:var(--verde);
+    border-color:var(--verde);
+  }
+  .plantilla-tipo-btn.activo{
+    background:var(--accent) !important;
+    border-color:var(--accent) !important;
+    color:#fff !important;
+  }
   .nota-guardada-item{
     background:var(--surface);
     border:1px solid var(--border);
@@ -1442,47 +1473,59 @@
     </div>
   </div>
 
-  <!-- Editor de plantilla de recursos: texto plano estructurado, sin IA -->
-  <div id="plantillaEditorVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+  <!-- Editor de plantilla de recursos: FORMULARIO estructurado (no texto libre) -->
+  <div id="plantillaEditorVista" style="display:none;flex-direction:column;flex:1;overflow-y:auto;">
     <div style="padding:10px 14px;display:flex;gap:8px;">
       <button id="volverAPlantillasBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Plantillas</button>
       <button id="guardarPlantillaBtn" style="flex:1;background:var(--accent);border:none;color:#fff;padding:7px 12px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;">Guardar plantilla</button>
       <button id="eliminarPlantillaBtn" style="display:none;background:transparent;border:1px solid var(--border);color:#f87171;padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">Eliminar</button>
     </div>
-    <div id="plantillaValidacion" style="margin:0 14px 8px;padding:8px 10px;background:#0e0e13;border:1px solid var(--border);border-radius:8px;font-size:0.72rem;line-height:1.5;color:var(--text-sec);"></div>
-    <textarea id="plantillaTexto" spellcheck="false" placeholder="PUBLICACIÓN
 
-Título:
-La noche del nihilista
+    <div style="padding:0 14px;">
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:8px;">Una plantilla es para UN solo espacio: una galería, una colección, o una publicación. Elige cuál estás planeando:</p>
+      <div id="plantillaTipoSelector" style="display:flex;gap:6px;margin-bottom:16px;">
+        <button type="button" class="plantilla-tipo-btn" data-tipo="galeria" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-sec);">Galería</button>
+        <button type="button" class="plantilla-tipo-btn" data-tipo="coleccion" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-sec);">Colección</button>
+        <button type="button" class="plantilla-tipo-btn" data-tipo="publicacion" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-sec);">Publicación</button>
+      </div>
 
-Resumen:
-Una colección sobre...
+      <label id="plantillaNombreLabel">Nombre</label>
+      <div class="plantilla-campo-copiable">
+        <input type="text" id="plantillaNombreInput" placeholder="Ej: La noche del nihilista">
+        <button type="button" class="copiar-campo-btn" data-target="plantillaNombreInput">Copiar</button>
+      </div>
 
---------------------------------
+      <label id="plantillaResumenLabel">Resumen</label>
+      <div class="plantilla-campo-copiable">
+        <textarea id="plantillaResumenInput" placeholder="Resumen o frase de bienvenida..."></textarea>
+        <button type="button" class="copiar-campo-btn" data-target="plantillaResumenInput">Copiar</button>
+      </div>
 
-RECURSO
+      <label>Enlace de Google Drive (imagen de portada)</label>
+      <div class="plantilla-campo-copiable">
+        <input type="text" id="plantillaPortadaInput" placeholder="https://drive.google.com/file/d/.../view">
+        <button type="button" class="copiar-campo-btn" data-target="plantillaPortadaInput">Copiar</button>
+      </div>
 
-Tipo: Video
-Etiqueta: Introducción
-Enlace:
-https://...
+      <div id="plantillaFondoGrupo">
+        <label>Enlace de Google Drive (imagen de fondo, opcional)</label>
+        <div class="plantilla-campo-copiable">
+          <input type="text" id="plantillaFondoInput" placeholder="https://drive.google.com/file/d/.../view">
+          <button type="button" class="copiar-campo-btn" data-target="plantillaFondoInput">Copiar</button>
+        </div>
+      </div>
 
---------------------------------
+      <div id="plantillaRecursosGrupo" style="display:none;">
+        <label style="margin-top:16px;">Recursos (elige el formato y pega el enlace, agrega los que necesites)</label>
+        <div id="plantillaRecursosBuilderContainer"></div>
+        <button type="button" id="plantillaAgregarRecursoBtn">+ Agregar recurso</button>
 
-RECURSO
-
-Tipo: PDF
-Etiqueta: Capítulo 1
-Enlace:
-https://...
-
---------------------------------
-
-PREGUNTA
-¿Qué significa el vacío?
-
-PREGUNTA
-¿Qué parte de ti intenta escapar?" style="flex:1;width:100%;box-sizing:border-box;padding:14px;background:#0e0e13;color:var(--text);border:none;font-family:'Courier New',monospace;font-size:0.82rem;line-height:1.55;resize:none;"></textarea>
+        <label style="margin-top:16px;">Preguntas de reflexión (opcional)</label>
+        <div id="plantillaPreguntasBuilderContainer"></div>
+        <button type="button" id="plantillaAgregarPreguntaBtn">+ Agregar pregunta</button>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
   </div>
 </div>
 
@@ -1577,6 +1620,8 @@ PREGUNTA
             <h2>Crear nueva galería</h2>
           </div>
         </div>
+      <button type="button" class="usar-plantilla-btn" data-tipo="galeria" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Usar plantilla</button>
+
       <label>Nombre de la galería</label>
       <input type="text" id="inputNombreGaleria" placeholder="Ej: Orbsentismo, MICSES...">
 
@@ -1605,6 +1650,8 @@ PREGUNTA
             <h2>Crear nueva colección</h2>
           </div>
         </div>
+      <button type="button" class="usar-plantilla-btn" data-tipo="coleccion" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Usar plantilla</button>
+
       <label>Nombre de la colección</label>
       <input type="text" id="inputNombreColeccion" placeholder="Ej: Una noche con el nihilismo">
 
@@ -1645,7 +1692,7 @@ PREGUNTA
             <h2>Publicar nuevo libro</h2>
           </div>
         </div>
-      <button type="button" id="importarPlantillaBtn" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Importar Plantilla de Recursos</button>
+      <button type="button" class="usar-plantilla-btn" data-tipo="publicacion" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Usar plantilla</button>
 
       <label>Título del libro</label>
       <input type="text" id="inputTitulo" placeholder="Ej: Meditaciones del Exadicto">
@@ -3731,132 +3778,167 @@ PREGUNTA
     }
   }
 
-  // ---------- Parser de plantillas: texto plano por palabras clave, sin IA ----------
-  // Reconoce las secciones PUBLICACIÓN / RECURSO / PREGUNTA y los campos
-  // "Campo: valor" (el valor puede ir en la misma línea o en la siguiente).
-  function parsearPlantilla(textoOriginal) {
-    const lineas = (textoOriginal || "").split(/\r?\n/);
-    let titulo = "";
-    let resumen = "";
-    const recursos = [];
-    const preguntas = [];
-    let recursoActual = null;
-    let campoPendiente = null; // { destino: "titulo"|"resumen"|"tipo"|"etiqueta"|"enlace"|"pregunta", indice? }
-
-    function normalizarCampo(campo) {
-      return campo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  // Copia el texto al portapapeles y da una señal visual de "copiado" en el botón
+  function copiarAlPortapapeles(valor, btn) {
+    if (!valor) return;
+    const marcarCopiado = () => {
+      if (!btn) return;
+      const textoOriginal = btn.textContent;
+      btn.textContent = "✓";
+      btn.classList.add("copiado");
+      setTimeout(() => { btn.textContent = textoOriginal; btn.classList.remove("copiado"); }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(valor).then(marcarCopiado).catch(() => {
+        alert("No se pudo copiar automáticamente. Copia el texto manualmente.");
+      });
+    } else {
+      // Respaldo para navegadores sin API de portapapeles
+      const temp = document.createElement("textarea");
+      temp.value = valor;
+      temp.style.position = "fixed";
+      temp.style.opacity = "0";
+      document.body.appendChild(temp);
+      temp.select();
+      try { document.execCommand("copy"); marcarCopiado(); } catch (e) { /* silencioso */ }
+      document.body.removeChild(temp);
     }
-
-    function asignarValor(campo, valor) {
-      if (campo === "titulo") titulo = valor;
-      else if (campo === "resumen") resumen = valor;
-      else if (recursoActual) {
-        if (campo === "tipo") recursoActual.tipo = valor;
-        else if (campo === "etiqueta") recursoActual.etiqueta = valor;
-        else if (campo === "enlace") recursoActual.enlace = valor;
-      }
-    }
-
-    for (const raw of lineas) {
-      const linea = raw.trim();
-      if (linea === "") continue;
-
-      // Líneas separadoras (---------) no aportan información
-      if (/^-{3,}$/.test(linea)) { campoPendiente = null; continue; }
-
-      // Encabezados de sección
-      if (/^PUBLICACI[OÓ]N$/i.test(linea)) { campoPendiente = null; continue; }
-      if (/^RECURSO$/i.test(linea)) {
-        recursoActual = { tipo: "", etiqueta: "", enlace: "" };
-        recursos.push(recursoActual);
-        campoPendiente = null;
-        continue;
-      }
-      if (/^PREGUNTA\s*:?\s*(.*)$/i.test(linea)) {
-        const m = linea.match(/^PREGUNTA\s*:?\s*(.*)$/i);
-        preguntas.push(m[1].trim());
-        campoPendiente = m[1].trim() === "" ? { destino: "pregunta", indice: preguntas.length - 1 } : null;
-        continue;
-      }
-
-      // Campo: valor (Título, Resumen, Tipo, Etiqueta, Enlace)
-      const m = linea.match(/^(T[ií]tulo|Resumen|Tipo|Etiqueta|Enlace)\s*:\s*(.*)$/i);
-      if (m) {
-        const campo = normalizarCampo(m[1]);
-        const valor = m[2].trim();
-        if (valor !== "") {
-          asignarValor(campo, valor);
-          campoPendiente = null;
-        } else {
-          campoPendiente = { destino: campo };
-        }
-        continue;
-      }
-
-      // Línea de texto libre: completa el campo pendiente (valor en línea siguiente)
-      if (campoPendiente) {
-        if (campoPendiente.destino === "pregunta") {
-          preguntas[campoPendiente.indice] = linea;
-        } else {
-          asignarValor(campoPendiente.destino, linea);
-        }
-        campoPendiente = null;
-      }
-    }
-
-    return { titulo, resumen, recursos, preguntas };
   }
 
-  // Mapea el "Tipo" escrito en la plantilla al tipo interno que usa el Taller
-  function mapearTipoRecurso(tipoTexto) {
-    const t = (tipoTexto || "").toLowerCase().trim();
-    if (t.startsWith("video")) return "video";
-    if (t.startsWith("audio")) return "audio";
-    if (t.startsWith("imagen") || t.startsWith("galería") || t.startsWith("galeria")) return "imagenes";
-    return "texto"; // PDF / Texto / cualquier otro caso
+  // Copiar de campos estáticos (Nombre, Resumen, Portada, Fondo) por delegación de eventos
+  document.getElementById("plantillaEditorVista").addEventListener("click", (e) => {
+    const btn = e.target.closest(".copiar-campo-btn[data-target]");
+    if (!btn) return;
+    const campo = document.getElementById(btn.dataset.target);
+    if (campo) copiarAlPortapapeles(campo.value, btn);
+  });
+
+  // ---------- Selector de tipo de plantilla (Galería / Colección / Publicación) ----------
+  const plantillaTipoBotones = Array.from(document.querySelectorAll(".plantilla-tipo-btn"));
+  const plantillaNombreLabel = document.getElementById("plantillaNombreLabel");
+  const plantillaResumenLabel = document.getElementById("plantillaResumenLabel");
+  const plantillaFondoGrupo = document.getElementById("plantillaFondoGrupo");
+  const plantillaRecursosGrupo = document.getElementById("plantillaRecursosGrupo");
+  let plantillaTipoActivo = "publicacion";
+
+  const ETIQUETAS_POR_TIPO = {
+    galeria: { nombre: "Nombre de la galería", resumen: "Resumen (nota de planificación, opcional)" },
+    coleccion: { nombre: "Nombre de la colección", resumen: "Frase o resumen de bienvenida" },
+    publicacion: { nombre: "Título de la publicación", resumen: "Resumen" }
+  };
+
+  function seleccionarTipoPlantilla(tipo) {
+    plantillaTipoActivo = tipo;
+    plantillaTipoBotones.forEach(b => b.classList.toggle("activo", b.dataset.tipo === tipo));
+    plantillaNombreLabel.textContent = ETIQUETAS_POR_TIPO[tipo].nombre;
+    plantillaResumenLabel.textContent = ETIQUETAS_POR_TIPO[tipo].resumen;
+    plantillaFondoGrupo.style.display = (tipo === "galeria" || tipo === "coleccion") ? "block" : "none";
+    plantillaRecursosGrupo.style.display = (tipo === "publicacion") ? "block" : "none";
   }
+  plantillaTipoBotones.forEach(b => b.addEventListener("click", () => seleccionarTipoPlantilla(b.dataset.tipo)));
 
-  // Construye el resumen de validación (✔ / ⚠) a partir de una plantilla ya parseada
-  function validarPlantilla(datos) {
-    const lineasOk = [];
-    const lineasAviso = [];
+  // ---------- Constructor de recursos DENTRO de una plantilla (independiente del Taller) ----------
+  let plantillaRecursosBuilder = [];
+  const plantillaRecursosBuilderContainer = document.getElementById("plantillaRecursosBuilderContainer");
 
-    if (datos.titulo.trim() === "") lineasAviso.push("⚠ Falta el título de la publicación");
-    lineasOk.push(`✔ ${datos.recursos.length} recurso${datos.recursos.length === 1 ? "" : "s"} encontrado${datos.recursos.length === 1 ? "" : "s"}`);
-    lineasOk.push(`✔ ${datos.preguntas.length} pregunta${datos.preguntas.length === 1 ? "" : "s"} encontrada${datos.preguntas.length === 1 ? "" : "s"}`);
-
-    datos.recursos.forEach((r, i) => {
-      if (!r.tipo) lineasAviso.push(`⚠ Recurso ${i + 1} sin tipo`);
-      if (!r.etiqueta) lineasAviso.push(`⚠ Recurso ${i + 1} sin etiqueta`);
-      if (!r.enlace) lineasAviso.push(`⚠ Recurso ${i + 1} sin enlace`);
+  function renderPlantillaRecursosBuilder() {
+    plantillaRecursosBuilderContainer.innerHTML = "";
+    plantillaRecursosBuilder.forEach((r, i) => {
+      const row = document.createElement("div");
+      row.className = "recurso-row";
+      row.innerHTML = `
+        <select class="pr-tipo">
+          <option value="texto" ${r.tipo === "texto" ? "selected" : ""}>Texto (PDF)</option>
+          <option value="audio" ${r.tipo === "audio" ? "selected" : ""}>Audio</option>
+          <option value="video" ${r.tipo === "video" ? "selected" : ""}>Video</option>
+          <option value="imagenes" ${r.tipo === "imagenes" ? "selected" : ""}>Galería de imágenes</option>
+        </select>
+        <div class="plantilla-campo-copiable">
+          <input type="text" class="pr-etiqueta" placeholder="Etiqueta, ej: Introducción" value="${escapeAttr(r.etiqueta)}">
+          <button type="button" class="copiar-campo-btn pr-copiar-etiqueta">Copiar</button>
+        </div>
+        <div class="plantilla-campo-copiable">
+          <input type="text" class="pr-enlace" placeholder="Enlace de Google Drive" value="${escapeAttr(r.enlace)}">
+          <button type="button" class="copiar-campo-btn pr-copiar-enlace">Copiar</button>
+        </div>
+        <div class="recurso-controles">
+          <button type="button" class="recurso-quitar">✕ Quitar</button>
+        </div>
+      `;
+      row.querySelector(".pr-tipo").addEventListener("change", (e) => { plantillaRecursosBuilder[i].tipo = e.target.value; });
+      row.querySelector(".pr-etiqueta").addEventListener("input", (e) => { plantillaRecursosBuilder[i].etiqueta = e.target.value; });
+      row.querySelector(".pr-enlace").addEventListener("input", (e) => { plantillaRecursosBuilder[i].enlace = e.target.value; });
+      row.querySelector(".pr-copiar-etiqueta").addEventListener("click", (e) => copiarAlPortapapeles(plantillaRecursosBuilder[i].etiqueta, e.target));
+      row.querySelector(".pr-copiar-enlace").addEventListener("click", (e) => copiarAlPortapapeles(plantillaRecursosBuilder[i].enlace, e.target));
+      row.querySelector(".recurso-quitar").addEventListener("click", () => {
+        plantillaRecursosBuilder.splice(i, 1);
+        renderPlantillaRecursosBuilder();
+      });
+      plantillaRecursosBuilderContainer.appendChild(row);
     });
-    datos.preguntas.forEach((p, i) => {
-      if (!p) lineasAviso.push(`⚠ Pregunta ${i + 1} está vacía`);
-    });
-
-    return [...lineasOk, ...lineasAviso].join("<br>");
   }
+  document.getElementById("plantillaAgregarRecursoBtn").addEventListener("click", () => {
+    plantillaRecursosBuilder.push({ tipo: "texto", etiqueta: "", enlace: "" });
+    renderPlantillaRecursosBuilder();
+  });
 
-  // ---------- Editor de plantilla ----------
+  // ---------- Constructor de preguntas DENTRO de una plantilla ----------
+  let plantillaPreguntasBuilder = [];
+  const plantillaPreguntasBuilderContainer = document.getElementById("plantillaPreguntasBuilderContainer");
+
+  function renderPlantillaPreguntasBuilder() {
+    plantillaPreguntasBuilderContainer.innerHTML = "";
+    plantillaPreguntasBuilder.forEach((texto, i) => {
+      const row = document.createElement("div");
+      row.className = "recurso-row";
+      row.innerHTML = `
+        <div class="plantilla-campo-copiable">
+          <textarea class="pp-texto" placeholder="Ej: ¿Dónde has visto esto en tu propia vida?" rows="2">${escapeAttr(texto)}</textarea>
+          <button type="button" class="copiar-campo-btn pp-copiar">Copiar</button>
+        </div>
+        <div class="recurso-controles">
+          <button type="button" class="pregunta-quitar">✕ Quitar</button>
+        </div>
+      `;
+      row.querySelector(".pp-texto").addEventListener("input", (e) => { plantillaPreguntasBuilder[i] = e.target.value; });
+      row.querySelector(".pp-copiar").addEventListener("click", (e) => copiarAlPortapapeles(plantillaPreguntasBuilder[i], e.target));
+      row.querySelector(".pregunta-quitar").addEventListener("click", () => {
+        plantillaPreguntasBuilder.splice(i, 1);
+        renderPlantillaPreguntasBuilder();
+      });
+      plantillaPreguntasBuilderContainer.appendChild(row);
+    });
+  }
+  document.getElementById("plantillaAgregarPreguntaBtn").addEventListener("click", () => {
+    plantillaPreguntasBuilder.push("");
+    renderPlantillaPreguntasBuilder();
+  });
+
+  // ---------- Editor de plantilla: abrir / guardar / eliminar ----------
   const plantillaEditorVista = document.getElementById("plantillaEditorVista");
-  const plantillaTexto = document.getElementById("plantillaTexto");
-  const plantillaValidacion = document.getElementById("plantillaValidacion");
+  const plantillaNombreInput = document.getElementById("plantillaNombreInput");
+  const plantillaResumenInput = document.getElementById("plantillaResumenInput");
+  const plantillaPortadaInput = document.getElementById("plantillaPortadaInput");
+  const plantillaFondoInput = document.getElementById("plantillaFondoInput");
   const eliminarPlantillaBtn = document.getElementById("eliminarPlantillaBtn");
   let plantillaIdActiva = null;
-
-  function actualizarValidacionPlantilla() {
-    const datos = parsearPlantilla(plantillaTexto.value);
-    plantillaValidacion.innerHTML = validarPlantilla(datos);
-  }
-  plantillaTexto.addEventListener("input", actualizarValidacionPlantilla);
 
   function abrirEditorPlantilla(id) {
     const todas = leerTodasLasPlantillas();
     const plantilla = id ? todas[id] : null;
     plantillaIdActiva = id || ("p_" + Date.now() + "_" + Math.floor(Math.random() * 10000));
-    plantillaTexto.value = plantilla ? plantilla.contenido : "";
+
+    seleccionarTipoPlantilla(plantilla ? plantilla.tipo : "publicacion");
+    plantillaNombreInput.value = plantilla ? (plantilla.nombre || "") : "";
+    plantillaResumenInput.value = plantilla ? (plantilla.resumen || "") : "";
+    plantillaPortadaInput.value = plantilla ? (plantilla.portada || "") : "";
+    plantillaFondoInput.value = plantilla ? (plantilla.fondo || "") : "";
+    plantillaRecursosBuilder = plantilla && Array.isArray(plantilla.recursos) ? plantilla.recursos.map(r => ({ ...r })) : [];
+    plantillaPreguntasBuilder = plantilla && Array.isArray(plantilla.preguntas) ? [...plantilla.preguntas] : [];
+    renderPlantillaRecursosBuilder();
+    renderPlantillaPreguntasBuilder();
+
     eliminarPlantillaBtn.style.display = plantilla ? "block" : "none";
-    actualizarValidacionPlantilla();
     plantillasVista.style.display = "none";
     plantillaEditorVista.style.display = "flex";
   }
@@ -3870,16 +3952,20 @@ PREGUNTA
   });
 
   document.getElementById("guardarPlantillaBtn").addEventListener("click", () => {
-    const contenido = plantillaTexto.value;
-    if (contenido.trim() === "") {
-      alert("La plantilla está vacía.");
+    const nombre = plantillaNombreInput.value.trim();
+    if (!nombre) {
+      alert("Ponle un nombre o título a la plantilla antes de guardarla.");
       return;
     }
-    const datos = parsearPlantilla(contenido);
     const todas = leerTodasLasPlantillas();
     todas[plantillaIdActiva] = {
-      titulo: datos.titulo.trim() || "Plantilla sin título",
-      contenido,
+      tipo: plantillaTipoActivo,
+      nombre,
+      resumen: plantillaResumenInput.value.trim(),
+      portada: plantillaPortadaInput.value.trim(),
+      fondo: plantillaFondoInput.value.trim(),
+      recursos: plantillaTipoActivo === "publicacion" ? plantillaRecursosBuilder.filter(r => r.etiqueta || r.enlace) : [],
+      preguntas: plantillaTipoActivo === "publicacion" ? plantillaPreguntasBuilder.filter(p => p.trim() !== "") : [],
       fecha: Date.now()
     };
     guardarTodasLasPlantillas(todas);
@@ -3890,7 +3976,7 @@ PREGUNTA
 
   eliminarPlantillaBtn.addEventListener("click", () => {
     if (!plantillaIdActiva) return;
-    if (confirm("¿Eliminar esta plantilla de recursos?")) {
+    if (confirm("¿Eliminar esta plantilla?")) {
       const todas = leerTodasLasPlantillas();
       delete todas[plantillaIdActiva];
       guardarTodasLasPlantillas(todas);
@@ -3900,6 +3986,8 @@ PREGUNTA
     }
   });
 
+  const ETIQUETA_TIPO_BADGE = { galeria: "Galería", coleccion: "Colección", publicacion: "Publicación" };
+
   function renderPlantillasGuardadas() {
     const plantillasLista = document.getElementById("plantillasLista");
     const todas = leerTodasLasPlantillas();
@@ -3907,17 +3995,19 @@ PREGUNTA
     plantillasLista.innerHTML = "";
 
     if (entradas.length === 0) {
-      plantillasLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes plantillas de recursos. Crea una para preparar publicaciones sin escribir directamente en el Taller.</div>`;
+      plantillasLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes plantillas. Créalas para preparar el contenido de una galería, colección o publicación antes de ir al Taller.</div>`;
       return;
     }
 
     entradas.forEach(([id, plantilla]) => {
-      const datos = parsearPlantilla(plantilla.contenido);
       const item = document.createElement("div");
       item.className = "nota-guardada-item";
+      const detalle = plantilla.tipo === "publicacion"
+        ? `${(plantilla.recursos || []).length} recurso(s) · ${(plantilla.preguntas || []).length} pregunta(s)`
+        : "Contenido de planificación";
       item.innerHTML = `
-        <div class="nota-guardada-titulo">${escapeHtml(plantilla.titulo)}</div>
-        <div class="nota-guardada-preview">${datos.recursos.length} recurso(s) · ${datos.preguntas.length} pregunta(s)</div>
+        <div class="nota-guardada-titulo">[${ETIQUETA_TIPO_BADGE[plantilla.tipo] || plantilla.tipo}] ${escapeHtml(plantilla.nombre)}</div>
+        <div class="nota-guardada-preview">${detalle}</div>
         <div class="nota-guardada-controles">
           <button class="abrir-plantilla">Editar</button>
           <button class="eliminar">Eliminar</button>
@@ -3925,7 +4015,7 @@ PREGUNTA
       `;
       item.querySelector(".abrir-plantilla").addEventListener("click", () => abrirEditorPlantilla(id));
       item.querySelector(".eliminar").addEventListener("click", () => {
-        if (confirm(`¿Eliminar la plantilla "${plantilla.titulo}"?`)) {
+        if (confirm(`¿Eliminar la plantilla "${plantilla.nombre}"?`)) {
           const todasActualizadas = leerTodasLasPlantillas();
           delete todasActualizadas[id];
           guardarTodasLasPlantillas(todasActualizadas);
@@ -3936,67 +4026,74 @@ PREGUNTA
     });
   }
 
-  // ---------- Importar Plantilla al Taller ----------
+  // ---------- Usar plantilla: importar al formulario correspondiente del Taller ----------
   const importarPlantillaModal = document.getElementById("importarPlantillaModal");
   const importarPlantillaLista = document.getElementById("importarPlantillaLista");
 
-  document.getElementById("importarPlantillaBtn").addEventListener("click", () => {
-    const todas = leerTodasLasPlantillas();
-    const entradas = Object.entries(todas).sort((a, b) => b[1].fecha - a[1].fecha);
-    importarPlantillaLista.innerHTML = "";
+  document.querySelectorAll(".usar-plantilla-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tipo = btn.dataset.tipo;
+      const todas = leerTodasLasPlantillas();
+      const entradas = Object.entries(todas)
+        .filter(([, p]) => p.tipo === tipo)
+        .sort((a, b) => b[1].fecha - a[1].fecha);
+      importarPlantillaLista.innerHTML = "";
 
-    if (entradas.length === 0) {
-      importarPlantillaLista.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes plantillas guardadas. Créalas desde orbSY notes → Plantillas de Recursos.</div>`;
-    } else {
-      entradas.forEach(([id, plantilla]) => {
-        const datos = parsearPlantilla(plantilla.contenido);
-        const fila = document.createElement("div");
-        fila.style.cssText = "border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;";
-        fila.innerHTML = `
-          <div style="font-weight:600;font-size:0.85rem;">${escapeHtml(plantilla.titulo)}</div>
-          <div style="font-size:0.72rem;color:var(--text-sec);margin-top:2px;">${datos.recursos.length} recurso(s) · ${datos.preguntas.length} pregunta(s)</div>
-        `;
-        fila.addEventListener("click", () => {
-          importarPlantillaEnTaller(datos);
-          importarPlantillaModal.style.display = "none";
+      if (entradas.length === 0) {
+        importarPlantillaLista.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes plantillas de tipo "${ETIQUETA_TIPO_BADGE[tipo]}". Créalas desde orbSY notes → Plantillas de Recursos.</div>`;
+      } else {
+        entradas.forEach(([id, plantilla]) => {
+          const fila = document.createElement("div");
+          fila.style.cssText = "border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;";
+          const detalle = tipo === "publicacion" ? `${(plantilla.recursos || []).length} recurso(s) · ${(plantilla.preguntas || []).length} pregunta(s)` : "Toca para usarla";
+          fila.innerHTML = `
+            <div style="font-weight:600;font-size:0.85rem;">${escapeHtml(plantilla.nombre)}</div>
+            <div style="font-size:0.72rem;color:var(--text-sec);margin-top:2px;">${detalle}</div>
+          `;
+          fila.addEventListener("click", () => {
+            importarPlantillaEnTaller(tipo, plantilla);
+            importarPlantillaModal.style.display = "none";
+          });
+          importarPlantillaLista.appendChild(fila);
         });
-        importarPlantillaLista.appendChild(fila);
-      });
-    }
-    importarPlantillaModal.style.display = "flex";
+      }
+      importarPlantillaModal.style.display = "flex";
+    });
   });
 
   document.getElementById("importarPlantillaCancelar").addEventListener("click", () => {
     importarPlantillaModal.style.display = "none";
   });
 
-  function importarPlantillaEnTaller(datos) {
-    if (datos.titulo) document.getElementById("inputTitulo").value = datos.titulo;
-    if (datos.resumen) document.getElementById("inputResumen").value = datos.resumen;
+  function importarPlantillaEnTaller(tipo, plantilla) {
+    if (tipo === "galeria") {
+      document.getElementById("inputNombreGaleria").value = plantilla.nombre || "";
+      document.getElementById("inputImagenGaleria").value = plantilla.portada || "";
+      document.getElementById("inputFondoGaleria").value = plantilla.fondo || "";
+      document.getElementById("inputNombreGaleria").scrollIntoView({ behavior: "smooth", block: "center" });
+    } else if (tipo === "coleccion") {
+      document.getElementById("inputNombreColeccion").value = plantilla.nombre || "";
+      document.getElementById("inputFraseColeccion").value = plantilla.resumen || "";
+      document.getElementById("inputImagenColeccion").value = plantilla.portada || "";
+      document.getElementById("inputFondoColeccion").value = plantilla.fondo || "";
+      document.getElementById("inputNombreColeccion").scrollIntoView({ behavior: "smooth", block: "center" });
+    } else if (tipo === "publicacion") {
+      document.getElementById("inputTitulo").value = plantilla.nombre || "";
+      document.getElementById("inputResumen").value = plantilla.resumen || "";
+      document.getElementById("inputPortada").value = plantilla.portada || "";
 
-    if (datos.recursos.length > 0) {
-      recursosBuilder = datos.recursos.map(r => ({
-        tipo: mapearTipoRecurso(r.tipo),
-        etiqueta: r.etiqueta || "",
-        enlace: r.enlace || "",
-        fuente: "drive"
-      }));
-      renderRecursosBuilder();
+      const recursos = plantilla.recursos || [];
+      if (recursos.length > 0) {
+        recursosBuilder = recursos.map(r => ({ tipo: r.tipo || "texto", etiqueta: r.etiqueta || "", enlace: r.enlace || "", fuente: "drive" }));
+        renderRecursosBuilder();
+      }
+      const preguntas = plantilla.preguntas || [];
+      if (preguntas.length > 0) {
+        preguntasBuilder = [...preguntas];
+        renderPreguntasBuilder();
+      }
+      document.getElementById("inputTitulo").scrollIntoView({ behavior: "smooth", block: "center" });
     }
-
-    if (datos.preguntas.length > 0) {
-      preguntasBuilder = datos.preguntas.filter(p => p.trim() !== "");
-      renderPreguntasBuilder();
-    }
-
-    const advertencias = [];
-    datos.recursos.forEach((r, i) => {
-      if (!r.enlace) advertencias.push(`Recurso ${i + 1} sin enlace`);
-      if (!r.etiqueta) advertencias.push(`Recurso ${i + 1} sin etiqueta`);
-    });
-    let mensaje = `Se importaron ${datos.recursos.length} recurso(s) y ${datos.preguntas.length} pregunta(s). Revisa los campos y pulsa Publicar.`;
-    if (advertencias.length > 0) mensaje += "\n\nPendientes por completar:\n- " + advertencias.join("\n- ");
-    alert(mensaje);
   }
 
   // ---------- Modal: índice temático ----------
