@@ -488,6 +488,35 @@
     pointer-events:none;
   }
   .galeria-tile:active .galeria-tile-img::after{ border-color:var(--accent); border-top-color:transparent; border-right-color:transparent; }
+
+  /* Círculos de perfil (galaxias), mismo patrón pero con color elegido por cada usuario */
+  .perfil-tile-img{
+    position:relative;
+    width:104px;
+    height:104px;
+    border-radius:50%;
+    overflow:hidden;
+    margin-bottom:10px;
+  }
+  .perfil-tile-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .perfil-tile-img::after{
+    content:"";
+    position:absolute;
+    inset:-6px;
+    border-radius:50%;
+    border:2.5px solid var(--color-galaxia, var(--verde));
+    border-top-color:transparent;
+    border-right-color:transparent;
+    transform:rotate(-35deg);
+    pointer-events:none;
+    box-shadow:0 0 14px -2px var(--color-galaxia, var(--verde));
+  }
+
   .galeria-tile-nombre{
     font-size:0.78rem;
     letter-spacing:0.04em;
@@ -1442,6 +1471,23 @@
       </div>
     </div>
 
+    <div id="configurarPerfilSection" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+      <h2 style="margin-bottom:4px;">Configura tu perfil</h2>
+      <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:12px;">Así te van a ver los demás en el selector de perfiles.</p>
+      <label>Nombre para mostrar</label>
+      <input type="text" id="perfilNombreInput" placeholder="Ej: El Orbsentista">
+      <label>Enlace de Google Drive (tu foto de perfil)</label>
+      <input type="text" id="perfilImagenInput" placeholder="https://drive.google.com/file/d/.../view">
+      <label>Color de tu galaxia</label>
+      <select id="perfilColorInput">
+        <option value="verde">Verde fosforescente</option>
+        <option value="turquesa">Azul turquesa</option>
+        <option value="violeta">Morado</option>
+        <option value="gris">Blanco grisáceo</option>
+      </select>
+      <button id="guardarPerfilBtn" style="margin-top:10px;">Guardar perfil</button>
+    </div>
+
     <div id="perfilInfo" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;">
       <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:6px;">Tu enlace de perfil (compártelo para que otros vean solo tus galerías):</p>
       <div style="display:flex;gap:8px;">
@@ -1575,8 +1621,36 @@
     </div>
   </div>
 
+  <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
+  <div id="vistaPerfiles">
+    <div class="orbsy-marca">
+      <svg class="orbsy-logo-svg" viewBox="0 0 200 200" style="margin-bottom:14px;">
+        <defs>
+          <radialGradient id="esferaGradPerfiles" cx="38%" cy="35%" r="70%">
+            <stop offset="0%" stop-color="#3a3a44"/>
+            <stop offset="55%" stop-color="#202027"/>
+            <stop offset="100%" stop-color="#121216"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(-18 100 100)"/>
+        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(42 100 100)"/>
+        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(102 100 100)"/>
+        <circle cx="100" cy="100" r="52" fill="url(#esferaGradPerfiles)" stroke="#3d3d47" stroke-width="1"/>
+        <circle cx="168" cy="78" r="10" fill="#39ff8c"/>
+        <circle cx="40" cy="128" r="8.5" fill="#22d3c4"/>
+        <circle cx="118" cy="172" r="7" fill="#9b7cf6"/>
+      </svg>
+      <div class="orbsy-wordmark"><span class="orb">orb</span><span class="sy">SY</span></div>
+    </div>
+    <div class="galerias-eyebrow">Elige un perfil</div>
+    <div id="loadingMsgPerfiles" class="empty-msg">Cargando perfiles...</div>
+    <div id="perfilesGrid" class="galerias-grid"></div>
+    <div id="emptyMsgPerfiles" class="empty-msg" style="display:none;">Aún no hay perfiles creados.</div>
+  </div>
+
   <!-- VISTA: GALERÍAS (nivel superior, pantalla de inicio) -->
-  <div id="vistaGalerias">
+  <div id="vistaGalerias" style="display:none;">
+    <button id="backToPerfilesBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;margin-bottom:14px;">← Perfiles</button>
     <!-- Motivos de galaxia sutiles, solo decorativos -->
     <div class="capa-estrellas" aria-hidden="true">
       <span class="estrella-punto" style="top:8%; left:6%; background:#39ff8c;"></span>
@@ -1603,25 +1677,6 @@
         <circle cx="40" cy="45" r="2.5" fill="#39ff8c"/>
         <circle cx="80" cy="30" r="2.5" fill="#39ff8c"/>
       </svg>
-    </div>
-    <div class="orbsy-marca">
-      <svg class="orbsy-logo-svg" viewBox="0 0 200 200" style="margin-bottom:14px;">
-        <defs>
-          <radialGradient id="esferaGrad" cx="38%" cy="35%" r="70%">
-            <stop offset="0%" stop-color="#3a3a44"/>
-            <stop offset="55%" stop-color="#202027"/>
-            <stop offset="100%" stop-color="#121216"/>
-          </radialGradient>
-        </defs>
-        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(-18 100 100)"/>
-        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(42 100 100)"/>
-        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(102 100 100)"/>
-        <circle cx="100" cy="100" r="52" fill="url(#esferaGrad)" stroke="#3d3d47" stroke-width="1"/>
-        <circle cx="168" cy="78" r="10" fill="#39ff8c"/>
-        <circle cx="40" cy="128" r="8.5" fill="#22d3c4"/>
-        <circle cx="118" cy="172" r="7" fill="#9b7cf6"/>
-      </svg>
-      <div class="orbsy-wordmark"><span class="orb">orb</span><span class="sy">SY</span></div>
     </div>
     <div class="galerias-eyebrow">Tus galerías</div>
     <div id="loadingMsgGalerias" class="empty-msg">Cargando...</div>
@@ -1763,6 +1818,8 @@
     addDoc,
     deleteDoc,
     updateDoc,
+    setDoc,
+    getDoc,
     doc,
     onSnapshot,
     query,
@@ -1792,12 +1849,13 @@
   const librosCol = collection(db, "libros");
   const coleccionesCol = collection(db, "colecciones");
   const galeriasCol = collection(db, "galerias");
+  const usuariosCol = collection(db, "usuarios");
 
   // Estado en memoria: se llenan con los listeners de Firestore más abajo
   let libros = [];        // [{id, titulo, resumen, portadaId, coleccionId, recursos, fecha}]
   let colecciones = [];   // [{id, nombre, imagenId, frase, clave, galeriaId, fecha}]
   let galerias = [];      // [{id, nombre, imagenId, fecha}]
-  let vista = "galerias"; // "galerias" | "colecciones" | "coleccion"
+  let vista = uidPerfilObjetivo ? "galerias" : "perfiles"; // "perfiles" | "galerias" | "colecciones" | "coleccion"
   let galeriaActualId = null;
   let coleccionActualId = null;
 
@@ -1853,7 +1911,10 @@
 
   // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
   const parametrosUrl = new URLSearchParams(location.search);
-  const uidPerfilObjetivo = parametrosUrl.get("u");
+  let uidPerfilObjetivo = parametrosUrl.get("u");
+
+  const COLORES_GALAXIA = { verde: "#39ff8c", turquesa: "#22d3c4", violeta: "#9b7cf6", gris: "#c7c7cf" };
+  const ID_PERFIL_GENERAL = "__perfil_general__"; // agrupa contenido sin dueño asignado
 
   const adminToggleBtn = document.getElementById("adminToggleBtn");
   const adminPanel = document.getElementById("adminPanel");
@@ -1938,7 +1999,7 @@
 
   // Detecta automáticamente si ya hay sesión iniciada (por ejemplo si
   // recargas la página después de haber entrado como admin)
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     isAdmin = !!user;
     uidActual = user ? user.uid : null;
     if (isAdmin) {
@@ -1946,16 +2007,54 @@
       formSection.style.display = "block";
       perfilInfo.style.display = "block";
       perfilEnlaceInput.value = `${location.origin}${location.pathname}?u=${user.uid}`;
+
+      try {
+        const perfilDoc = await getDoc(doc(db, "usuarios", user.uid));
+        if (!perfilDoc.exists()) {
+          document.getElementById("configurarPerfilSection").style.display = "block";
+        } else {
+          document.getElementById("configurarPerfilSection").style.display = "none";
+        }
+      } catch (e) {
+        console.error("No se pudo revisar el perfil:", e);
+      }
     } else {
       loginSection.style.display = "block";
       formSection.style.display = "none";
       perfilInfo.style.display = "none";
+      document.getElementById("configurarPerfilSection").style.display = "none";
     }
     if (libroSnapshotListo && coleccionSnapshotListo && galeriaSnapshotListo) {
       renderAdminListaGalerias();
       renderAdminListaColecciones();
       renderAdminListaLibros();
     }
+  });
+
+  // ---------- Configurar perfil (nombre, foto, color de galaxia) ----------
+  document.getElementById("guardarPerfilBtn").addEventListener("click", async () => {
+    const nombre = document.getElementById("perfilNombreInput").value.trim();
+    const imagenUrl = document.getElementById("perfilImagenInput").value.trim();
+    const color = document.getElementById("perfilColorInput").value;
+
+    if (!nombre || !imagenUrl) {
+      alert("Ponle un nombre y una foto a tu perfil.");
+      return;
+    }
+    if (!uidActual) return;
+
+    const imagenId = extraerIdDrive(imagenUrl);
+    const btn = document.getElementById("guardarPerfilBtn");
+    btn.disabled = true;
+    btn.textContent = "Guardando...";
+    try {
+      await setDoc(doc(db, "usuarios", uidActual), { nombre, imagenId, color }, { merge: true });
+      document.getElementById("configurarPerfilSection").style.display = "none";
+    } catch (e) {
+      alert("Error al guardar tu perfil: " + e.message);
+    }
+    btn.disabled = false;
+    btn.textContent = "Guardar perfil";
   });
 
   // ---------- Constructor de recursos (índice temático) ----------
@@ -2413,6 +2512,25 @@
   const emptyMsgGalerias = document.getElementById("emptyMsgGalerias");
   const headerColeccionesEl = document.getElementById("headerColecciones");
   const tituloGaleriaHeaderEl = document.getElementById("tituloGaleriaHeader");
+  const vistaPerfilesEl = document.getElementById("vistaPerfiles");
+  const perfilesGrid = document.getElementById("perfilesGrid");
+  const loadingMsgPerfiles = document.getElementById("loadingMsgPerfiles");
+  const emptyMsgPerfiles = document.getElementById("emptyMsgPerfiles");
+
+  // Si el enlace ya trae ?u=UID, saltamos directo a "Tus galerías" de ese perfil.
+  if (vista === "galerias") {
+    vistaPerfilesEl.style.display = "none";
+    vistaGaleriasEl.style.display = "block";
+  }
+
+  document.getElementById("backToPerfilesBtn").addEventListener("click", () => {
+    vista = "perfiles";
+    uidPerfilObjetivo = null;
+    galeriaActualId = null;
+    vistaGaleriasEl.style.display = "none";
+    vistaPerfilesEl.style.display = "block";
+    history.replaceState(null, "", location.pathname);
+  });
 
   let libroSnapshotListo = false;
   let coleccionSnapshotListo = false;
@@ -2470,11 +2588,73 @@
     renderAdminListaGalerias();
     renderAdminListaColecciones();
     renderSelectGalerias();
+    renderPerfiles();
     marcarListoSiCorresponde();
   }, (error) => {
     loadingMsgGalerias.style.display = "none";
     console.error("Error al leer las galerías:", error);
   });
+
+  // ---------- Perfiles (galaxias): selector tipo Netflix ----------
+  let usuarios = [];
+  onSnapshot(usuariosCol, (snapshot) => {
+    usuarios = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderPerfiles();
+  }, (error) => {
+    loadingMsgPerfiles.style.display = "none";
+    console.error("Error al leer los perfiles:", error);
+  });
+
+  function renderPerfiles() {
+    loadingMsgPerfiles.style.display = "none";
+    perfilesGrid.innerHTML = "";
+    const hayGeneral = galerias.some(g => !g.ownerId);
+
+    if (usuarios.length === 0 && !hayGeneral) {
+      emptyMsgPerfiles.style.display = "block";
+      return;
+    }
+    emptyMsgPerfiles.style.display = "none";
+
+    usuarios.forEach(u => {
+      const tile = document.createElement("div");
+      tile.className = "galeria-tile";
+      const colorHex = COLORES_GALAXIA[u.color] || COLORES_GALAXIA.verde;
+      tile.innerHTML = `
+        <div class="perfil-tile-img" style="--color-galaxia:${colorHex};">
+          <img src="${imagenDirecta(u.imagenId)}" data-alt-src="${imagenAlternativa(u.imagenId)}" data-tried-alt="0" alt="${escapeHtml(u.nombre || "Perfil")}" loading="lazy" onerror="manejarErrorImagen(this)">
+        </div>
+        <div class="galeria-tile-nombre">${escapeHtml(u.nombre || "Sin nombre")}</div>
+      `;
+      tile.addEventListener("click", () => seleccionarPerfil(u.id));
+      perfilesGrid.appendChild(tile);
+    });
+
+    const hayContenidoSinDueno = galerias.some(g => !g.ownerId);
+    if (hayContenidoSinDueno) {
+      const tile = document.createElement("div");
+      tile.className = "galeria-tile";
+      const galeriaSinDueno = galerias.find(g => !g.ownerId);
+      tile.innerHTML = `
+        <div class="perfil-tile-img" style="--color-galaxia:${COLORES_GALAXIA.gris};">
+          <img src="${imagenDirecta(galeriaSinDueno.imagenId)}" data-alt-src="${imagenAlternativa(galeriaSinDueno.imagenId)}" data-tried-alt="0" alt="General" loading="lazy" onerror="manejarErrorImagen(this)">
+        </div>
+        <div class="galeria-tile-nombre">General</div>
+      `;
+      tile.addEventListener("click", () => seleccionarPerfil(ID_PERFIL_GENERAL));
+      perfilesGrid.appendChild(tile);
+    }
+  }
+
+  function seleccionarPerfil(uid) {
+    uidPerfilObjetivo = uid;
+    vista = "galerias";
+    vistaPerfilesEl.style.display = "none";
+    vistaGaleriasEl.style.display = "block";
+    history.replaceState(null, "", `${location.pathname}?u=${uid}`);
+    renderGalerias();
+    window.scrollTo(0, 0);
+  }
 
   // Libros de una colección (o de la "General" virtual, que agrupa los
   // libros sin colección asignada o cuya colección fue borrada).
@@ -2499,6 +2679,7 @@
   // galerías. Sin ese parámetro, se ve todo (comportamiento de siempre).
   function galeriasVisibles() {
     if (!uidPerfilObjetivo) return galerias;
+    if (uidPerfilObjetivo === ID_PERFIL_GENERAL) return galerias.filter(g => !g.ownerId);
     return galerias.filter(g => g.ownerId === uidPerfilObjetivo);
   }
 
