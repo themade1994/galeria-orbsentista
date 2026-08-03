@@ -1227,26 +1227,37 @@
   }
   .galeria-img-dot.activo{ background:var(--turquesa); }
 
-  /* PORTADA PARA AUDIO (tipo "cover" de canción) */
-  #audioPortadaWrap{
-    position:absolute;
-    inset:0;
+  /* PORTADA PARA AUDIO (tipo "cover" de canción, estilo Spotify) */
+  .pdf-body.con-portada-audio{
     display:flex;
     flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+  }
+  #audioPortadaWrap{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    flex:1;
+    min-height:0;
+    padding:24px 24px 10px;
     background:#000;
   }
   #audioPortadaImg{
-    flex:1;
-    width:100%;
+    width:min(70vw, 320px);
+    aspect-ratio:1/1;
     object-fit:cover;
-    min-height:0;
+    border-radius:14px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.5);
   }
   .pdf-body.con-portada-audio #pdfFrame{
-    position:absolute;
-    bottom:0;
-    left:0;
-    right:0;
+    display:block;
+    width:100%;
     height:110px;
+    flex-shrink:0;
     background:#0b0b0e;
   }
 
@@ -1412,6 +1423,31 @@
         <button id="loginBtn">Entrar</button>
       </div>
       <p id="loginError" style="color:#f87171;font-size:0.78rem;display:none;">Correo o contraseña incorrectos</p>
+
+      <div style="text-align:center;margin-top:14px;">
+        <button id="mostrarRegistroBtn" style="background:transparent;border:none;color:var(--accent);font-size:0.8rem;cursor:pointer;text-decoration:underline;">¿No tienes cuenta? Crear una nueva</button>
+      </div>
+
+      <div id="registroSection" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+        <h2>Crear cuenta nueva</h2>
+        <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:10px;">Esto es una versión de prueba: cualquiera que se registre tendrá su propio espacio de galerías, separado del de los demás, dentro de este mismo Orbsy.</p>
+        <div class="login-box">
+          <input type="email" id="registroEmail" placeholder="Correo" autocomplete="username" style="margin-bottom:8px;">
+        </div>
+        <div class="login-box">
+          <input type="password" id="registroPass" placeholder="Contraseña (mínimo 6 caracteres)" autocomplete="new-password">
+          <button id="registroBtn">Crear</button>
+        </div>
+        <p id="registroError" style="color:#f87171;font-size:0.78rem;display:none;"></p>
+      </div>
+    </div>
+
+    <div id="perfilInfo" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;">
+      <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:6px;">Tu enlace de perfil (compártelo para que otros vean solo tus galerías):</p>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="perfilEnlaceInput" readonly style="flex:1;padding:8px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text-sec);font-size:0.72rem;">
+        <button id="copiarEnlacePerfilBtn" style="background:var(--accent);border:none;color:#fff;padding:0 12px;border-radius:7px;font-size:0.75rem;cursor:pointer;">Copiar</button>
+      </div>
     </div>
 
     <div id="formSection" style="display:none;">
@@ -1419,6 +1455,7 @@
         <h2 style="margin:0;display:flex;align-items:center;gap:8px;">
           <svg class="icono-taller" viewBox="0 0 200 200" width="22" height="22"><use href="#icono-taller-svg"/></svg>
           Taller
+
         </h2>
         <button id="tallerToggleBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);width:34px;height:34px;border-radius:8px;font-size:0.9rem;cursor:pointer;">▲</button>
       </div>
@@ -1735,6 +1772,7 @@
   import {
     getAuth,
     signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
     signOut,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -1811,6 +1849,11 @@
   // Firestore (que debes configurar en la consola de Firebase) exigen
   // estar autenticado para poder publicar o borrar libros.
   let isAdmin = false;
+  let uidActual = null;
+
+  // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
+  const parametrosUrl = new URLSearchParams(location.search);
+  const uidPerfilObjetivo = parametrosUrl.get("u");
 
   const adminToggleBtn = document.getElementById("adminToggleBtn");
   const adminPanel = document.getElementById("adminPanel");
@@ -1840,16 +1883,78 @@
     loginBtn.textContent = "Entrar";
   });
 
+  // ---------- Registro de cuenta nueva (multiperfil, versión de prueba) ----------
+  const registroSection = document.getElementById("registroSection");
+  const mostrarRegistroBtn = document.getElementById("mostrarRegistroBtn");
+  const registroBtn = document.getElementById("registroBtn");
+  const registroEmail = document.getElementById("registroEmail");
+  const registroPass = document.getElementById("registroPass");
+  const registroError = document.getElementById("registroError");
+
+  mostrarRegistroBtn.addEventListener("click", () => {
+    const visible = registroSection.style.display === "block";
+    registroSection.style.display = visible ? "none" : "block";
+    mostrarRegistroBtn.textContent = visible ? "¿No tienes cuenta? Crear una nueva" : "Ya tengo cuenta, ocultar esto";
+  });
+
+  registroBtn.addEventListener("click", async () => {
+    registroError.style.display = "none";
+    const correo = registroEmail.value.trim();
+    const clave = registroPass.value;
+    if (!correo || clave.length < 6) {
+      registroError.textContent = "Escribe un correo y una contraseña de al menos 6 caracteres.";
+      registroError.style.display = "block";
+      return;
+    }
+    registroBtn.disabled = true;
+    registroBtn.textContent = "Creando...";
+    try {
+      await createUserWithEmailAndPassword(auth, correo, clave);
+      // onAuthStateChanged detecta la sesión nueva automáticamente
+    } catch (e) {
+      registroError.textContent = e.code === "auth/email-already-in-use"
+        ? "Ese correo ya tiene una cuenta. Intenta iniciar sesión."
+        : "No se pudo crear la cuenta: " + e.message;
+      registroError.style.display = "block";
+    }
+    registroBtn.disabled = false;
+    registroBtn.textContent = "Crear";
+  });
+
+  // ---------- Enlace de perfil (para compartir solo tus propias galerías) ----------
+  const perfilInfo = document.getElementById("perfilInfo");
+  const perfilEnlaceInput = document.getElementById("perfilEnlaceInput");
+  document.getElementById("copiarEnlacePerfilBtn").addEventListener("click", async () => {
+    perfilEnlaceInput.select();
+    try {
+      await navigator.clipboard.writeText(perfilEnlaceInput.value);
+      const btn = document.getElementById("copiarEnlacePerfilBtn");
+      btn.textContent = "¡Copiado!";
+      setTimeout(() => { btn.textContent = "Copiar"; }, 1500);
+    } catch (e) {
+      alert("Selecciona y copia el enlace manualmente.");
+    }
+  });
+
   // Detecta automáticamente si ya hay sesión iniciada (por ejemplo si
   // recargas la página después de haber entrado como admin)
   onAuthStateChanged(auth, (user) => {
     isAdmin = !!user;
+    uidActual = user ? user.uid : null;
     if (isAdmin) {
       loginSection.style.display = "none";
       formSection.style.display = "block";
+      perfilInfo.style.display = "block";
+      perfilEnlaceInput.value = `${location.origin}${location.pathname}?u=${user.uid}`;
     } else {
       loginSection.style.display = "block";
       formSection.style.display = "none";
+      perfilInfo.style.display = "none";
+    }
+    if (libroSnapshotListo && coleccionSnapshotListo && galeriaSnapshotListo) {
+      renderAdminListaGalerias();
+      renderAdminListaColecciones();
+      renderAdminListaLibros();
     }
   });
 
@@ -2088,10 +2193,10 @@
 
     try {
       if (libroEnEdicionId) {
-        await updateDoc(doc(db, "libros", libroEnEdicionId), datosLibro);
+        await updateDoc(doc(db, "libros", libroEnEdicionId), { ...datosLibro, ownerId: uidActual });
         cancelarEdicionLibro();
       } else {
-        await addDoc(librosCol, { ...datosLibro, fecha: serverTimestamp() });
+        await addDoc(librosCol, { ...datosLibro, ownerId: uidActual, fecha: serverTimestamp() });
         document.getElementById("inputTitulo").value = "";
         document.getElementById("inputResumen").value = "";
         document.getElementById("inputPortada").value = "";
@@ -2161,13 +2266,14 @@
 
     try {
       if (galeriaEnEdicionId) {
-        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId });
+        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId, ownerId: uidActual });
         cancelarEdicionGaleria();
       } else {
         await addDoc(galeriasCol, {
           nombre,
           imagenId,
           fondoId,
+          ownerId: uidActual,
           fecha: serverTimestamp()
         });
         document.getElementById("inputNombreGaleria").value = "";
@@ -2261,10 +2367,10 @@
 
     try {
       if (coleccionEnEdicionId) {
-        await updateDoc(doc(db, "colecciones", coleccionEnEdicionId), datosColeccion);
+        await updateDoc(doc(db, "colecciones", coleccionEnEdicionId), { ...datosColeccion, ownerId: uidActual });
         cancelarEdicionColeccion();
       } else {
-        await addDoc(coleccionesCol, { ...datosColeccion, fecha: serverTimestamp() });
+        await addDoc(coleccionesCol, { ...datosColeccion, ownerId: uidActual, fecha: serverTimestamp() });
         document.getElementById("inputNombreColeccion").value = "";
         document.getElementById("inputFraseColeccion").value = "";
         document.getElementById("inputImagenColeccion").value = "";
@@ -2389,20 +2495,33 @@
   }
 
   // ---------- Vista: pantalla de Galerías (nivel superior) ----------
+  // Si el enlace pide un perfil específico (?u=UID), solo se muestran sus
+  // galerías. Sin ese parámetro, se ve todo (comportamiento de siempre).
+  function galeriasVisibles() {
+    if (!uidPerfilObjetivo) return galerias;
+    return galerias.filter(g => g.ownerId === uidPerfilObjetivo);
+  }
+
   function renderGalerias() {
     galeriasGrid.innerHTML = "";
+    const galeriasAMostrar = galeriasVisibles();
     const coleccionesGeneral = coleccionesDeGaleria(ID_GALERIA_GENERAL);
     const librosGeneral = librosDeColeccion(ID_GENERAL);
-    const hayGeneral = coleccionesGeneral.length > 0 || librosGeneral.length > 0;
-    const hayContenido = galerias.length > 0 || hayGeneral;
+    // El cajón "General" (sin dueño claro) solo se muestra en el enlace genérico,
+    // no dentro del perfil específico de alguien.
+    const hayGeneral = !uidPerfilObjetivo && (coleccionesGeneral.length > 0 || librosGeneral.length > 0);
+    const hayContenido = galeriasAMostrar.length > 0 || hayGeneral;
 
     if (!hayContenido) {
       emptyMsgGalerias.style.display = "block";
+      emptyMsgGalerias.textContent = uidPerfilObjetivo
+        ? "Este perfil todavía no tiene galerías publicadas."
+        : "Aún no hay galerías creadas.";
       return;
     }
     emptyMsgGalerias.style.display = "none";
 
-    galerias.forEach(gal => {
+    galeriasAMostrar.forEach(gal => {
       galeriasGrid.appendChild(crearTarjetaGaleria(gal.id, gal.nombre, gal.imagenId));
     });
 
@@ -2661,15 +2780,21 @@
   }
 
   // ---------- Panel admin: lista de libros (siempre muestra todos) ----------
+  // Un elemento es "mío" si lo creé yo, o si es contenido antiguo sin dueño asignado.
+  function esMio(item) {
+    return !item.ownerId || item.ownerId === uidActual;
+  }
+
   function renderAdminListaLibros() {
     adminListContainer.innerHTML = "";
-    libros.forEach(libro => {
+    libros.filter(esMio).forEach(libro => {
       const row = document.createElement("div");
       row.className = "admin-row";
 
+      const coleccionesPropias = colecciones.filter(esMio);
       const opciones = [`<option value="">General (sin colección)</option>`]
-        .concat(colecciones.map(c => `<option value="${c.id}" ${libro.coleccionId === c.id ? "selected" : ""}>${escapeHtml(c.nombre)}</option>`));
-      if (!colecciones.some(c => c.id === libro.coleccionId)) {
+        .concat(coleccionesPropias.map(c => `<option value="${c.id}" ${libro.coleccionId === c.id ? "selected" : ""}>${escapeHtml(c.nombre)}</option>`));
+      if (!coleccionesPropias.some(c => c.id === libro.coleccionId)) {
         // Si la colección asignada ya no existe, que quede "General" seleccionado
         opciones[0] = `<option value="" selected>General (sin colección)</option>`;
       }
@@ -2698,13 +2823,14 @@
   // ---------- Panel admin: lista de colecciones ----------
   function renderAdminListaColecciones() {
     adminColeccionesContainer.innerHTML = "";
-    colecciones.forEach(col => {
+    colecciones.filter(esMio).forEach(col => {
       const row = document.createElement("div");
       row.className = "admin-row";
 
+      const galeriasPropias = galerias.filter(esMio);
       const opciones = [`<option value="">General (sin galería)</option>`]
-        .concat(galerias.map(g => `<option value="${g.id}" ${col.galeriaId === g.id ? "selected" : ""}>${escapeHtml(g.nombre)}</option>`));
-      if (!galerias.some(g => g.id === col.galeriaId)) {
+        .concat(galeriasPropias.map(g => `<option value="${g.id}" ${col.galeriaId === g.id ? "selected" : ""}>${escapeHtml(g.nombre)}</option>`));
+      if (!galeriasPropias.some(g => g.id === col.galeriaId)) {
         opciones[0] = `<option value="" selected>General (sin galería)</option>`;
       }
 
@@ -2732,7 +2858,7 @@
   // ---------- Panel admin: lista de galerías ----------
   function renderAdminListaGalerias() {
     adminGaleriasContainer.innerHTML = "";
-    galerias.forEach(gal => {
+    galerias.filter(esMio).forEach(gal => {
       const row = document.createElement("div");
       row.className = "admin-row";
       row.innerHTML = `
@@ -2755,18 +2881,19 @@
   // ---------- Panel admin: opciones del desplegable al crear una colección ----------
   function renderSelectGalerias() {
     const valorPrevio = inputGaleriaAsignada.value;
+    const galeriasPropias = galerias.filter(esMio);
     inputGaleriaAsignada.innerHTML = "";
-    if (galerias.length === 0) {
+    if (galeriasPropias.length === 0) {
       inputGaleriaAsignada.innerHTML = `<option value="">Crea primero una galería arriba</option>`;
       return;
     }
-    galerias.forEach(gal => {
+    galeriasPropias.forEach(gal => {
       const opt = document.createElement("option");
       opt.value = gal.id;
       opt.textContent = gal.nombre;
       inputGaleriaAsignada.appendChild(opt);
     });
-    if (galerias.some(g => g.id === valorPrevio)) {
+    if (galeriasPropias.some(g => g.id === valorPrevio)) {
       inputGaleriaAsignada.value = valorPrevio;
     }
   }
@@ -2774,19 +2901,20 @@
   // ---------- Panel admin: opciones del desplegable al publicar un libro ----------
   function renderSelectColecciones() {
     const valorPrevio = inputColeccionAsignada.value;
+    const coleccionesPropias = colecciones.filter(esMio);
     inputColeccionAsignada.innerHTML = "";
-    if (colecciones.length === 0) {
+    if (coleccionesPropias.length === 0) {
       inputColeccionAsignada.innerHTML = `<option value="">Crea primero una colección arriba</option>`;
       return;
     }
-    colecciones.forEach(col => {
+    coleccionesPropias.forEach(col => {
       const nombreGaleria = galerias.find(g => g.id === col.galeriaId)?.nombre || "General";
       const opt = document.createElement("option");
       opt.value = col.id;
       opt.textContent = `${col.nombre} (${nombreGaleria})`;
       inputColeccionAsignada.appendChild(opt);
     });
-    if (colecciones.some(c => c.id === valorPrevio)) {
+    if (coleccionesPropias.some(c => c.id === valorPrevio)) {
       inputColeccionAsignada.value = valorPrevio;
     }
   }
