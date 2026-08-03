@@ -1426,12 +1426,66 @@
   </div>
 
   <div id="notasGuardadasVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
-    <div style="padding:10px 14px;">
+    <div style="padding:10px 14px 0;">
       <button id="volverAHerramientasBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
     </div>
+    <div style="display:flex;gap:8px;padding:12px 14px 8px;border-bottom:1px solid var(--border);">
+      <button class="notas-tab-btn activo" id="tabNotasBtn" type="button" style="flex:1;background:var(--accent);border:none;color:#fff;padding:8px 0;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;">Notas</button>
+      <button class="notas-tab-btn" id="tabPlantillasBtn" type="button" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:8px 0;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;">Plantillas de Recursos</button>
+    </div>
     <div class="notas-guardadas-lista" id="notasGuardadasLista"></div>
+    <div id="plantillasVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+      <div style="padding:12px 14px 0;">
+        <button id="nuevaPlantillaBtn" style="width:100%;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">+ Nueva plantilla de recursos</button>
+      </div>
+      <div class="notas-guardadas-lista" id="plantillasLista"></div>
+    </div>
+  </div>
+
+  <!-- Editor de plantilla de recursos: texto plano estructurado, sin IA -->
+  <div id="plantillaEditorVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;display:flex;gap:8px;">
+      <button id="volverAPlantillasBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Plantillas</button>
+      <button id="guardarPlantillaBtn" style="flex:1;background:var(--accent);border:none;color:#fff;padding:7px 12px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;">Guardar plantilla</button>
+      <button id="eliminarPlantillaBtn" style="display:none;background:transparent;border:1px solid var(--border);color:#f87171;padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">Eliminar</button>
+    </div>
+    <div id="plantillaValidacion" style="margin:0 14px 8px;padding:8px 10px;background:#0e0e13;border:1px solid var(--border);border-radius:8px;font-size:0.72rem;line-height:1.5;color:var(--text-sec);"></div>
+    <textarea id="plantillaTexto" spellcheck="false" placeholder="PUBLICACIÓN
+
+Título:
+La noche del nihilista
+
+Resumen:
+Una colección sobre...
+
+--------------------------------
+
+RECURSO
+
+Tipo: Video
+Etiqueta: Introducción
+Enlace:
+https://...
+
+--------------------------------
+
+RECURSO
+
+Tipo: PDF
+Etiqueta: Capítulo 1
+Enlace:
+https://...
+
+--------------------------------
+
+PREGUNTA
+¿Qué significa el vacío?
+
+PREGUNTA
+¿Qué parte de ti intenta escapar?" style="flex:1;width:100%;box-sizing:border-box;padding:14px;background:#0e0e13;color:var(--text);border:none;font-family:'Courier New',monospace;font-size:0.82rem;line-height:1.55;resize:none;"></textarea>
   </div>
 </div>
+
 
 <header id="headerColecciones" style="display:none;">
   <button id="backToGaleriasBtn" style="position:absolute;left:16px;top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:6px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Galerías</button>
@@ -1591,6 +1645,8 @@
             <h2>Publicar nuevo libro</h2>
           </div>
         </div>
+      <button type="button" id="importarPlantillaBtn" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Importar Plantilla de Recursos</button>
+
       <label>Título del libro</label>
       <input type="text" id="inputTitulo" placeholder="Ej: Meditaciones del Exadicto">
 
@@ -1653,6 +1709,7 @@
     <div id="loadingMsgPerfiles" class="empty-msg">Cargando perfiles...</div>
     <div id="perfilesGrid" class="galerias-grid"></div>
     <div id="emptyMsgPerfiles" class="empty-msg" style="display:none;">Aún no hay perfiles creados.</div>
+    <div id="errorMsgPerfiles" class="empty-msg" style="display:none;color:#f87171;">No se pudieron cargar los perfiles (permiso denegado). Revisa las reglas de Firestore para la colección "usuarios".</div>
   </div>
 
   <!-- VISTA: GALERÍAS (nivel superior, pantalla de inicio) -->
@@ -1741,6 +1798,16 @@
       <button id="transferModalCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
       <button id="transferModalEnviar" style="flex:1;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">Enviar solicitud</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL: IMPORTAR PLANTILLA DE RECURSOS AL TALLER -->
+<div id="importarPlantillaModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:400px;width:100%;padding:22px;max-height:80vh;display:flex;flex-direction:column;">
+    <h3 style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:6px;">Importar Plantilla de Recursos</h3>
+    <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:14px;">Elige una plantilla creada en orbSY notes. Se llenará automáticamente el título, el resumen, los recursos y las preguntas de reflexión.</p>
+    <div id="importarPlantillaLista" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;"></div>
+    <button id="importarPlantillaCancelar" style="margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
   </div>
 </div>
 
@@ -2040,6 +2107,11 @@
         }
       } catch (e) {
         console.error("No se pudo revisar el perfil:", e);
+        // Si falla la lectura (típicamente por permisos de Firestore), igual
+        // mostramos el formulario para no dejar al usuario sin poder
+        // configurar su perfil, y avisamos del problema real.
+        document.getElementById("configurarPerfilSection").style.display = "block";
+        alert("No se pudo verificar tu perfil (" + e.code + "). Es probable que las reglas de seguridad de Firestore aún no permitan leer/escribir la colección \"usuarios\". Puedes seguir e intentar guardar tu perfil de todas formas.");
       }
     } else {
       loginSection.style.display = "block";
@@ -2621,12 +2693,17 @@
 
   // ---------- Perfiles (galaxias): selector tipo Netflix ----------
   let usuarios = [];
+  const errorMsgPerfiles = document.getElementById("errorMsgPerfiles");
   onSnapshot(usuariosCol, (snapshot) => {
     usuarios = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    errorMsgPerfiles.style.display = "none";
     renderPerfiles();
     renderSolicitudes();
   }, (error) => {
     loadingMsgPerfiles.style.display = "none";
+    perfilesGrid.innerHTML = "";
+    emptyMsgPerfiles.style.display = "none";
+    errorMsgPerfiles.style.display = "block";
     console.error("Error al leer los perfiles:", error);
   });
 
@@ -3541,6 +3618,7 @@
   document.getElementById("abrirNotasGuardadasBtn").addEventListener("click", () => {
     herramientasMenu.style.display = "none";
     notasGuardadasVista.style.display = "flex";
+    activarTabNotas();
     renderNotasGuardadas();
   });
   document.getElementById("volverAHerramientasBtn").addEventListener("click", () => {
@@ -3604,6 +3682,321 @@
     const div = document.createElement("div");
     div.textContent = str || "";
     return div.innerHTML;
+  }
+
+  // ---------- orbSY notes: pestañas (Notas / Plantillas de Recursos) ----------
+  const tabNotasBtn = document.getElementById("tabNotasBtn");
+  const tabPlantillasBtn = document.getElementById("tabPlantillasBtn");
+  const plantillasVista = document.getElementById("plantillasVista");
+
+  function activarTabNotas() {
+    tabNotasBtn.style.background = "var(--accent)";
+    tabNotasBtn.style.border = "none";
+    tabNotasBtn.style.color = "#fff";
+    tabPlantillasBtn.style.background = "transparent";
+    tabPlantillasBtn.style.border = "1px solid var(--border)";
+    tabPlantillasBtn.style.color = "var(--text-sec)";
+    notasGuardadasLista.style.display = "block";
+    plantillasVista.style.display = "none";
+  }
+  function activarTabPlantillas() {
+    tabPlantillasBtn.style.background = "var(--accent)";
+    tabPlantillasBtn.style.border = "none";
+    tabPlantillasBtn.style.color = "#fff";
+    tabNotasBtn.style.background = "transparent";
+    tabNotasBtn.style.border = "1px solid var(--border)";
+    tabNotasBtn.style.color = "var(--text-sec)";
+    notasGuardadasLista.style.display = "none";
+    plantillasVista.style.display = "flex";
+    renderPlantillasGuardadas();
+  }
+  tabNotasBtn.addEventListener("click", activarTabNotas);
+  tabPlantillasBtn.addEventListener("click", activarTabPlantillas);
+
+  // ---------- Plantillas de Recursos: almacenamiento local ----------
+  const CLAVE_PLANTILLAS = "orbsy_plantillas_recursos";
+
+  function leerTodasLasPlantillas() {
+    try {
+      return JSON.parse(localStorage.getItem(CLAVE_PLANTILLAS)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function guardarTodasLasPlantillas(obj) {
+    try {
+      localStorage.setItem(CLAVE_PLANTILLAS, JSON.stringify(obj));
+    } catch (e) {
+      console.error("No se pudo guardar la plantilla localmente:", e);
+    }
+  }
+
+  // ---------- Parser de plantillas: texto plano por palabras clave, sin IA ----------
+  // Reconoce las secciones PUBLICACIÓN / RECURSO / PREGUNTA y los campos
+  // "Campo: valor" (el valor puede ir en la misma línea o en la siguiente).
+  function parsearPlantilla(textoOriginal) {
+    const lineas = (textoOriginal || "").split(/\r?\n/);
+    let titulo = "";
+    let resumen = "";
+    const recursos = [];
+    const preguntas = [];
+    let recursoActual = null;
+    let campoPendiente = null; // { destino: "titulo"|"resumen"|"tipo"|"etiqueta"|"enlace"|"pregunta", indice? }
+
+    function normalizarCampo(campo) {
+      return campo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function asignarValor(campo, valor) {
+      if (campo === "titulo") titulo = valor;
+      else if (campo === "resumen") resumen = valor;
+      else if (recursoActual) {
+        if (campo === "tipo") recursoActual.tipo = valor;
+        else if (campo === "etiqueta") recursoActual.etiqueta = valor;
+        else if (campo === "enlace") recursoActual.enlace = valor;
+      }
+    }
+
+    for (const raw of lineas) {
+      const linea = raw.trim();
+      if (linea === "") continue;
+
+      // Líneas separadoras (---------) no aportan información
+      if (/^-{3,}$/.test(linea)) { campoPendiente = null; continue; }
+
+      // Encabezados de sección
+      if (/^PUBLICACI[OÓ]N$/i.test(linea)) { campoPendiente = null; continue; }
+      if (/^RECURSO$/i.test(linea)) {
+        recursoActual = { tipo: "", etiqueta: "", enlace: "" };
+        recursos.push(recursoActual);
+        campoPendiente = null;
+        continue;
+      }
+      if (/^PREGUNTA\s*:?\s*(.*)$/i.test(linea)) {
+        const m = linea.match(/^PREGUNTA\s*:?\s*(.*)$/i);
+        preguntas.push(m[1].trim());
+        campoPendiente = m[1].trim() === "" ? { destino: "pregunta", indice: preguntas.length - 1 } : null;
+        continue;
+      }
+
+      // Campo: valor (Título, Resumen, Tipo, Etiqueta, Enlace)
+      const m = linea.match(/^(T[ií]tulo|Resumen|Tipo|Etiqueta|Enlace)\s*:\s*(.*)$/i);
+      if (m) {
+        const campo = normalizarCampo(m[1]);
+        const valor = m[2].trim();
+        if (valor !== "") {
+          asignarValor(campo, valor);
+          campoPendiente = null;
+        } else {
+          campoPendiente = { destino: campo };
+        }
+        continue;
+      }
+
+      // Línea de texto libre: completa el campo pendiente (valor en línea siguiente)
+      if (campoPendiente) {
+        if (campoPendiente.destino === "pregunta") {
+          preguntas[campoPendiente.indice] = linea;
+        } else {
+          asignarValor(campoPendiente.destino, linea);
+        }
+        campoPendiente = null;
+      }
+    }
+
+    return { titulo, resumen, recursos, preguntas };
+  }
+
+  // Mapea el "Tipo" escrito en la plantilla al tipo interno que usa el Taller
+  function mapearTipoRecurso(tipoTexto) {
+    const t = (tipoTexto || "").toLowerCase().trim();
+    if (t.startsWith("video")) return "video";
+    if (t.startsWith("audio")) return "audio";
+    if (t.startsWith("imagen") || t.startsWith("galería") || t.startsWith("galeria")) return "imagenes";
+    return "texto"; // PDF / Texto / cualquier otro caso
+  }
+
+  // Construye el resumen de validación (✔ / ⚠) a partir de una plantilla ya parseada
+  function validarPlantilla(datos) {
+    const lineasOk = [];
+    const lineasAviso = [];
+
+    if (datos.titulo.trim() === "") lineasAviso.push("⚠ Falta el título de la publicación");
+    lineasOk.push(`✔ ${datos.recursos.length} recurso${datos.recursos.length === 1 ? "" : "s"} encontrado${datos.recursos.length === 1 ? "" : "s"}`);
+    lineasOk.push(`✔ ${datos.preguntas.length} pregunta${datos.preguntas.length === 1 ? "" : "s"} encontrada${datos.preguntas.length === 1 ? "" : "s"}`);
+
+    datos.recursos.forEach((r, i) => {
+      if (!r.tipo) lineasAviso.push(`⚠ Recurso ${i + 1} sin tipo`);
+      if (!r.etiqueta) lineasAviso.push(`⚠ Recurso ${i + 1} sin etiqueta`);
+      if (!r.enlace) lineasAviso.push(`⚠ Recurso ${i + 1} sin enlace`);
+    });
+    datos.preguntas.forEach((p, i) => {
+      if (!p) lineasAviso.push(`⚠ Pregunta ${i + 1} está vacía`);
+    });
+
+    return [...lineasOk, ...lineasAviso].join("<br>");
+  }
+
+  // ---------- Editor de plantilla ----------
+  const plantillaEditorVista = document.getElementById("plantillaEditorVista");
+  const plantillaTexto = document.getElementById("plantillaTexto");
+  const plantillaValidacion = document.getElementById("plantillaValidacion");
+  const eliminarPlantillaBtn = document.getElementById("eliminarPlantillaBtn");
+  let plantillaIdActiva = null;
+
+  function actualizarValidacionPlantilla() {
+    const datos = parsearPlantilla(plantillaTexto.value);
+    plantillaValidacion.innerHTML = validarPlantilla(datos);
+  }
+  plantillaTexto.addEventListener("input", actualizarValidacionPlantilla);
+
+  function abrirEditorPlantilla(id) {
+    const todas = leerTodasLasPlantillas();
+    const plantilla = id ? todas[id] : null;
+    plantillaIdActiva = id || ("p_" + Date.now() + "_" + Math.floor(Math.random() * 10000));
+    plantillaTexto.value = plantilla ? plantilla.contenido : "";
+    eliminarPlantillaBtn.style.display = plantilla ? "block" : "none";
+    actualizarValidacionPlantilla();
+    plantillasVista.style.display = "none";
+    plantillaEditorVista.style.display = "flex";
+  }
+
+  document.getElementById("nuevaPlantillaBtn").addEventListener("click", () => abrirEditorPlantilla(null));
+
+  document.getElementById("volverAPlantillasBtn").addEventListener("click", () => {
+    plantillaEditorVista.style.display = "none";
+    notasGuardadasVista.style.display = "flex";
+    activarTabPlantillas();
+  });
+
+  document.getElementById("guardarPlantillaBtn").addEventListener("click", () => {
+    const contenido = plantillaTexto.value;
+    if (contenido.trim() === "") {
+      alert("La plantilla está vacía.");
+      return;
+    }
+    const datos = parsearPlantilla(contenido);
+    const todas = leerTodasLasPlantillas();
+    todas[plantillaIdActiva] = {
+      titulo: datos.titulo.trim() || "Plantilla sin título",
+      contenido,
+      fecha: Date.now()
+    };
+    guardarTodasLasPlantillas(todas);
+    plantillaEditorVista.style.display = "none";
+    notasGuardadasVista.style.display = "flex";
+    activarTabPlantillas();
+  });
+
+  eliminarPlantillaBtn.addEventListener("click", () => {
+    if (!plantillaIdActiva) return;
+    if (confirm("¿Eliminar esta plantilla de recursos?")) {
+      const todas = leerTodasLasPlantillas();
+      delete todas[plantillaIdActiva];
+      guardarTodasLasPlantillas(todas);
+      plantillaEditorVista.style.display = "none";
+      notasGuardadasVista.style.display = "flex";
+      activarTabPlantillas();
+    }
+  });
+
+  function renderPlantillasGuardadas() {
+    const plantillasLista = document.getElementById("plantillasLista");
+    const todas = leerTodasLasPlantillas();
+    const entradas = Object.entries(todas).sort((a, b) => b[1].fecha - a[1].fecha);
+    plantillasLista.innerHTML = "";
+
+    if (entradas.length === 0) {
+      plantillasLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes plantillas de recursos. Crea una para preparar publicaciones sin escribir directamente en el Taller.</div>`;
+      return;
+    }
+
+    entradas.forEach(([id, plantilla]) => {
+      const datos = parsearPlantilla(plantilla.contenido);
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">${escapeHtml(plantilla.titulo)}</div>
+        <div class="nota-guardada-preview">${datos.recursos.length} recurso(s) · ${datos.preguntas.length} pregunta(s)</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-plantilla">Editar</button>
+          <button class="eliminar">Eliminar</button>
+        </div>
+      `;
+      item.querySelector(".abrir-plantilla").addEventListener("click", () => abrirEditorPlantilla(id));
+      item.querySelector(".eliminar").addEventListener("click", () => {
+        if (confirm(`¿Eliminar la plantilla "${plantilla.titulo}"?`)) {
+          const todasActualizadas = leerTodasLasPlantillas();
+          delete todasActualizadas[id];
+          guardarTodasLasPlantillas(todasActualizadas);
+          renderPlantillasGuardadas();
+        }
+      });
+      plantillasLista.appendChild(item);
+    });
+  }
+
+  // ---------- Importar Plantilla al Taller ----------
+  const importarPlantillaModal = document.getElementById("importarPlantillaModal");
+  const importarPlantillaLista = document.getElementById("importarPlantillaLista");
+
+  document.getElementById("importarPlantillaBtn").addEventListener("click", () => {
+    const todas = leerTodasLasPlantillas();
+    const entradas = Object.entries(todas).sort((a, b) => b[1].fecha - a[1].fecha);
+    importarPlantillaLista.innerHTML = "";
+
+    if (entradas.length === 0) {
+      importarPlantillaLista.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes plantillas guardadas. Créalas desde orbSY notes → Plantillas de Recursos.</div>`;
+    } else {
+      entradas.forEach(([id, plantilla]) => {
+        const datos = parsearPlantilla(plantilla.contenido);
+        const fila = document.createElement("div");
+        fila.style.cssText = "border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;";
+        fila.innerHTML = `
+          <div style="font-weight:600;font-size:0.85rem;">${escapeHtml(plantilla.titulo)}</div>
+          <div style="font-size:0.72rem;color:var(--text-sec);margin-top:2px;">${datos.recursos.length} recurso(s) · ${datos.preguntas.length} pregunta(s)</div>
+        `;
+        fila.addEventListener("click", () => {
+          importarPlantillaEnTaller(datos);
+          importarPlantillaModal.style.display = "none";
+        });
+        importarPlantillaLista.appendChild(fila);
+      });
+    }
+    importarPlantillaModal.style.display = "flex";
+  });
+
+  document.getElementById("importarPlantillaCancelar").addEventListener("click", () => {
+    importarPlantillaModal.style.display = "none";
+  });
+
+  function importarPlantillaEnTaller(datos) {
+    if (datos.titulo) document.getElementById("inputTitulo").value = datos.titulo;
+    if (datos.resumen) document.getElementById("inputResumen").value = datos.resumen;
+
+    if (datos.recursos.length > 0) {
+      recursosBuilder = datos.recursos.map(r => ({
+        tipo: mapearTipoRecurso(r.tipo),
+        etiqueta: r.etiqueta || "",
+        enlace: r.enlace || "",
+        fuente: "drive"
+      }));
+      renderRecursosBuilder();
+    }
+
+    if (datos.preguntas.length > 0) {
+      preguntasBuilder = datos.preguntas.filter(p => p.trim() !== "");
+      renderPreguntasBuilder();
+    }
+
+    const advertencias = [];
+    datos.recursos.forEach((r, i) => {
+      if (!r.enlace) advertencias.push(`Recurso ${i + 1} sin enlace`);
+      if (!r.etiqueta) advertencias.push(`Recurso ${i + 1} sin etiqueta`);
+    });
+    let mensaje = `Se importaron ${datos.recursos.length} recurso(s) y ${datos.preguntas.length} pregunta(s). Revisa los campos y pulsa Publicar.`;
+    if (advertencias.length > 0) mensaje += "\n\nPendientes por completar:\n- " + advertencias.join("\n- ");
+    alert(mensaje);
   }
 
   // ---------- Modal: índice temático ----------
