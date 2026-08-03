@@ -1497,6 +1497,13 @@
     </div>
 
     <div id="formSection" style="display:none;">
+      <div id="solicitudesSection" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+        <h2 style="margin-bottom:4px;">🔄 Solicitudes de transferencia</h2>
+        <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:12px;">Galerías, colecciones o publicaciones que otros perfiles quieren pasarte, o que tú les enviaste.</p>
+        <div id="solicitudesEntrantesContainer"></div>
+        <div id="solicitudesEnviadasContainer" style="margin-top:10px;"></div>
+      </div>
+
       <div id="tallerHeader" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:16px;">
         <h2 style="margin:0;display:flex;align-items:center;gap:8px;">
           <svg class="icono-taller" viewBox="0 0 200 200" width="22" height="22"><use href="#icono-taller-svg"/></svg>
@@ -1723,6 +1730,20 @@
   </div>
 </div>
 
+<!-- MODAL: TRANSFERIR CONTENIDO A OTRO PERFIL -->
+<div id="transferModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:340px;width:100%;padding:22px;">
+    <h3 id="transferModalTitulo" style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:6px;">Transferir</h3>
+    <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:14px;">Elige a quién quieres enviárselo. Pasará a ser suyo solo si acepta la solicitud.</p>
+    <select id="transferDestinoSelect" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.85rem;"></select>
+    <p id="transferModalError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:8px;"></p>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button id="transferModalCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
+      <button id="transferModalEnviar" style="flex:1;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">Enviar solicitud</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: ÍNDICE TEMÁTICO -->
 <div id="indiceModal">
   <div class="indice-caja">
@@ -1850,6 +1871,7 @@
   const coleccionesCol = collection(db, "colecciones");
   const galeriasCol = collection(db, "galerias");
   const usuariosCol = collection(db, "usuarios");
+  const solicitudesCol = collection(db, "solicitudesTransferencia");
 
   // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
   // (Declarado aquí arriba porque "vista" lo necesita para inicializarse)
@@ -2030,6 +2052,7 @@
       renderAdminListaColecciones();
       renderAdminListaLibros();
     }
+    renderSolicitudes();
   });
 
   // ---------- Configurar perfil (nombre, foto, color de galaxia) ----------
@@ -2601,6 +2624,7 @@
   onSnapshot(usuariosCol, (snapshot) => {
     usuarios = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     renderPerfiles();
+    renderSolicitudes();
   }, (error) => {
     loadingMsgPerfiles.style.display = "none";
     console.error("Error al leer los perfiles:", error);
@@ -2656,6 +2680,160 @@
     renderGalerias();
     window.scrollTo(0, 0);
   }
+
+  // ---------- Solicitudes de transferencia entre perfiles ----------
+  // Permite enviarle a otro perfil una galería, colección o publicación:
+  // no cambia de dueño hasta que el destinatario acepta la solicitud.
+  let solicitudes = [];
+  const solicitudesSection = document.getElementById("solicitudesSection");
+  const solicitudesEntrantesContainer = document.getElementById("solicitudesEntrantesContainer");
+  const solicitudesEnviadasContainer = document.getElementById("solicitudesEnviadasContainer");
+
+  onSnapshot(solicitudesCol, (snapshot) => {
+    solicitudes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderSolicitudes();
+  }, (error) => {
+    console.error("Error al leer las solicitudes de transferencia:", error);
+  });
+
+  function nombrePerfil(uid) {
+    const u = usuarios.find(u => u.id === uid);
+    return u && u.nombre ? u.nombre : "Alguien";
+  }
+
+  const ETIQUETAS_TIPO_TRANSFER = { galeria: "Galería", coleccion: "Colección", libro: "Publicación" };
+
+  function renderSolicitudes() {
+    if (!isAdmin) { solicitudesSection.style.display = "none"; return; }
+
+    const entrantes = solicitudes.filter(s => s.paraUid === uidActual && s.estado === "pendiente");
+    const enviadas = solicitudes.filter(s => s.deUid === uidActual && s.estado === "pendiente");
+
+    solicitudesSection.style.display = (entrantes.length > 0 || enviadas.length > 0) ? "block" : "none";
+
+    solicitudesEntrantesContainer.innerHTML = "";
+    entrantes.forEach(s => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+      row.innerHTML = `
+        <div class="admin-row-titulo">${escapeHtml(s.itemNombre || "Sin título")}<br>
+          <span style="font-size:0.72rem;color:var(--text-sec);font-weight:400;">${ETIQUETAS_TIPO_TRANSFER[s.tipo] || s.tipo} · de ${escapeHtml(s.deNombre || "Alguien")}</span>
+        </div>
+        <div class="admin-row-controles">
+          <button class="aceptar-btn">Aceptar</button>
+          <button class="delete-btn">Rechazar</button>
+        </div>
+      `;
+      row.querySelector(".aceptar-btn").addEventListener("click", () => aceptarSolicitud(s));
+      row.querySelector(".delete-btn").addEventListener("click", () => rechazarSolicitud(s));
+      solicitudesEntrantesContainer.appendChild(row);
+    });
+
+    solicitudesEnviadasContainer.innerHTML = "";
+    enviadas.forEach(s => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+      row.innerHTML = `
+        <div class="admin-row-titulo">${escapeHtml(s.itemNombre || "Sin título")}<br>
+          <span style="font-size:0.72rem;color:var(--text-sec);font-weight:400;">Enviada a ${escapeHtml(nombrePerfil(s.paraUid))} · esperando respuesta</span>
+        </div>
+        <div class="admin-row-controles">
+          <button class="delete-btn">Cancelar</button>
+        </div>
+      `;
+      row.querySelector(".delete-btn").addEventListener("click", () => cancelarSolicitud(s));
+      solicitudesEnviadasContainer.appendChild(row);
+    });
+  }
+
+  async function aceptarSolicitud(sol) {
+    const coleccionFirestore = sol.tipo === "galeria" ? "galerias" : sol.tipo === "coleccion" ? "colecciones" : "libros";
+    const cambios = { ownerId: uidActual };
+    // Colecciones y publicaciones llegan sueltas ("General" de tu perfil) para
+    // que tú decidas después, desde el Taller, en qué galería o colección guardarlas.
+    if (sol.tipo === "coleccion") cambios.galeriaId = "";
+    if (sol.tipo === "libro") cambios.coleccionId = "";
+    try {
+      await updateDoc(doc(db, coleccionFirestore, sol.itemId), cambios);
+      await deleteDoc(doc(db, "solicitudesTransferencia", sol.id));
+    } catch (e) {
+      alert("No se pudo aceptar la transferencia: " + e.message);
+    }
+  }
+
+  async function rechazarSolicitud(sol) {
+    try {
+      await deleteDoc(doc(db, "solicitudesTransferencia", sol.id));
+    } catch (e) {
+      alert("No se pudo rechazar la solicitud: " + e.message);
+    }
+  }
+
+  async function cancelarSolicitud(sol) {
+    try {
+      await deleteDoc(doc(db, "solicitudesTransferencia", sol.id));
+    } catch (e) {
+      alert("No se pudo cancelar la solicitud: " + e.message);
+    }
+  }
+
+  // ---------- Modal para elegir a quién transferir ----------
+  const transferModal = document.getElementById("transferModal");
+  const transferModalTitulo = document.getElementById("transferModalTitulo");
+  const transferDestinoSelect = document.getElementById("transferDestinoSelect");
+  const transferModalError = document.getElementById("transferModalError");
+  let itemActualTransferir = null;
+
+  function abrirModalTransferir(tipo, itemId, itemNombre) {
+    const otrosPerfiles = usuarios.filter(u => u.id !== uidActual);
+    if (otrosPerfiles.length === 0) {
+      alert("Todavía no hay otros perfiles creados a quién transferirle esto.");
+      return;
+    }
+    itemActualTransferir = { tipo, itemId, itemNombre };
+    transferModalTitulo.textContent = `Transferir "${itemNombre}"`;
+    transferModalError.style.display = "none";
+    transferDestinoSelect.innerHTML = otrosPerfiles
+      .map(u => `<option value="${u.id}">${escapeHtml(u.nombre || "Sin nombre")}</option>`)
+      .join("");
+    transferModal.style.display = "flex";
+  }
+
+  document.getElementById("transferModalCancelar").addEventListener("click", () => {
+    transferModal.style.display = "none";
+    itemActualTransferir = null;
+  });
+
+  document.getElementById("transferModalEnviar").addEventListener("click", async () => {
+    if (!itemActualTransferir) return;
+    const paraUid = transferDestinoSelect.value;
+    if (!paraUid) return;
+    const yaHayPendiente = solicitudes.some(s =>
+      s.itemId === itemActualTransferir.itemId && s.estado === "pendiente"
+    );
+    if (yaHayPendiente) {
+      transferModalError.textContent = "Ya hay una solicitud pendiente para esto.";
+      transferModalError.style.display = "block";
+      return;
+    }
+    try {
+      await addDoc(solicitudesCol, {
+        tipo: itemActualTransferir.tipo,
+        itemId: itemActualTransferir.itemId,
+        itemNombre: itemActualTransferir.itemNombre,
+        deUid: uidActual,
+        deNombre: nombrePerfil(uidActual),
+        paraUid,
+        estado: "pendiente",
+        fecha: serverTimestamp()
+      });
+      transferModal.style.display = "none";
+      itemActualTransferir = null;
+    } catch (e) {
+      transferModalError.textContent = "No se pudo enviar la solicitud: " + e.message;
+      transferModalError.style.display = "block";
+    }
+  });
 
   // Libros de una colección (o de la "General" virtual, que agrupa los
   // libros sin colección asignada o cuya colección fue borrada).
@@ -2986,6 +3164,7 @@
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
           <button class="editar-btn">Editar</button>
+          <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar</button>
         </div>
       `;
@@ -2993,6 +3172,7 @@
         await updateDoc(doc(db, "libros", libro.id), { coleccionId: e.target.value });
       });
       row.querySelector(".editar-btn").addEventListener("click", () => cargarLibroParaEditar(libro));
+      row.querySelector(".transferir-btn").addEventListener("click", () => abrirModalTransferir("libro", libro.id, libro.titulo));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar "${libro.titulo}"?`)) {
           await deleteDoc(doc(db, "libros", libro.id));
@@ -3021,6 +3201,7 @@
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
           <button class="editar-btn">Editar</button>
+          <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar</button>
         </div>
       `;
@@ -3028,6 +3209,7 @@
         await updateDoc(doc(db, "colecciones", col.id), { galeriaId: e.target.value });
       });
       row.querySelector(".editar-btn").addEventListener("click", () => cargarColeccionParaEditar(col));
+      row.querySelector(".transferir-btn").addEventListener("click", () => abrirModalTransferir("coleccion", col.id, col.nombre));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar la colección "${col.nombre}"? Los escritos dentro no se borran, pasarán a verse en "General".`)) {
           await deleteDoc(doc(db, "colecciones", col.id));
@@ -3047,10 +3229,12 @@
         <div class="admin-row-titulo">${escapeHtml(gal.nombre)}</div>
         <div class="admin-row-controles">
           <button class="editar-btn">Editar</button>
+          <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar galería</button>
         </div>
       `;
       row.querySelector(".editar-btn").addEventListener("click", () => cargarGaleriaParaEditar(gal));
+      row.querySelector(".transferir-btn").addEventListener("click", () => abrirModalTransferir("galeria", gal.id, gal.nombre));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar la galería "${gal.nombre}"? Las colecciones dentro no se borran, pasarán a verse en "General".`)) {
           await deleteDoc(doc(db, "galerias", gal.id));
@@ -3550,6 +3734,7 @@
       // Galería de imágenes: visor propio con anterior/siguiente y deslizar,
       // en vez del iframe de Drive.
       pdfFrame.style.display = "none";
+      pdfFrame.src = ""; // corta cualquier audio/video que siguiera sonando de fondo
       pdfLoading.style.display = "none";
       galeriaImagenesViewer.style.display = "flex";
       document.getElementById("audioPortadaWrap").style.display = "none";
