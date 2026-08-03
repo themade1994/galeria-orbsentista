@@ -1227,6 +1227,29 @@
   }
   .galeria-img-dot.activo{ background:var(--turquesa); }
 
+  /* PORTADA PARA AUDIO (tipo "cover" de canción) */
+  #audioPortadaWrap{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    background:#000;
+  }
+  #audioPortadaImg{
+    flex:1;
+    width:100%;
+    object-fit:cover;
+    min-height:0;
+  }
+  .pdf-body.con-portada-audio #pdfFrame{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    height:110px;
+    background:#0b0b0e;
+  }
+
   /* MODAL LECTOR PDF */
   #pdfModal{
     display:none;
@@ -1645,6 +1668,10 @@
       <button id="imagenSiguienteBtn" class="galeria-img-nav der">→</button>
       <div id="galeriaImagenesDots" class="galeria-img-dots"></div>
     </div>
+
+    <div id="audioPortadaWrap" style="display:none;">
+      <img id="audioPortadaImg" src="" alt="Portada del audio">
+    </div>
   </div>
 
   <div id="indiceDrawerOverlay"></div>
@@ -1854,6 +1881,9 @@
         ` : `
         <input type="text" class="recurso-enlace" placeholder="${r.tipo === 'video' && r.fuente === 'youtube' ? 'Enlace de YouTube' : 'Enlace de Google Drive'}" value="${escapeAttr(r.enlace)}">
         `}
+        ${r.tipo === "audio" ? `
+        <input type="text" class="recurso-imagen-audio" placeholder="Imagen/portada para este audio (opcional)" value="${escapeAttr(r.imagenAudio || "")}">
+        ` : ""}
         <div class="recurso-controles">
           <button type="button" class="recurso-subir" ${i === 0 ? "disabled" : ""}>▲</button>
           <button type="button" class="recurso-bajar" ${i === recursosBuilder.length - 1 ? "disabled" : ""}>▼</button>
@@ -1876,6 +1906,8 @@
       if (enlaceInput) enlaceInput.addEventListener("input", (e) => { recursosBuilder[i].enlace = e.target.value; });
       const enlacesMultiplesInput = row.querySelector(".recurso-enlaces-multiples");
       if (enlacesMultiplesInput) enlacesMultiplesInput.addEventListener("input", (e) => { recursosBuilder[i].enlacesMultiples = e.target.value; });
+      const imagenAudioInput = row.querySelector(".recurso-imagen-audio");
+      if (imagenAudioInput) imagenAudioInput.addEventListener("input", (e) => { recursosBuilder[i].imagenAudio = e.target.value; });
       row.querySelector(".recurso-subir").addEventListener("click", () => {
         if (i === 0) return;
         [recursosBuilder[i - 1], recursosBuilder[i]] = [recursosBuilder[i], recursosBuilder[i - 1]];
@@ -1962,7 +1994,8 @@
         tipo: r.tipo,
         etiqueta: r.etiqueta,
         fuente: r.fuente || "drive",
-        enlace: r.fuente === "youtube" ? `https://youtu.be/${r.driveId}` : `https://drive.google.com/file/d/${r.driveId}/view`
+        enlace: r.fuente === "youtube" ? `https://youtu.be/${r.driveId}` : `https://drive.google.com/file/d/${r.driveId}/view`,
+        imagenAudio: r.imagenId ? `https://drive.google.com/file/d/${r.imagenId}/view` : ""
       };
     });
     if (recursosBuilder.length === 0) recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
@@ -2036,7 +2069,8 @@
         tipo: r.tipo,
         etiqueta: r.etiqueta.trim(),
         fuente: esYoutube ? "youtube" : "drive",
-        driveId: esYoutube ? extraerIdYoutube(r.enlace.trim()) : extraerIdDrive(r.enlace.trim())
+        driveId: esYoutube ? extraerIdYoutube(r.enlace.trim()) : extraerIdDrive(r.enlace.trim()),
+        imagenId: (r.tipo === "audio" && r.imagenAudio && r.imagenAudio.trim()) ? extraerIdDrive(r.imagenAudio.trim()) : ""
       };
     });
 
@@ -3208,6 +3242,8 @@
       pdfFrame.style.display = "none";
       pdfLoading.style.display = "none";
       galeriaImagenesViewer.style.display = "flex";
+      document.getElementById("audioPortadaWrap").style.display = "none";
+      document.querySelector(".pdf-body").classList.remove("con-portada-audio");
       imagenesActualIndex = 0;
       renderImagenGaleria(recurso.imagenes);
     } else {
@@ -3215,6 +3251,17 @@
       pdfFrame.style.display = "block";
       pdfLoading.style.display = "flex";
       pdfLoading.textContent = "Cargando documento...";
+
+      const audioPortadaWrap = document.getElementById("audioPortadaWrap");
+      if (recurso.tipo === "audio" && recurso.imagenId) {
+        document.getElementById("audioPortadaImg").src = imagenDirecta(recurso.imagenId);
+        audioPortadaWrap.style.display = "flex";
+        document.querySelector(".pdf-body").classList.add("con-portada-audio");
+      } else {
+        audioPortadaWrap.style.display = "none";
+        document.querySelector(".pdf-body").classList.remove("con-portada-audio");
+      }
+
       // El mismo visor de Drive (/preview) detecta automáticamente si es un
       // PDF, un audio o un video, y muestra el reproductor correspondiente.
       // Requiere que el archivo esté compartido como "Cualquier persona con el enlace".
