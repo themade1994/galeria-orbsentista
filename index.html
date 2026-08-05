@@ -546,6 +546,16 @@
     margin-bottom:8px;
   }
   .orbsy-general-flanco .galeria-tile-nombre{ font-size:0.8rem; font-weight:600; }
+
+  /* La esfera de orbSY General es la única con los 3 colores juntos en su anillo */
+  .orbsy-general-flanco .perfil-tile-img::after{
+    background:conic-gradient(from 0deg, var(--verde), var(--accent), var(--violeta), var(--verde));
+    border:none;
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+    mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+    transform:none;
+    box-shadow:0 0 16px -2px rgba(155,124,246,0.5);
+  }
   .galerias-eyebrow{
     text-align:center;
     font-family:'IBM Plex Mono', monospace;
@@ -1710,6 +1720,11 @@
       <label>Enlace de Google Drive (imagen de fondo, opcional)</label>
       <input type="text" id="inputFondoGaleria" placeholder="https://drive.google.com/file/d/.../view">
 
+      <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:10px;">
+        <input type="checkbox" id="inputEsGaleriaGeneral" style="width:auto;">
+        Esta es la galería <strong>orbSY General</strong> (sin dueño, se muestra como la esfera principal arriba de todos los perfiles)
+      </label>
+
       <div style="display:flex;gap:8px;">
         <button id="crearGaleriaBtn" style="flex:1;">Crear galería</button>
         <button id="cancelarEdicionGaleriaBtn" style="display:none;flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:0 14px;border-radius:9px;">Cancelar</button>
@@ -2559,6 +2574,7 @@
     document.getElementById("inputNombreGaleria").value = gal.nombre || "";
     document.getElementById("inputImagenGaleria").value = gal.imagenId ? `https://drive.google.com/file/d/${gal.imagenId}/view` : "";
     document.getElementById("inputFondoGaleria").value = gal.fondoId ? `https://drive.google.com/file/d/${gal.fondoId}/view` : "";
+    document.getElementById("inputEsGaleriaGeneral").checked = !gal.ownerId;
     crearGaleriaBtn.textContent = "Guardar cambios";
     cancelarEdicionGaleriaBtn.style.display = "block";
     tallerContenido.style.display = "block";
@@ -2571,6 +2587,7 @@
     document.getElementById("inputNombreGaleria").value = "";
     document.getElementById("inputImagenGaleria").value = "";
     document.getElementById("inputFondoGaleria").value = "";
+    document.getElementById("inputEsGaleriaGeneral").checked = false;
     crearGaleriaBtn.textContent = "Crear galería";
     cancelarEdicionGaleriaBtn.style.display = "none";
   }
@@ -2588,25 +2605,28 @@
 
     const imagenId = extraerIdDrive(imagenUrl);
     const fondoId = fondoUrl ? extraerIdDrive(fondoUrl) : "";
+    const esGeneral = document.getElementById("inputEsGaleriaGeneral").checked;
+    const ownerIdAsignado = esGeneral ? null : uidActual;
 
     crearGaleriaBtn.disabled = true;
     crearGaleriaBtn.textContent = galeriaEnEdicionId ? "Guardando..." : "Creando...";
 
     try {
       if (galeriaEnEdicionId) {
-        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId, ownerId: uidActual });
+        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId, ownerId: ownerIdAsignado });
         cancelarEdicionGaleria();
       } else {
         await addDoc(galeriasCol, {
           nombre,
           imagenId,
           fondoId,
-          ownerId: uidActual,
+          ownerId: ownerIdAsignado,
           fecha: serverTimestamp()
         });
         document.getElementById("inputNombreGaleria").value = "";
         document.getElementById("inputImagenGaleria").value = "";
         document.getElementById("inputFondoGaleria").value = "";
+        document.getElementById("inputEsGaleriaGeneral").checked = false;
       }
     } catch (e) {
       alert("Error al guardar la galería: " + e.message);
