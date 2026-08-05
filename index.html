@@ -324,6 +324,39 @@
     border-color:var(--accent) !important;
     color:#fff !important;
   }
+
+  /* Insignia fija de orbSY: niño con telescopio, centrada abajo, en todas las páginas */
+  #insigniaOrbsy{
+    position:fixed;
+    bottom:6px;
+    left:50%;
+    transform:translateX(-50%);
+    height:clamp(58px, 11vh, 92px);
+    width:auto;
+    z-index:40;
+    pointer-events:none;
+    opacity:0.94;
+    filter:drop-shadow(0 0 6px rgba(0,0,0,0.5));
+  }
+
+  /* Animación de entrada tipo "flipbook": 3 cuadros que alternan */
+  #introFlipbook{
+    position:fixed; inset:0; z-index:9999;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(155,124,246,0.10), transparent 55%),
+      radial-gradient(ellipse at 75% 70%, rgba(34,211,196,0.08), transparent 55%),
+      var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0;
+    pointer-events:none;
+  }
+  #introFlipbook.mostrar{ opacity:1; transition:opacity 0.2s ease; }
+  #introFlipbook.ocultando{ opacity:0; transition:opacity 0.4s ease; }
+  #introFlipbookImg{
+    height:min(46vh, 320px);
+    width:auto;
+    filter:drop-shadow(0 0 18px rgba(57,255,140,0.15));
+  }
   .nota-guardada-item{
     background:var(--surface);
     border:1px solid var(--border);
@@ -472,6 +505,47 @@
   }
   .orbsy-wordmark .orb{ color:var(--verde); text-shadow:0 0 14px rgba(57,255,140,0.4); }
   .orbsy-wordmark .sy{ color:var(--accent); text-shadow:0 0 14px rgba(34,211,196,0.4); }
+
+  /* Fila superior de la pantalla de perfiles: Galería de Usuarios (izq) · logo (centro) · orbSY General (der) */
+  .fila-superior-perfiles{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:4px;
+  }
+  .rotulo-galeria-usuarios{
+    flex:1;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:700;
+    font-size:clamp(0.85rem, 3.4vw, 1.15rem);
+    line-height:1.18;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    padding-top:16px;
+  }
+  .rotulo-galeria-usuarios .p1{ color:var(--verde); }
+  .rotulo-galeria-usuarios .p2{ color:var(--accent); }
+  .rotulo-galeria-usuarios .p3{ color:var(--violeta); }
+  .fila-superior-perfiles .orbsy-marca{ flex:0 0 auto; margin-bottom:0; }
+  .fila-superior-perfiles .orbsy-logo-svg{ width:clamp(56px, 13vw, 100px); height:clamp(56px, 13vw, 100px); }
+  .fila-superior-perfiles .orbsy-wordmark{ font-size:clamp(1.15rem, 4vw, 1.7rem); }
+
+  .orbsy-general-flanco{
+    flex:1;
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center;
+    cursor:pointer;
+    padding-top:6px;
+    visibility:hidden;
+  }
+  .orbsy-general-flanco.visible{ visibility:visible; }
+  .orbsy-general-flanco .perfil-tile-img{
+    width:clamp(78px, 19vw, 118px);
+    height:clamp(78px, 19vw, 118px);
+    margin-bottom:8px;
+  }
+  .orbsy-general-flanco .galeria-tile-nombre{ font-size:0.8rem; font-weight:600; }
   .galerias-eyebrow{
     text-align:center;
     font-family:'IBM Plex Mono', monospace;
@@ -1374,6 +1448,11 @@
 </style>
 </head>
 <body>
+<img id="insigniaOrbsy" src="orbsy-insignia.png" alt="" aria-hidden="true">
+
+<div id="introFlipbook" aria-hidden="true">
+  <img id="introFlipbookImg" src="intro-1.png" alt="">
+</div>
 
 <!-- Definición reutilizable del ícono meteorito (orbSY notes) -->
 <svg width="0" height="0" style="position:absolute;">
@@ -1733,26 +1812,32 @@
 
   <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
   <div id="vistaPerfiles">
-    <div class="orbsy-marca">
-      <svg class="orbsy-logo-svg" viewBox="0 0 200 200" style="margin-bottom:14px;">
-        <defs>
-          <radialGradient id="esferaGradPerfiles" cx="38%" cy="35%" r="70%">
-            <stop offset="0%" stop-color="#3a3a44"/>
-            <stop offset="55%" stop-color="#202027"/>
-            <stop offset="100%" stop-color="#121216"/>
-          </radialGradient>
-        </defs>
-        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(-18 100 100)"/>
-        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(42 100 100)"/>
-        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(102 100 100)"/>
-        <circle cx="100" cy="100" r="52" fill="url(#esferaGradPerfiles)" stroke="#3d3d47" stroke-width="1"/>
-        <circle cx="168" cy="78" r="10" fill="#39ff8c"/>
-        <circle cx="40" cy="128" r="8.5" fill="#22d3c4"/>
-        <circle cx="118" cy="172" r="7" fill="#9b7cf6"/>
-      </svg>
-      <div class="orbsy-wordmark"><span class="orb">orb</span><span class="sy">SY</span></div>
+    <div class="fila-superior-perfiles">
+      <div class="rotulo-galeria-usuarios"><span class="p1">Galería</span><br><span class="p2">de</span><br><span class="p3">Usuarios</span></div>
+
+      <div class="orbsy-marca">
+        <svg class="orbsy-logo-svg" viewBox="0 0 200 200" style="margin-bottom:14px;">
+          <defs>
+            <radialGradient id="esferaGradPerfiles" cx="38%" cy="35%" r="70%">
+              <stop offset="0%" stop-color="#3a3a44"/>
+              <stop offset="55%" stop-color="#202027"/>
+              <stop offset="100%" stop-color="#121216"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(-18 100 100)"/>
+          <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(42 100 100)"/>
+          <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(102 100 100)"/>
+          <circle cx="100" cy="100" r="52" fill="url(#esferaGradPerfiles)" stroke="#3d3d47" stroke-width="1"/>
+          <circle cx="168" cy="78" r="10" fill="#39ff8c"/>
+          <circle cx="40" cy="128" r="8.5" fill="#22d3c4"/>
+          <circle cx="118" cy="172" r="7" fill="#9b7cf6"/>
+        </svg>
+        <div class="orbsy-wordmark"><span class="orb">orb</span><span class="sy">SY</span></div>
+      </div>
+
+      <div id="orbsyGeneralFlanco" class="orbsy-general-flanco"></div>
     </div>
-    <div class="galerias-eyebrow">Elige un perfil</div>
+    <div class="galerias-eyebrow">Tus galerías, tus mundos</div>
     <div id="loadingMsgPerfiles" class="empty-msg">Cargando perfiles...</div>
     <div id="perfilesGrid" class="galerias-grid"></div>
     <div id="emptyMsgPerfiles" class="empty-msg" style="display:none;">Aún no hay perfiles creados.</div>
@@ -2072,6 +2157,7 @@
     loginBtn.textContent = "Entrando...";
     try {
       await signInWithEmailAndPassword(auth, adminEmail.value.trim(), adminPass.value);
+      reproducirIntroFlipbook("larga");
       // onAuthStateChanged se encarga de mostrar el panel
     } catch (e) {
       loginError.textContent = "Correo o contraseña incorrectos";
@@ -2757,10 +2843,12 @@
   function renderPerfiles() {
     loadingMsgPerfiles.style.display = "none";
     perfilesGrid.innerHTML = "";
+    const orbsyGeneralFlanco = document.getElementById("orbsyGeneralFlanco");
     const hayGeneral = galerias.some(g => !g.ownerId);
 
     if (usuarios.length === 0 && !hayGeneral) {
       emptyMsgPerfiles.style.display = "block";
+      orbsyGeneralFlanco.classList.remove("visible");
       return;
     }
     emptyMsgPerfiles.style.display = "none";
@@ -2781,21 +2869,22 @@
 
     const hayContenidoSinDueno = galerias.some(g => !g.ownerId);
     if (hayContenidoSinDueno) {
-      const tile = document.createElement("div");
-      tile.className = "galeria-tile";
       const galeriaSinDueno = galerias.find(g => !g.ownerId);
-      tile.innerHTML = `
+      orbsyGeneralFlanco.classList.add("visible");
+      orbsyGeneralFlanco.innerHTML = `
         <div class="perfil-tile-img" style="--color-galaxia:${COLORES_GALAXIA.gris};">
-          <img src="${imagenDirecta(galeriaSinDueno.imagenId)}" data-alt-src="${imagenAlternativa(galeriaSinDueno.imagenId)}" data-tried-alt="0" alt="General" loading="lazy" onerror="manejarErrorImagen(this)">
+          <img src="${imagenDirecta(galeriaSinDueno.imagenId)}" data-alt-src="${imagenAlternativa(galeriaSinDueno.imagenId)}" data-tried-alt="0" alt="orbSY General" loading="lazy" onerror="manejarErrorImagen(this)">
         </div>
-        <div class="galeria-tile-nombre">General</div>
+        <div class="galeria-tile-nombre">${escapeHtml(galeriaSinDueno.nombre || "orbSY General")}</div>
       `;
-      tile.addEventListener("click", () => seleccionarPerfil(ID_PERFIL_GENERAL));
-      perfilesGrid.appendChild(tile);
+      orbsyGeneralFlanco.onclick = () => seleccionarPerfil(ID_PERFIL_GENERAL);
+    } else {
+      orbsyGeneralFlanco.classList.remove("visible");
     }
   }
 
   function seleccionarPerfil(uid) {
+    reproducirIntroFlipbook("rafaga");
     uidPerfilObjetivo = uid;
     vista = "galerias";
     vistaPerfilesEl.style.display = "none";
@@ -3045,6 +3134,7 @@
   }
 
   function abrirGaleria(id, nombre) {
+    reproducirIntroFlipbook("rafaga");
     vista = "colecciones";
     galeriaActualId = id;
     vistaGaleriasEl.style.display = "none";
@@ -3147,6 +3237,7 @@
   }
 
   function abrirColeccion(id, nombre, frase) {
+    reproducirIntroFlipbook("rafaga");
     vista = "coleccion";
     coleccionActualId = id;
     vistaColeccionesEl.style.display = "none";
@@ -4108,6 +4199,7 @@
       alert("Esta publicación todavía no tiene contenido cargado.");
       return;
     }
+    reproducirIntroFlipbook("rafaga");
     preguntasReflexionActuales = Array.isArray(preguntasReflexion) ? preguntasReflexion.filter(p => p && p.trim()) : [];
     if (recursos.length === 1) {
       abrirRecurso(libroId, tituloPublicacion, recursos, 0);
@@ -4438,6 +4530,43 @@
   }
 
   backBtn.addEventListener("click", cerrarLector);
+
+  // ---------- Animación de entrada tipo "flipbook" (3 cuadros) ----------
+  const introFlipbook = document.getElementById("introFlipbook");
+  const introFlipbookImg = document.getElementById("introFlipbookImg");
+  const FRAMES_INTRO = ["intro-1.png", "intro-2.png", "intro-3.png"];
+  let introEnCurso = false;
+
+  function reproducirIntroFlipbook(velocidad) {
+    if (introEnCurso) return;
+    introEnCurso = true;
+
+    // "larga": al cargar la página y al iniciar sesión de Admin (~2.7s)
+    // "rafaga": al entrar a un perfil, galería, colección o publicación (~0.55s)
+    const porCuadro = velocidad === "larga" ? 720 : 115;
+    const sostener = velocidad === "larga" ? 350 : 60;
+    const desvanecer = velocidad === "larga" ? 450 : 180;
+
+    introFlipbook.classList.remove("ocultando");
+    introFlipbookImg.src = FRAMES_INTRO[0];
+    // Forzar reflow para reiniciar la transición de opacidad si ya estaba oculto
+    void introFlipbook.offsetWidth;
+    introFlipbook.classList.add("mostrar");
+
+    setTimeout(() => { introFlipbookImg.src = FRAMES_INTRO[1]; }, porCuadro);
+    setTimeout(() => { introFlipbookImg.src = FRAMES_INTRO[2]; }, porCuadro * 2);
+
+    setTimeout(() => {
+      introFlipbook.classList.remove("mostrar");
+      introFlipbook.classList.add("ocultando");
+      setTimeout(() => {
+        introEnCurso = false;
+      }, desvanecer);
+    }, porCuadro * 2 + sostener);
+  }
+
+  // Se reproduce al cargar la página (pantalla de "Elige un perfil")
+  reproducirIntroFlipbook("larga");
 </script>
 
 </body>
