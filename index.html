@@ -2246,6 +2246,9 @@
       perfilInfo.style.display = "block";
       perfilEnlaceInput.value = `${location.origin}${location.pathname}?u=${user.uid}`;
 
+      const opcionGeneralLabel = document.getElementById("inputEsGaleriaGeneral").closest("label");
+      opcionGeneralLabel.style.display = (user.uid === UID_ADMIN_GENERAL) ? "flex" : "none";
+
       try {
         const perfilDoc = await getDoc(doc(db, "usuarios", user.uid));
         if (!perfilDoc.exists()) {
@@ -3376,8 +3379,11 @@
 
   // ---------- Panel admin: lista de libros (siempre muestra todos) ----------
   // Un elemento es "mío" si lo creé yo, o si es contenido antiguo sin dueño asignado.
+  const UID_ADMIN_GENERAL = "b2NiOeuL0EdbrfSmjBBedc5sutt2"; // única cuenta que puede administrar contenido "sin dueño" (orbSY General)
+
   function esMio(item) {
-    return !item.ownerId || item.ownerId === uidActual;
+    if (!item.ownerId) return uidActual === UID_ADMIN_GENERAL;
+    return item.ownerId === uidActual;
   }
 
   function renderAdminListaLibros() {
