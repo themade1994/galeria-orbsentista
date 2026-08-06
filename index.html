@@ -458,11 +458,17 @@
   #vistaGalerias{ position:relative; z-index:1; }
   #vistaPerfiles{ position:relative; z-index:1; }
 
+  #universoFondo{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
   .capa-estrellas{
     position:absolute;
     inset:0;
     pointer-events:none;
-    z-index:0;
     overflow:hidden;
   }
   .estrella-punto{
@@ -475,7 +481,7 @@
   }
   .constelacion{
     position:absolute;
-    opacity:0.35;
+    opacity:0.3;
   }
   #coleccionesWrap, #galeriasGrid, .orbsy-marca, .galerias-eyebrow, #buscadorInput{
     position:relative;
@@ -1459,6 +1465,93 @@
 </style>
 </head>
 <body>
+<div id="universoFondo" aria-hidden="true">
+  <div class="capa-estrellas">
+      <span class="estrella-punto" style="top:62.7%; left:4.4%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:15.3%; left:11.7%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:10.3%; left:42.1%; background:#39ff8c; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:50.0%; left:4.5%; background:#9b7cf6; width:3px; height:3px;"></span>
+      <span class="estrella-punto" style="top:53.8%; left:22.9%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:74.1%; left:17.2%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:16.8%; left:92.9%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:38.1%; left:36.1%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:78.7%; left:71.3%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:9.5%; left:29.9%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:56.8%; left:68.9%; background:#39ff8c; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:95.6%; left:83.3%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:28.4%; left:62.4%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:35.8%; left:65.7%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:59.9%; left:18.3%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:45.9%; left:27.6%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:22.9%; left:32.8%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:23.8%; left:5.0%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:8.3%; left:88.7%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:22.2%; left:49.4%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:15.6%; left:15.3%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:27.0%; left:57.5%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:36.4%; left:96.7%; background:#22d3c4; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:73.8%; left:83.8%; background:#39ff8c; width:3px; height:3px;"></span>
+      <span class="estrella-punto" style="top:42.1%; left:8.0%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:52.3%; left:94.3%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:66.6%; left:12.9%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:75.0%; left:34.3%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:45.1%; left:92.6%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:94.3%; left:74.4%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:84.7%; left:30.4%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:20.9%; left:37.5%; background:#9b7cf6; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:58.9%; left:48.4%; background:#22d3c4; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:24.7%; left:24.9%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:10.1%; left:48.2%; background:#9b7cf6; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:14.2%; left:47.2%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:52.1%; left:59.6%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:73.8%; left:67.5%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:96.5%; left:63.7%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:44.9%; left:25.6%; background:#39ff8c; width:3px; height:3px;"></span>
+
+      <svg class="constelacion" style="top:6%; left:8%;" viewBox="0 0 120 90" width="85" height="65">
+        <line x1="10" y1="60" x2="45" y2="20" stroke="#22d3c4" stroke-width="1"/>
+        <line x1="45" y1="20" x2="90" y2="35" stroke="#22d3c4" stroke-width="1"/>
+        <line x1="90" y1="35" x2="105" y2="10" stroke="#22d3c4" stroke-width="1"/>
+        <circle cx="10" cy="60" r="2.2" fill="#22d3c4"/>
+        <circle cx="45" cy="20" r="2.2" fill="#22d3c4"/>
+        <circle cx="90" cy="35" r="2.2" fill="#22d3c4"/>
+        <circle cx="105" cy="10" r="2.2" fill="#22d3c4"/>
+      </svg>
+      <svg class="constelacion" style="top:18%; right:6%;" viewBox="0 0 120 90" width="75" height="55">
+        <line x1="8" y1="15" x2="40" y2="45" stroke="#e8e8ec" stroke-width="1"/>
+        <line x1="40" y1="45" x2="80" y2="30" stroke="#e8e8ec" stroke-width="1"/>
+        <circle cx="8" cy="15" r="2" fill="#e8e8ec"/>
+        <circle cx="40" cy="45" r="2" fill="#e8e8ec"/>
+        <circle cx="80" cy="30" r="2" fill="#e8e8ec"/>
+      </svg>
+      <svg class="constelacion" style="top:44%; left:4%;" viewBox="0 0 120 90" width="80" height="60">
+        <line x1="12" y1="10" x2="38" y2="40" stroke="#9b7cf6" stroke-width="1"/>
+        <line x1="38" y1="40" x2="20" y2="70" stroke="#9b7cf6" stroke-width="1"/>
+        <line x1="38" y1="40" x2="75" y2="55" stroke="#9b7cf6" stroke-width="1"/>
+        <circle cx="12" cy="10" r="2.2" fill="#9b7cf6"/>
+        <circle cx="38" cy="40" r="2.2" fill="#9b7cf6"/>
+        <circle cx="20" cy="70" r="2.2" fill="#9b7cf6"/>
+        <circle cx="75" cy="55" r="2.2" fill="#9b7cf6"/>
+      </svg>
+      <svg class="constelacion" style="top:62%; right:10%;" viewBox="0 0 120 90" width="90" height="68">
+        <line x1="10" y1="50" x2="42" y2="15" stroke="#39ff8c" stroke-width="1"/>
+        <line x1="42" y1="15" x2="80" y2="25" stroke="#39ff8c" stroke-width="1"/>
+        <line x1="80" y1="25" x2="100" y2="55" stroke="#39ff8c" stroke-width="1"/>
+        <circle cx="10" cy="50" r="2.2" fill="#39ff8c"/>
+        <circle cx="42" cy="15" r="2.2" fill="#39ff8c"/>
+        <circle cx="80" cy="25" r="2.2" fill="#39ff8c"/>
+        <circle cx="100" cy="55" r="2.2" fill="#39ff8c"/>
+      </svg>
+      <svg class="constelacion" style="bottom:5%; left:14%;" viewBox="0 0 120 90" width="80" height="60">
+        <line x1="8" y1="20" x2="35" y2="50" stroke="#e8e8ec" stroke-width="1"/>
+        <line x1="35" y1="50" x2="75" y2="35" stroke="#e8e8ec" stroke-width="1"/>
+        <circle cx="8" cy="20" r="2" fill="#e8e8ec"/>
+        <circle cx="35" cy="50" r="2" fill="#e8e8ec"/>
+        <circle cx="75" cy="35" r="2" fill="#e8e8ec"/>
+      </svg>
+  </div>
+</div>
+
 <img id="insigniaOrbsy" src="orbsy-insignia.png" alt="" aria-hidden="true">
 
 <div id="introFlipbook" aria-hidden="true">
@@ -1835,16 +1928,6 @@
 
   <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
   <div id="vistaPerfiles">
-    <div class="capa-estrellas" aria-hidden="true">
-      <span class="estrella-punto" style="top:8%; left:6%; background:#39ff8c;"></span>
-      <span class="estrella-punto" style="top:14%; left:18%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:6%; right:12%; background:#22d3c4;"></span>
-      <span class="estrella-punto" style="top:22%; right:6%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="bottom:10%; left:9%; background:#9b7cf6;"></span>
-      <span class="estrella-punto" style="bottom:18%; left:22%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="bottom:8%; right:8%; background:#39ff8c;"></span>
-      <span class="estrella-punto" style="bottom:26%; right:20%; background:#e8e8ec; width:2px; height:2px;"></span>
-    </div>
     <div class="fila-superior-perfiles">
       <div class="rotulo-galeria-usuarios"><span class="p1">Galería</span><br><span class="p2">de</span><br><span class="p3">Usuarios</span></div>
 
@@ -1880,33 +1963,6 @@
   <!-- VISTA: GALERÍAS (nivel superior, pantalla de inicio) -->
   <div id="vistaGalerias" style="display:none;">
     <button id="backToPerfilesBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;margin-bottom:14px;">← Perfiles</button>
-    <!-- Motivos de galaxia sutiles, solo decorativos -->
-    <div class="capa-estrellas" aria-hidden="true">
-      <span class="estrella-punto" style="top:8%; left:6%; background:#39ff8c;"></span>
-      <span class="estrella-punto" style="top:14%; left:18%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:6%; right:12%; background:#22d3c4;"></span>
-      <span class="estrella-punto" style="top:22%; right:6%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="bottom:10%; left:9%; background:#9b7cf6;"></span>
-      <span class="estrella-punto" style="bottom:18%; left:22%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="bottom:8%; right:8%; background:#39ff8c;"></span>
-      <span class="estrella-punto" style="bottom:26%; right:20%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <svg class="constelacion" style="top:4%; right:4%;" viewBox="0 0 120 90" width="90" height="70">
-        <line x1="10" y1="60" x2="45" y2="20" stroke="#22d3c4" stroke-width="1"/>
-        <line x1="45" y1="20" x2="90" y2="35" stroke="#22d3c4" stroke-width="1"/>
-        <line x1="90" y1="35" x2="105" y2="10" stroke="#22d3c4" stroke-width="1"/>
-        <circle cx="10" cy="60" r="2.5" fill="#22d3c4"/>
-        <circle cx="45" cy="20" r="2.5" fill="#22d3c4"/>
-        <circle cx="90" cy="35" r="2.5" fill="#22d3c4"/>
-        <circle cx="105" cy="10" r="2.5" fill="#22d3c4"/>
-      </svg>
-      <svg class="constelacion" style="bottom:6%; left:5%;" viewBox="0 0 120 90" width="80" height="60">
-        <line x1="8" y1="15" x2="40" y2="45" stroke="#39ff8c" stroke-width="1"/>
-        <line x1="40" y1="45" x2="80" y2="30" stroke="#39ff8c" stroke-width="1"/>
-        <circle cx="8" cy="15" r="2.5" fill="#39ff8c"/>
-        <circle cx="40" cy="45" r="2.5" fill="#39ff8c"/>
-        <circle cx="80" cy="30" r="2.5" fill="#39ff8c"/>
-      </svg>
-    </div>
     <div class="galerias-eyebrow">Tus galerías</div>
     <div id="loadingMsgGalerias" class="empty-msg">Cargando...</div>
     <div id="galeriasGrid" class="galerias-grid"></div>
