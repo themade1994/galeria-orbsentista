@@ -1682,6 +1682,12 @@
       </div>
     </div>
 
+    <div id="zonaPeligroCuenta" style="display:none;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.35);border-radius:12px;padding:14px;margin-bottom:16px;">
+      <p style="font-size:0.78rem;color:#f87171;font-weight:600;margin-bottom:4px;">Zona de peligro</p>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:10px;">Esto borra para siempre esta cuenta con la que estás conectado ahora mismo: su perfil, todas sus galerías, colecciones y publicaciones, y el correo/contraseña con el que entraste. No se puede deshacer, y no afecta a ninguna otra cuenta.</p>
+      <button id="eliminarCuentaBtn" style="width:100%;background:transparent;border:1px solid #f87171;color:#f87171;padding:9px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;">Eliminar esta cuenta para siempre</button>
+    </div>
+
     <div id="formSection" style="display:none;">
       <div id="solicitudesSection" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
         <h2 style="margin-bottom:4px;">🔄 Solicitudes de transferencia</h2>
@@ -2066,7 +2072,10 @@
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    deleteUser,
+    reauthenticateWithCredential,
+    EmailAuthProvider
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
@@ -2235,6 +2244,64 @@
     }
   });
 
+  // ---------- Eliminar esta cuenta para siempre (perfil + contenido + login) ----------
+  document.getElementById("eliminarCuentaBtn").addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const nombrePerfilActual = (usuarios.find(u => u.id === user.uid) || {}).nombre || user.email;
+    const primeraConfirmacion = confirm(
+      `¿Eliminar para siempre la cuenta "${nombrePerfilActual}" (${user.email})?\n\n` +
+      `Esto borra su perfil, todas sus galerías, colecciones y publicaciones, y el correo/contraseña. No hay forma de deshacerlo.`
+    );
+    if (!primeraConfirmacion) return;
+
+    const segundaConfirmacion = prompt(`Para confirmar, escribe ELIMINAR en mayúsculas:`);
+    if (segundaConfirmacion !== "ELIMINAR") {
+      alert("No se escribió \"ELIMINAR\" exactamente. No se borró nada.");
+      return;
+    }
+
+    const btn = document.getElementById("eliminarCuentaBtn");
+    btn.disabled = true;
+    btn.textContent = "Eliminando...";
+
+    try {
+      const misLibros = libros.filter(l => l.ownerId === user.uid);
+      const misColecciones = colecciones.filter(c => c.ownerId === user.uid);
+      const misGalerias = galerias.filter(g => g.ownerId === user.uid);
+
+      for (const l of misLibros) await deleteDoc(doc(db, "libros", l.id));
+      for (const c of misColecciones) await deleteDoc(doc(db, "colecciones", c.id));
+      for (const g of misGalerias) await deleteDoc(doc(db, "galerias", g.id));
+
+      await deleteDoc(doc(db, "usuarios", user.uid));
+
+      await deleteUser(user);
+      alert("Cuenta eliminada por completo. Vas a salir de la sesión ahora.");
+      // signOut no es necesario: deleteUser ya cierra la sesión automáticamente
+    } catch (e) {
+      if (e.code === "auth/requires-recent-login") {
+        const clave = prompt("Por seguridad, Firebase pide confirmar tu contraseña de nuevo antes de borrar la cuenta. Escríbela:");
+        if (clave) {
+          try {
+            const credencial = EmailAuthProvider.credential(user.email, clave);
+            await reauthenticateWithCredential(user, credencial);
+            await deleteUser(user);
+            alert("Cuenta eliminada por completo.");
+          } catch (e2) {
+            alert("No se pudo eliminar la cuenta: " + e2.message);
+          }
+        }
+      } else {
+        alert("No se pudo eliminar la cuenta: " + e.message);
+      }
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Eliminar esta cuenta para siempre";
+  });
+
   // Detecta automáticamente si ya hay sesión iniciada (por ejemplo si
   // recargas la página después de haber entrado como admin)
   onAuthStateChanged(auth, async (user) => {
@@ -2244,6 +2311,7 @@
       loginSection.style.display = "none";
       formSection.style.display = "block";
       perfilInfo.style.display = "block";
+      document.getElementById("zonaPeligroCuenta").style.display = "block";
       perfilEnlaceInput.value = `${location.origin}${location.pathname}?u=${user.uid}`;
 
       const opcionGeneralLabel = document.getElementById("inputEsGaleriaGeneral").closest("label");
@@ -2268,6 +2336,7 @@
       loginSection.style.display = "block";
       formSection.style.display = "none";
       perfilInfo.style.display = "none";
+      document.getElementById("zonaPeligroCuenta").style.display = "none";
       document.getElementById("configurarPerfilSection").style.display = "none";
     }
     if (libroSnapshotListo && coleccionSnapshotListo && galeriaSnapshotListo) {
@@ -4557,20 +4626,20 @@
 
   backBtn.addEventListener("click", cerrarLector);
 
-  // ---------- Animación de entrada tipo "flipbook" (3 cuadros) ----------
+  // ---------- Animación de entrada tipo "flipbook" (5 cuadros) ----------
   const introFlipbook = document.getElementById("introFlipbook");
   const introFlipbookImg = document.getElementById("introFlipbookImg");
-  const FRAMES_INTRO = ["intro-1.png", "intro-2.png", "intro-3.png"];
+  const FRAMES_INTRO = ["intro-1.png", "intro-2.png", "intro-3.png", "intro-4.png", "intro-5.png"];
   let introEnCurso = false;
 
   function reproducirIntroFlipbook(velocidad) {
     if (introEnCurso) return;
     introEnCurso = true;
 
-    // "larga": al cargar la página y al iniciar sesión de Admin (~2.7s)
-    // "rafaga": al entrar a un perfil, galería, colección o publicación (~0.55s)
-    const porCuadro = velocidad === "larga" ? 720 : 115;
-    const sostener = velocidad === "larga" ? 350 : 60;
+    // "larga": al cargar la página y al iniciar sesión de Admin (~3.6s, 5 cuadros)
+    // "rafaga": al entrar a un perfil, galería, colección o publicación (~0.55s, igual de rápida)
+    const porCuadro = velocidad === "larga" ? 560 : 70;
+    const sostener = velocidad === "larga" ? 400 : 60;
     const desvanecer = velocidad === "larga" ? 450 : 180;
 
     introFlipbook.classList.remove("ocultando");
@@ -4579,16 +4648,18 @@
     void introFlipbook.offsetWidth;
     introFlipbook.classList.add("mostrar");
 
-    setTimeout(() => { introFlipbookImg.src = FRAMES_INTRO[1]; }, porCuadro);
-    setTimeout(() => { introFlipbookImg.src = FRAMES_INTRO[2]; }, porCuadro * 2);
+    for (let i = 1; i < FRAMES_INTRO.length; i++) {
+      setTimeout(() => { introFlipbookImg.src = FRAMES_INTRO[i]; }, porCuadro * i);
+    }
 
+    const duracionCuadros = porCuadro * (FRAMES_INTRO.length - 1);
     setTimeout(() => {
       introFlipbook.classList.remove("mostrar");
       introFlipbook.classList.add("ocultando");
       setTimeout(() => {
         introEnCurso = false;
       }, desvanecer);
-    }, porCuadro * 2 + sostener);
+    }, duracionCuadros + sostener);
   }
 
   // Se reproduce al cargar la página (pantalla de "Elige un perfil")
