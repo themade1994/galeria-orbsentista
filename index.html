@@ -456,6 +456,7 @@
     z-index:0;
   }
   #vistaGalerias{ position:relative; z-index:1; }
+  #vistaPerfiles{ position:relative; z-index:1; }
 
   .capa-estrellas{
     position:absolute;
@@ -1622,6 +1623,7 @@
 <header id="headerColecciones" style="display:none;">
   <button id="backToGaleriasBtn" style="position:absolute;left:16px;top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:6px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Galerías</button>
   <h1 id="tituloGaleriaHeader" aria-label="Galería"></h1>
+  <div id="firmaGaleriaHeader" style="text-align:center;font-style:italic;font-size:0.8rem;color:var(--text-sec);margin-top:2px;"></div>
 </header>
 
 <main>
@@ -1833,6 +1835,16 @@
 
   <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
   <div id="vistaPerfiles">
+    <div class="capa-estrellas" aria-hidden="true">
+      <span class="estrella-punto" style="top:8%; left:6%; background:#39ff8c;"></span>
+      <span class="estrella-punto" style="top:14%; left:18%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:6%; right:12%; background:#22d3c4;"></span>
+      <span class="estrella-punto" style="top:22%; right:6%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="bottom:10%; left:9%; background:#9b7cf6;"></span>
+      <span class="estrella-punto" style="bottom:18%; left:22%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="bottom:8%; right:8%; background:#39ff8c;"></span>
+      <span class="estrella-punto" style="bottom:26%; right:20%; background:#e8e8ec; width:2px; height:2px;"></span>
+    </div>
     <div class="fila-superior-perfiles">
       <div class="rotulo-galeria-usuarios"><span class="p1">Galería</span><br><span class="p2">de</span><br><span class="p3">Usuarios</span></div>
 
@@ -1919,6 +1931,7 @@
       <div id="coleccionHeaderInfo">
         <h2 id="coleccionDetalleTitulo"></h2>
         <p id="coleccionDetalleFrase"></p>
+        <div id="firmaColeccionDetalle" style="font-style:italic;font-size:0.78rem;color:var(--text-sec);margin-top:-6px;margin-bottom:10px;"></div>
       </div>
     </div>
     <div id="gridContainer" class="grid"></div>
@@ -1971,6 +1984,7 @@
       <h3 id="indiceTitulo">Índice temático</h3>
       <button class="indice-cerrar" id="cerrarIndiceBtn">✕</button>
     </div>
+    <div id="firmaIndice" style="text-align:center;font-style:italic;font-size:0.76rem;color:var(--text-sec);padding:0 14px 10px;margin-top:-8px;"></div>
     <div class="indice-lista" id="indiceLista"></div>
   </div>
 </div>
@@ -1987,6 +2001,7 @@
       Notas
     </button>
   </div>
+  <div id="firmaLectorBar" style="text-align:center;font-style:italic;font-size:0.72rem;color:var(--text-sec);padding:3px 10px;border-bottom:1px solid var(--border);"></div>
   <div id="navBar">
     <button id="anteriorBtn">← Anterior</button>
     <button id="siguienteBtn">Siguiente →</button>
@@ -3236,6 +3251,7 @@
     tituloGaleriaHeaderEl.setAttribute("aria-label", nombre);
     document.getElementById("buscadorInput").value = "";
     const galeriaActual = galerias.find(g => g.id === id);
+    document.getElementById("firmaGaleriaHeader").textContent = "De " + nombreCreador(galeriaActual ? galeriaActual.ownerId : null);
     aplicarFondo(vistaColeccionesEl, galeriaActual ? galeriaActual.fondoId : "");
     aplicarFiltro();
     window.scrollTo(0, 0);
@@ -3339,6 +3355,7 @@
     renderColeccionDetalle(id);
 
     const coleccionActual = colecciones.find(c => c.id === id);
+    document.getElementById("firmaColeccionDetalle").textContent = "De " + nombreCreador(coleccionActual ? coleccionActual.ownerId : null);
     const galeriaActual = galerias.find(g => g.id === galeriaActualId);
     const fondoEfectivo = (coleccionActual && coleccionActual.fondoId)
       ? coleccionActual.fondoId
@@ -3449,6 +3466,13 @@
   // ---------- Panel admin: lista de libros (siempre muestra todos) ----------
   // Un elemento es "mío" si lo creé yo, o si es contenido antiguo sin dueño asignado.
   const UID_ADMIN_GENERAL = "b2NiOeuL0EdbrfSmjBBedc5sutt2"; // única cuenta que puede administrar contenido "sin dueño" (orbSY General)
+
+  // Devuelve el nombre a mostrar como firma del creador de una galería/colección/publicación
+  function nombreCreador(ownerId) {
+    if (!ownerId) return "orbSY General";
+    const u = usuarios.find(u => u.id === ownerId);
+    return u ? (u.nombre || "Usuario") : "Usuario";
+  }
 
   function esMio(item) {
     if (!item.ownerId) return uidActual === UID_ADMIN_GENERAL;
@@ -4301,7 +4325,9 @@
       return;
     }
     // Varios recursos: mostrar el índice temático primero
+    const libroActual = libros.find(l => l.id === libroId);
     indiceTitulo.textContent = tituloPublicacion;
+    document.getElementById("firmaIndice").textContent = "De " + nombreCreador(libroActual ? libroActual.ownerId : null);
     indiceLista.innerHTML = "";
     recursos.forEach((r, i) => {
       const item = document.createElement("div");
@@ -4403,6 +4429,8 @@
     modalTitle.textContent = recursos.length > 1
       ? `${tituloPublicacion} — ${recurso.etiqueta}`
       : tituloPublicacion;
+    const libroDelRecurso = libros.find(l => l.id === libroId);
+    document.getElementById("firmaLectorBar").textContent = "De " + nombreCreador(libroDelRecurso ? libroDelRecurso.ownerId : null);
 
     reflexionToggleBtn.style.display = preguntasReflexionActuales.length > 0 ? "inline-block" : "none";
     reflexionToggleBtn.textContent = preguntasReflexionActuales.length > 1 ? `🪞 Reflexión (${preguntasReflexionActuales.length})` : "🪞 Reflexión";
@@ -4662,8 +4690,23 @@
     }, duracionCuadros + sostener);
   }
 
-  // Se reproduce al cargar la página (pantalla de "Elige un perfil")
-  reproducirIntroFlipbook("larga");
+  // Se reproduce al cargar la página (pantalla de "Elige un perfil").
+  // Precargamos los 5 cuadros primero para que los cambios de imagen sean
+  // instantáneos y no dependan de la velocidad de la red en ese momento
+  // (si no, en conexiones lentas los cuadros pueden verse fuera de orden).
+  const precargaFramesIntro = Promise.all(
+    FRAMES_INTRO.map(src => new Promise(resolve => {
+      const img = new Image();
+      img.onload = resolve;
+      img.onerror = resolve;
+      img.src = src;
+    }))
+  );
+  const esperaMaximaPrecarga = new Promise(resolve => setTimeout(resolve, 1800));
+
+  Promise.race([precargaFramesIntro, esperaMaximaPrecarga]).then(() => {
+    reproducirIntroFlipbook("larga");
+  });
 </script>
 
 </body>
