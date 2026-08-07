@@ -1911,6 +1911,16 @@
       <div id="preguntasBuilderContainer"></div>
       <button type="button" id="agregarPreguntaBtn">+ Agregar pregunta</button>
 
+      <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:18px;">
+        <input type="checkbox" id="inputAgregarDiccionario" style="width:auto;">
+        📖 Agregar Diccionario de Referencias
+      </label>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin:2px 0 8px;">Explica aquí las palabras o ideas propias que uses en esta publicación. Esto enriquece aún más la esencia de tu usuario.</p>
+      <div id="diccionarioSeccion" style="display:none;">
+        <div id="diccionarioBuilderContainer"></div>
+        <button type="button" id="agregarTerminoBtn">+ Agregar término</button>
+      </div>
+
       <div style="display:flex;gap:8px;margin-top:16px;">
         <button id="publishBtn" style="flex:1;">Publicar</button>
         <button id="cancelarEdicionLibroBtn" style="display:none;flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:0 14px;border-radius:9px;">Cancelar</button>
@@ -1988,6 +1998,7 @@
         <h2 id="coleccionDetalleTitulo"></h2>
         <p id="coleccionDetalleFrase"></p>
         <div id="firmaColeccionDetalle" style="font-style:italic;font-size:0.78rem;color:var(--text-sec);margin-top:-6px;margin-bottom:10px;"></div>
+        <button id="abrirDiccionarioBtn" style="display:none;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:10px;">📖 Diccionario de Referencias</button>
       </div>
     </div>
     <div id="gridContainer" class="grid"></div>
@@ -2030,6 +2041,16 @@
     <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:14px;">Elige una plantilla creada en orbSY notes. Se llenará automáticamente el título, el resumen, los recursos y las preguntas de reflexión.</p>
     <div id="importarPlantillaLista" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;"></div>
     <button id="importarPlantillaCancelar" style="margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL: DICCIONARIO DE REFERENCIAS -->
+<div id="diccionarioModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;padding:22px;max-height:80vh;display:flex;flex-direction:column;">
+    <h3 style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:2px;">📖 Diccionario de Referencias</h3>
+    <p id="diccionarioModalSubtitulo" style="font-size:0.76rem;color:var(--text-sec);margin-bottom:14px;"></p>
+    <div id="diccionarioModalLista" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px;"></div>
+    <button id="cerrarDiccionarioBtn" style="margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cerrar</button>
   </div>
 </div>
 
@@ -2165,6 +2186,7 @@
   const coleccionesCol = collection(db, "colecciones");
   const galeriasCol = collection(db, "galerias");
   const usuariosCol = collection(db, "usuarios");
+  const referenciasCol = collection(db, "referencias");
   const solicitudesCol = collection(db, "solicitudesTransferencia");
 
   // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
@@ -2176,6 +2198,7 @@
   let libros = [];        // [{id, titulo, resumen, portadaId, coleccionId, recursos, fecha}]
   let colecciones = [];   // [{id, nombre, imagenId, frase, clave, galeriaId, fecha}]
   let galerias = [];      // [{id, nombre, imagenId, fecha}]
+  let referencias = [];   // [{id, ownerId, termino, definicion, fecha}] — Diccionario de Referencias
   let vista = uidPerfilObjetivo ? "galerias" : "perfiles"; // "perfiles" | "galerias" | "colecciones" | "coleccion"
   let galeriaActualId = null;
   let coleccionActualId = null;
@@ -2560,6 +2583,49 @@
 
   renderPreguntasBuilder();
 
+  // ---------- Constructor del Diccionario de Referencias (opcional, por publicación) ----------
+  let diccionarioBuilder = [];
+  const diccionarioBuilderContainer = document.getElementById("diccionarioBuilderContainer");
+  const diccionarioSeccion = document.getElementById("diccionarioSeccion");
+  const inputAgregarDiccionario = document.getElementById("inputAgregarDiccionario");
+
+  function renderDiccionarioBuilder() {
+    diccionarioBuilderContainer.innerHTML = "";
+    diccionarioBuilder.forEach((par, i) => {
+      const row = document.createElement("div");
+      row.className = "recurso-row";
+      row.innerHTML = `
+        <input type="text" class="termino-palabra" placeholder="Palabra o idea, ej: orbe" value="${escapeAttr(par.termino)}">
+        <textarea class="termino-definicion" placeholder="Explicación o referencia..." rows="2">${escapeAttr(par.definicion)}</textarea>
+        <div class="recurso-controles">
+          <button type="button" class="termino-quitar">✕ Quitar</button>
+        </div>
+      `;
+      row.querySelector(".termino-palabra").addEventListener("input", (e) => { diccionarioBuilder[i].termino = e.target.value; });
+      row.querySelector(".termino-definicion").addEventListener("input", (e) => { diccionarioBuilder[i].definicion = e.target.value; });
+      row.querySelector(".termino-quitar").addEventListener("click", () => {
+        diccionarioBuilder.splice(i, 1);
+        renderDiccionarioBuilder();
+      });
+      diccionarioBuilderContainer.appendChild(row);
+    });
+  }
+
+  document.getElementById("agregarTerminoBtn").addEventListener("click", () => {
+    diccionarioBuilder.push({ termino: "", definicion: "" });
+    renderDiccionarioBuilder();
+  });
+
+  inputAgregarDiccionario.addEventListener("change", () => {
+    diccionarioSeccion.style.display = inputAgregarDiccionario.checked ? "block" : "none";
+    if (inputAgregarDiccionario.checked && diccionarioBuilder.length === 0) {
+      diccionarioBuilder.push({ termino: "", definicion: "" });
+      renderDiccionarioBuilder();
+    }
+  });
+
+  renderDiccionarioBuilder();
+
   // ---------- Publicar libro (con su índice temático de recursos) ----------
   const publishBtn = document.getElementById("publishBtn");
   const cancelarEdicionLibroBtn = document.getElementById("cancelarEdicionLibroBtn");
@@ -2595,6 +2661,21 @@
     preguntasBuilder = Array.isArray(libro.preguntasReflexion) ? [...libro.preguntasReflexion] : (libro.preguntaReflexion ? [libro.preguntaReflexion] : []);
     renderPreguntasBuilder();
 
+    const terminosDelLibro = Array.isArray(libro.terminosReferencia) ? libro.terminosReferencia : [];
+    if (terminosDelLibro.length > 0) {
+      diccionarioBuilder = terminosDelLibro.map(termino => {
+        const ref = referencias.find(r => r.ownerId === (libro.ownerId || uidActual) && r.termino.toLowerCase() === termino.toLowerCase());
+        return { termino, definicion: ref ? ref.definicion : "" };
+      });
+      inputAgregarDiccionario.checked = true;
+      diccionarioSeccion.style.display = "block";
+    } else {
+      diccionarioBuilder = [];
+      inputAgregarDiccionario.checked = false;
+      diccionarioSeccion.style.display = "none";
+    }
+    renderDiccionarioBuilder();
+
     publishBtn.textContent = "Guardar cambios";
     cancelarEdicionLibroBtn.style.display = "block";
     tallerContenido.style.display = "block";
@@ -2611,6 +2692,10 @@
     renderRecursosBuilder();
     preguntasBuilder = [];
     renderPreguntasBuilder();
+    diccionarioBuilder = [];
+    inputAgregarDiccionario.checked = false;
+    diccionarioSeccion.style.display = "none";
+    renderDiccionarioBuilder();
     publishBtn.textContent = "Publicar";
     cancelarEdicionLibroBtn.style.display = "none";
   }
@@ -2642,6 +2727,9 @@
 
     const portadaId = extraerIdDrive(portadaUrl);
     const preguntasReflexion = preguntasBuilder.map(p => p.trim()).filter(p => p !== "");
+    const terminosValidos = inputAgregarDiccionario.checked
+      ? diccionarioBuilder.map(par => ({ termino: par.termino.trim(), definicion: par.definicion.trim() })).filter(par => par.termino !== "" && par.definicion !== "")
+      : [];
     const recursos = recursosBuilder.map(r => {
       if (r.tipo === "imagenes") {
         const imagenes = (r.enlacesMultiples || "")
@@ -2674,15 +2762,18 @@
       portadaId,
       recursos,
       preguntasReflexion,
-      coleccionId: coleccionSeleccionada
+      coleccionId: coleccionSeleccionada,
+      terminosReferencia: terminosValidos.map(par => par.termino)
     };
 
     try {
       if (libroEnEdicionId) {
         await updateDoc(doc(db, "libros", libroEnEdicionId), { ...datosLibro, ownerId: uidActual });
+        await sincronizarDiccionario(terminosValidos);
         cancelarEdicionLibro();
       } else {
         await addDoc(librosCol, { ...datosLibro, ownerId: uidActual, fecha: serverTimestamp() });
+        await sincronizarDiccionario(terminosValidos);
         document.getElementById("inputTitulo").value = "";
         document.getElementById("inputResumen").value = "";
         document.getElementById("inputPortada").value = "";
@@ -2690,6 +2781,10 @@
         renderRecursosBuilder();
         preguntasBuilder = [];
         renderPreguntasBuilder();
+        diccionarioBuilder = [];
+        inputAgregarDiccionario.checked = false;
+        diccionarioSeccion.style.display = "none";
+        renderDiccionarioBuilder();
       }
     } catch (e) {
       alert("Error al publicar: " + e.message);
@@ -2698,6 +2793,25 @@
     publishBtn.disabled = false;
     if (!libroEnEdicionId) publishBtn.textContent = "Publicar";
   });
+
+  // Guarda o actualiza cada término en el Diccionario de Referencias global del usuario
+  // (así no hay que reescribir la misma definición en cada publicación que la use).
+  async function sincronizarDiccionario(pares) {
+    for (const par of pares) {
+      const existente = referencias.find(r => r.ownerId === uidActual && r.termino.toLowerCase() === par.termino.toLowerCase());
+      try {
+        if (existente) {
+          if (existente.definicion !== par.definicion) {
+            await updateDoc(doc(db, "referencias", existente.id), { definicion: par.definicion });
+          }
+        } else {
+          await addDoc(referenciasCol, { ownerId: uidActual, termino: par.termino, definicion: par.definicion, fecha: serverTimestamp() });
+        }
+      } catch (e) {
+        console.error("No se pudo sincronizar el término \"" + par.termino + "\":", e);
+      }
+    }
+  }
 
   // ---------- Taller: colapsar/expandir el contenido de configuración ----------
   const tallerContenido = document.getElementById("tallerContenido");
@@ -2985,6 +3099,13 @@
   }, (error) => {
     loadingMsgGalerias.style.display = "none";
     console.error("Error al leer las galerías:", error);
+  });
+
+  // Diccionario de Referencias: se carga entero (no hace falta orden, es poco volumen)
+  onSnapshot(referenciasCol, (snapshot) => {
+    referencias = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  }, (error) => {
+    console.error("Error al leer el Diccionario de Referencias:", error);
   });
 
   // ---------- Perfiles (galaxias): selector tipo Netflix ----------
@@ -3412,6 +3533,10 @@
 
     const coleccionActual = colecciones.find(c => c.id === id);
     document.getElementById("firmaColeccionDetalle").textContent = "De " + nombreCreador(coleccionActual ? coleccionActual.ownerId : null);
+
+    const libroConTerminos = libros.some(l => l.coleccionId === id && Array.isArray(l.terminosReferencia) && l.terminosReferencia.length > 0);
+    document.getElementById("abrirDiccionarioBtn").style.display = libroConTerminos ? "inline-block" : "none";
+
     const galeriaActual = galerias.find(g => g.id === galeriaActualId);
     const fondoEfectivo = (coleccionActual && coleccionActual.fondoId)
       ? coleccionActual.fondoId
@@ -3420,6 +3545,48 @@
 
     window.scrollTo(0, 0);
   }
+
+  // ---------- Diccionario de Referencias: lista filtrada por colección ----------
+  document.getElementById("abrirDiccionarioBtn").addEventListener("click", () => {
+    const terminosDeLaColeccion = new Map(); // termino en minúscula -> {termino, definicion}
+    libros
+      .filter(l => l.coleccionId === coleccionActualId && Array.isArray(l.terminosReferencia))
+      .forEach(l => {
+        l.terminosReferencia.forEach(termino => {
+          const clave = termino.toLowerCase();
+          if (terminosDeLaColeccion.has(clave)) return;
+          const ref = referencias.find(r => r.ownerId === l.ownerId && r.termino.toLowerCase() === clave);
+          if (ref) terminosDeLaColeccion.set(clave, ref);
+        });
+      });
+
+    const listaOrdenada = Array.from(terminosDeLaColeccion.values())
+      .sort((a, b) => a.termino.localeCompare(b.termino, "es", { sensitivity: "base" }));
+
+    const coleccionActual = colecciones.find(c => c.id === coleccionActualId);
+    document.getElementById("diccionarioModalSubtitulo").textContent =
+      `Palabras e ideas propias usadas en "${coleccionActual ? coleccionActual.nombre : "esta colección"}", ordenadas alfabéticamente.`;
+
+    const lista = document.getElementById("diccionarioModalLista");
+    lista.innerHTML = "";
+    if (listaOrdenada.length === 0) {
+      lista.innerHTML = `<p style="font-size:0.8rem;color:var(--text-sec);">Todavía no hay términos en esta colección.</p>`;
+    } else {
+      listaOrdenada.forEach(ref => {
+        const item = document.createElement("div");
+        item.innerHTML = `
+          <div style="font-weight:600;font-size:0.9rem;color:var(--accent);">${escapeHtml(ref.termino)}</div>
+          <div style="font-size:0.82rem;color:var(--text);line-height:1.5;margin-top:2px;">${escapeHtml(ref.definicion)}</div>
+        `;
+        lista.appendChild(item);
+      });
+    }
+    document.getElementById("diccionarioModal").style.display = "flex";
+  });
+
+  document.getElementById("cerrarDiccionarioBtn").addEventListener("click", () => {
+    document.getElementById("diccionarioModal").style.display = "none";
+  });
 
   document.getElementById("backToHomeBtn").addEventListener("click", () => {
     vista = "colecciones";
