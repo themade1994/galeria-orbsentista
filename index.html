@@ -294,6 +294,23 @@
   /* Lista de notas guardadas (desde el panel Herramientas) */
   .notas-guardadas-lista{ padding:10px; overflow-y:auto; flex:1; }
 
+  .bio-resumen{ font-size:0.85rem; line-height:1.55; color:var(--text); margin-bottom:16px; white-space:pre-wrap; }
+  .bio-arbol details{ border-left:2px solid var(--border); padding-left:10px; margin-bottom:6px; }
+  .bio-arbol summary{ cursor:pointer; font-size:0.85rem; padding:6px 0; list-style:none; }
+  .bio-arbol summary::-webkit-details-marker{ display:none; }
+  .bio-arbol summary::before{ content:"▸ "; color:var(--accent); }
+  .bio-arbol details[open] > summary::before{ content:"▾ "; }
+  .bio-arbol .bio-galeria > summary{ font-weight:600; color:var(--verde); }
+  .bio-arbol .bio-coleccion > summary{ font-weight:600; color:var(--accent); font-size:0.82rem; }
+  .bio-arbol .bio-publicacion > summary{ font-style:italic; color:var(--text-sec); font-size:0.8rem; }
+  .bio-termino-fila{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0 6px 4px; border-bottom:1px solid var(--border); }
+  .bio-termino-texto{ flex:1; }
+  .bio-termino-texto .palabra{ font-weight:600; font-size:0.85rem; color:var(--text); }
+  .bio-termino-texto .def{ font-size:0.8rem; color:var(--text-sec); margin-top:2px; line-height:1.4; }
+  .bio-guardar-btn{ flex-shrink:0; background:transparent; border:1px solid var(--accent); color:var(--accent); font-size:0.65rem; padding:4px 8px; border-radius:6px; cursor:pointer; white-space:nowrap; }
+  .bio-guardar-btn.guardado{ border-color:var(--verde); color:var(--verde); }
+  .bio-vacio{ font-size:0.8rem; color:var(--text-sec); padding:10px 0; }
+
   .plantilla-campo-copiable{
     display:flex;
     gap:6px;
@@ -1570,6 +1587,19 @@
       <polygon points="98,92 122,100 130,124 116,148 88,150 68,130 72,104" fill="#9b7cf6" stroke="#9b7cf6" stroke-width="2"/>
     </g>
 
+    <!-- Ícono de Historial de Referencias: cápsula de muestra sellada, con un
+         fragmento brillante adentro. Mismo lenguaje de forma sólida + brillo
+         que el meteorito, pero en turquesa, y quieta en vez de cayendo. -->
+    <g id="icono-capsula-svg">
+      <linearGradient id="capsulaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#22d3c4" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#22d3c4" stop-opacity="0.55"/>
+      </linearGradient>
+      <rect x="72" y="46" width="56" height="112" rx="28" fill="url(#capsulaGrad)" stroke="#22d3c4" stroke-width="6"/>
+      <line x1="72" y1="100" x2="128" y2="100" stroke="#22d3c4" stroke-width="4"/>
+      <polygon points="100,72 108,88 124,90 112,101 115,117 100,109 85,117 88,101 76,90 92,88" fill="#22d3c4"/>
+    </g>
+
     <!-- Candado propio: anillo abierto + cuerpo, mismo lenguaje del logo -->
     <g id="icono-candado-svg">
       <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="#e8e8ec" stroke-width="9" stroke-linecap="round"/>
@@ -1621,6 +1651,13 @@
       <div>
         <div style="font-size:0.85rem;font-weight:600;">orbSY notes</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Tus apuntes guardados</div>
+      </div>
+    </div>
+    <div class="herramienta-item" id="abrirHistorialBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-capsula-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Historial de Referencias</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Palabras de otros autores que guardaste</div>
       </div>
     </div>
     <div class="herramienta-item" style="opacity:0.45;cursor:default;">
@@ -1710,6 +1747,14 @@
       <div style="height:20px;"></div>
     </div>
   </div>
+
+  <div id="historialVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasDesdeHistorialBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Palabras e ideas de otros autores que guardaste mientras explorabas orbSY, en orden alfabético.</p>
+    <div class="notas-guardadas-lista" id="historialLista"></div>
+  </div>
 </div>
 
 
@@ -1766,6 +1811,8 @@
         <option value="violeta">Morado</option>
         <option value="gris">Blanco grisáceo</option>
       </select>
+      <label>Resumen / biografía (opcional)</label>
+      <textarea id="perfilResumenInput" rows="3" placeholder="Tu categoría, estilo y dirección del trabajo. Aparece cuando alguien consulta tu biografía."></textarea>
       <button id="guardarPerfilBtn" style="margin-top:10px;">Guardar perfil</button>
     </div>
 
@@ -1973,6 +2020,7 @@
   <!-- VISTA: GALERÍAS (nivel superior, pantalla de inicio) -->
   <div id="vistaGalerias" style="display:none;">
     <button id="backToPerfilesBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;margin-bottom:14px;">← Perfiles</button>
+    <button id="abrirBiografiaBtn" style="display:none;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:14px;margin-left:8px;">📖 Biografía y Diccionario de Referencias</button>
     <div class="galerias-eyebrow">Tus galerías</div>
     <div id="loadingMsgGalerias" class="empty-msg">Cargando...</div>
     <div id="galeriasGrid" class="galerias-grid"></div>
@@ -2041,6 +2089,15 @@
     <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:14px;">Elige una plantilla creada en orbSY notes. Se llenará automáticamente el título, el resumen, los recursos y las preguntas de reflexión.</p>
     <div id="importarPlantillaLista" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;"></div>
     <button id="importarPlantillaCancelar" style="margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL: BIOGRAFÍA Y DICCIONARIO DE REFERENCIAS DEL AUTOR -->
+<div id="biografiaModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;max-height:82vh;display:flex;flex-direction:column;">
+    <h3 id="biografiaModalTitulo" style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:10px;"></h3>
+    <div id="biografiaModalCuerpo" style="overflow-y:auto;flex:1;"></div>
+    <button id="cerrarBiografiaBtn" style="margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;flex-shrink:0;">Cerrar</button>
   </div>
 </div>
 
@@ -2187,6 +2244,7 @@
   const galeriasCol = collection(db, "galerias");
   const usuariosCol = collection(db, "usuarios");
   const referenciasCol = collection(db, "referencias");
+  const historialCol = collection(db, "historial");
   const solicitudesCol = collection(db, "solicitudesTransferencia");
 
   // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
@@ -2199,6 +2257,7 @@
   let colecciones = [];   // [{id, nombre, imagenId, frase, clave, galeriaId, fecha}]
   let galerias = [];      // [{id, nombre, imagenId, fecha}]
   let referencias = [];   // [{id, ownerId, termino, definicion, fecha}] — Diccionario de Referencias
+  let historial = [];     // [{id, ownerId, termino, definicion, autorNombre, fecha}] — Historial de Referencias (guardados personales)
   let vista = uidPerfilObjetivo ? "galerias" : "perfiles"; // "perfiles" | "galerias" | "colecciones" | "coleccion"
   let galeriaActualId = null;
   let coleccionActualId = null;
@@ -2446,6 +2505,7 @@
     const nombre = document.getElementById("perfilNombreInput").value.trim();
     const imagenUrl = document.getElementById("perfilImagenInput").value.trim();
     const color = document.getElementById("perfilColorInput").value;
+    const resumen = document.getElementById("perfilResumenInput").value.trim();
 
     if (!nombre || !imagenUrl) {
       alert("Ponle un nombre y una foto a tu perfil.");
@@ -2458,7 +2518,7 @@
     btn.disabled = true;
     btn.textContent = "Guardando...";
     try {
-      await setDoc(doc(db, "usuarios", uidActual), { nombre, imagenId, color }, { merge: true });
+      await setDoc(doc(db, "usuarios", uidActual), { nombre, imagenId, color, resumen }, { merge: true });
       document.getElementById("configurarPerfilSection").style.display = "none";
     } catch (e) {
       alert("Error al guardar tu perfil: " + e.message);
@@ -3108,6 +3168,14 @@
     console.error("Error al leer el Diccionario de Referencias:", error);
   });
 
+  // Historial de Referencias: guardados personales (curados por cada usuario)
+  onSnapshot(historialCol, (snapshot) => {
+    historial = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderHistorialGuardado === "function") renderHistorialGuardado();
+  }, (error) => {
+    console.error("Error al leer el Historial de Referencias:", error);
+  });
+
   // ---------- Perfiles (galaxias): selector tipo Netflix ----------
   let usuarios = [];
   const errorMsgPerfiles = document.getElementById("errorMsgPerfiles");
@@ -3362,6 +3430,10 @@
   function renderGalerias() {
     galeriasGrid.innerHTML = "";
     const galeriasAMostrar = galeriasVisibles();
+
+    const btnBiografia = document.getElementById("abrirBiografiaBtn");
+    btnBiografia.style.display = (uidPerfilObjetivo && uidPerfilObjetivo !== ID_PERFIL_GENERAL) ? "inline-block" : "none";
+
     const coleccionesGeneral = coleccionesDeGaleria(ID_GALERIA_GENERAL);
     const librosGeneral = librosDeColeccion(ID_GENERAL);
     // El cajón "General" (sin dueño claro) solo se muestra en el enlace genérico,
@@ -3566,6 +3638,7 @@
     const coleccionActual = colecciones.find(c => c.id === coleccionActualId);
     document.getElementById("diccionarioModalSubtitulo").textContent =
       `Palabras e ideas propias usadas en "${coleccionActual ? coleccionActual.nombre : "esta colección"}", ordenadas alfabéticamente.`;
+    const nombreAutorColeccion = nombreCreador(coleccionActual ? coleccionActual.ownerId : null);
 
     const lista = document.getElementById("diccionarioModalLista");
     lista.innerHTML = "";
@@ -3574,10 +3647,17 @@
     } else {
       listaOrdenada.forEach(ref => {
         const item = document.createElement("div");
+        item.className = "bio-termino-fila";
         item.innerHTML = `
-          <div style="font-weight:600;font-size:0.9rem;color:var(--accent);">${escapeHtml(ref.termino)}</div>
-          <div style="font-size:0.82rem;color:var(--text);line-height:1.5;margin-top:2px;">${escapeHtml(ref.definicion)}</div>
+          <div class="bio-termino-texto">
+            <div class="palabra" style="color:var(--accent);">${escapeHtml(ref.termino)}</div>
+            <div class="def">${escapeHtml(ref.definicion)}</div>
+          </div>
+          <button type="button" class="bio-guardar-btn">Guardar</button>
         `;
+        item.querySelector(".bio-guardar-btn").addEventListener("click", (e) => {
+          guardarEnHistorial(ref.termino, ref.definicion, nombreAutorColeccion, e.target);
+        });
         lista.appendChild(item);
       });
     }
@@ -3586,6 +3666,123 @@
 
   document.getElementById("cerrarDiccionarioBtn").addEventListener("click", () => {
     document.getElementById("diccionarioModal").style.display = "none";
+  });
+
+  // ---------- Biografía y Diccionario de Referencias acumulado del autor ----------
+  document.getElementById("abrirBiografiaBtn").addEventListener("click", () => {
+    if (!uidPerfilObjetivo) return;
+    const autor = usuarios.find(u => u.id === uidPerfilObjetivo);
+    const nombreAutor = autor ? (autor.nombre || "Usuario") : "Usuario";
+
+    document.getElementById("biografiaModalTitulo").textContent = nombreAutor;
+    const cuerpo = document.getElementById("biografiaModalCuerpo");
+    cuerpo.innerHTML = "";
+
+    // Resumen / biografía escrita por el propio autor
+    const resumenTexto = autor && autor.resumen ? autor.resumen.trim() : "";
+    const bloqueResumen = document.createElement("div");
+    bloqueResumen.className = "bio-resumen";
+    bloqueResumen.textContent = resumenTexto || "Este autor todavía no ha escrito una biografía.";
+    cuerpo.appendChild(bloqueResumen);
+
+    // Árbol: galerías (alfabético) > colecciones (alfabético) > publicaciones (alfabético) > términos (alfabético)
+    const galeriasDelAutor = galerias
+      .filter(g => g.ownerId === uidPerfilObjetivo)
+      .sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" }));
+
+    const arbol = document.createElement("div");
+    arbol.className = "bio-arbol";
+
+    if (galeriasDelAutor.length === 0) {
+      arbol.innerHTML = `<div class="bio-vacio">Este autor todavía no tiene galerías publicadas.</div>`;
+    }
+
+    galeriasDelAutor.forEach(gal => {
+      const coleccionesDeEsaGaleria = colecciones
+        .filter(c => c.galeriaId === gal.id)
+        .sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" }));
+
+      const detGaleria = document.createElement("details");
+      detGaleria.className = "bio-galeria";
+      const sumGaleria = document.createElement("summary");
+      sumGaleria.textContent = gal.nombre || "Sin nombre";
+      detGaleria.appendChild(sumGaleria);
+
+      if (coleccionesDeEsaGaleria.length === 0) {
+        const vacio = document.createElement("div");
+        vacio.className = "bio-vacio";
+        vacio.textContent = "Sin colecciones todavía.";
+        detGaleria.appendChild(vacio);
+      }
+
+      coleccionesDeEsaGaleria.forEach(col => {
+        const publicacionesDeEsaColeccion = libros
+          .filter(l => l.coleccionId === col.id)
+          .sort((a, b) => (a.titulo || "").localeCompare(b.titulo || "", "es", { sensitivity: "base" }));
+
+        const detColeccion = document.createElement("details");
+        detColeccion.className = "bio-coleccion";
+        const sumColeccion = document.createElement("summary");
+        sumColeccion.textContent = col.nombre || "Sin nombre";
+        detColeccion.appendChild(sumColeccion);
+
+        if (publicacionesDeEsaColeccion.length === 0) {
+          const vacio = document.createElement("div");
+          vacio.className = "bio-vacio";
+          vacio.textContent = "Sin publicaciones todavía.";
+          detColeccion.appendChild(vacio);
+        }
+
+        publicacionesDeEsaColeccion.forEach(libro => {
+          const detPublicacion = document.createElement("details");
+          detPublicacion.className = "bio-publicacion";
+          const sumPublicacion = document.createElement("summary");
+          sumPublicacion.textContent = libro.titulo || "Sin título";
+          detPublicacion.appendChild(sumPublicacion);
+
+          const terminos = (Array.isArray(libro.terminosReferencia) ? libro.terminosReferencia : [])
+            .map(t => referencias.find(r => r.ownerId === uidPerfilObjetivo && r.termino.toLowerCase() === t.toLowerCase()))
+            .filter(Boolean)
+            .sort((a, b) => a.termino.localeCompare(b.termino, "es", { sensitivity: "base" }));
+
+          if (terminos.length === 0) {
+            const vacio = document.createElement("div");
+            vacio.className = "bio-vacio";
+            vacio.textContent = "Sin diccionario de referencias en esta publicación.";
+            detPublicacion.appendChild(vacio);
+          } else {
+            terminos.forEach(ref => {
+              const fila = document.createElement("div");
+              fila.className = "bio-termino-fila";
+              fila.innerHTML = `
+                <div class="bio-termino-texto">
+                  <div class="palabra">${escapeHtml(ref.termino)}</div>
+                  <div class="def">${escapeHtml(ref.definicion)}</div>
+                </div>
+                <button type="button" class="bio-guardar-btn">Guardar</button>
+              `;
+              fila.querySelector(".bio-guardar-btn").addEventListener("click", (e) => {
+                guardarEnHistorial(ref.termino, ref.definicion, nombreAutor, e.target);
+              });
+              detPublicacion.appendChild(fila);
+            });
+          }
+
+          detColeccion.appendChild(detPublicacion);
+        });
+
+        detGaleria.appendChild(detColeccion);
+      });
+
+      arbol.appendChild(detGaleria);
+    });
+
+    cuerpo.appendChild(arbol);
+    document.getElementById("biografiaModal").style.display = "flex";
+  });
+
+  document.getElementById("cerrarBiografiaBtn").addEventListener("click", () => {
+    document.getElementById("biografiaModal").style.display = "none";
   });
 
   document.getElementById("backToHomeBtn").addEventListener("click", () => {
@@ -4105,6 +4302,75 @@
     notasGuardadasVista.style.display = "none";
     herramientasMenu.style.display = "block";
   });
+
+  // ---------- Vista: Historial de Referencias (guardados personales) ----------
+  const historialVista = document.getElementById("historialVista");
+  document.getElementById("abrirHistorialBtn").addEventListener("click", () => {
+    herramientasMenu.style.display = "none";
+    historialVista.style.display = "flex";
+    renderHistorialGuardado();
+  });
+  document.getElementById("volverAHerramientasDesdeHistorialBtn").addEventListener("click", () => {
+    historialVista.style.display = "none";
+    herramientasMenu.style.display = "block";
+  });
+
+  function renderHistorialGuardado() {
+    const historialLista = document.getElementById("historialLista");
+    if (!historialLista) return;
+    if (!uidActual) {
+      historialLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Necesitas iniciar sesión (Admin) para ver tu historial guardado.</div>`;
+      return;
+    }
+    const mios = historial
+      .filter(h => h.ownerId === uidActual)
+      .sort((a, b) => a.termino.localeCompare(b.termino, "es", { sensitivity: "base" }));
+
+    if (mios.length === 0) {
+      historialLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no has guardado nada. Cuando veas una palabra de otro autor que te interese, toca "Guardar" junto a su definición.</div>`;
+      return;
+    }
+    historialLista.innerHTML = "";
+    mios.forEach(h => {
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">${escapeHtml(h.termino)}</div>
+        <div class="nota-guardada-preview">${escapeHtml(h.definicion)}</div>
+        <div style="font-size:0.7rem;color:var(--text-sec);font-style:italic;margin-top:2px;">De ${escapeHtml(h.autorNombre || "un autor")}</div>
+        <div class="nota-guardada-controles">
+          <button class="eliminar">Quitar</button>
+        </div>
+      `;
+      item.querySelector(".eliminar").addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "historial", h.id));
+        } catch (e) {
+          alert("No se pudo quitar: " + e.message);
+        }
+      });
+      historialLista.appendChild(item);
+    });
+  }
+
+  // Guarda una palabra/definición de otro autor en tu Historial de Referencias personal
+  async function guardarEnHistorial(termino, definicion, autorNombre, btn) {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para guardar en tu historial.");
+      return;
+    }
+    const yaGuardado = historial.some(h => h.ownerId === uidActual && h.termino.toLowerCase() === termino.toLowerCase());
+    if (yaGuardado) {
+      if (btn) { btn.textContent = "Ya guardado"; btn.classList.add("guardado"); }
+      return;
+    }
+    try {
+      await addDoc(historialCol, { ownerId: uidActual, termino, definicion, autorNombre: autorNombre || "un autor", fecha: serverTimestamp() });
+      if (btn) { btn.textContent = "Guardado ✓"; btn.classList.add("guardado"); }
+    } catch (e) {
+      alert("No se pudo guardar: " + e.message);
+    }
+  }
 
   function renderNotasGuardadas() {
     const todas = leerTodasLasNotas();
