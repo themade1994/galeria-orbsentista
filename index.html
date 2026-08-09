@@ -368,6 +368,64 @@
     color:var(--accent);
   }
 
+  .capa-taller-overlay{
+    position:fixed;
+    inset:0;
+    z-index:9998;
+    background:rgba(0,0,0,0.82);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .capa-taller-caja{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    max-width:380px;
+    width:100%;
+    padding:30px 24px 24px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .capa-taller-cerrar{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    font-size:0.85rem;
+    cursor:pointer;
+  }
+  .capa-taller-titulo{
+    font-family:'Fraunces', serif;
+    font-size:1.15rem;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .capa-taller-subtitulo{
+    font-size:0.78rem;
+    color:var(--text-sec);
+    margin-bottom:18px;
+    line-height:1.4;
+  }
+  .capa-taller-contenido{
+    width:100%;
+    background:#0e0e13;
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:22px 14px;
+    font-size:0.8rem;
+    color:var(--text-sec);
+  }
+
   /* Insignia fija de orbSY: niño con telescopio, centrada abajo, en todas las páginas */
   #insigniaOrbsy{
     position:fixed;
@@ -1601,6 +1659,28 @@
   <img id="introFlipbookImg" src="intro-1.png" alt="">
 </div>
 
+<!-- Capas del Taller: Noticias en orbSY y Publicidad en orbSY.
+     Aparecen una vez por sesión, solo al iniciar sesión de Admin. -->
+<div id="capaNoticiasOrbSY" class="capa-taller-overlay" style="display:none;">
+  <div class="capa-taller-caja">
+    <button type="button" class="capa-taller-cerrar" id="cerrarCapaNoticiasBtn">✕</button>
+    <svg viewBox="0 0 200 200" style="width:56px;height:56px;margin-bottom:10px;"><use href="#icono-noticias-svg"/></svg>
+    <div class="capa-taller-titulo">Noticias en orbSY</div>
+    <p class="capa-taller-subtitulo">Datos y novedades productivas — psicología, ciencia, arte, literatura.</p>
+    <div class="capa-taller-contenido">Próximamente habrá noticias aquí.</div>
+  </div>
+</div>
+
+<div id="capaPublicidadOrbSY" class="capa-taller-overlay" style="display:none;">
+  <div class="capa-taller-caja">
+    <button type="button" class="capa-taller-cerrar" id="cerrarCapaPublicidadBtn">✕</button>
+    <svg viewBox="0 0 200 200" style="width:56px;height:56px;margin-bottom:10px;"><use href="#icono-publicidad-svg"/></svg>
+    <div class="capa-taller-titulo">Publicidad en orbSY</div>
+    <p class="capa-taller-subtitulo">Espacio reservado para anunciantes.</p>
+    <div class="capa-taller-contenido">Próximamente se harán publicidades aquí.</div>
+  </div>
+</div>
+
 <!-- Definición reutilizable del ícono meteorito (orbSY notes) -->
 <svg width="0" height="0" style="position:absolute;">
   <defs>
@@ -1624,6 +1704,31 @@
       <rect x="72" y="46" width="56" height="112" rx="28" fill="url(#capsulaGrad)" stroke="#22d3c4" stroke-width="6"/>
       <line x1="72" y1="100" x2="128" y2="100" stroke="#22d3c4" stroke-width="4"/>
       <polygon points="100,72 108,88 124,90 112,101 115,117 100,109 85,117 88,101 76,90 92,88" fill="#22d3c4"/>
+    </g>
+
+    <!-- Ícono de Noticias en orbSY: un pequeño emisor con ondas de señal,
+         cuerpo sólido + brillo, en verde (mismo verde del logo/wordmark
+         "orb", para marcarlo como contenido oficial de la plataforma). -->
+    <g id="icono-noticias-svg">
+      <linearGradient id="noticiasGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#39ff8c" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#39ff8c" stop-opacity="0.55"/>
+      </linearGradient>
+      <circle cx="100" cy="112" r="20" fill="url(#noticiasGrad)" stroke="#39ff8c" stroke-width="6"/>
+      <path d="M 78 90 A 46 46 0 0 1 122 90" fill="none" stroke="#39ff8c" stroke-width="7" stroke-linecap="round"/>
+      <path d="M 66 74 A 68 68 0 0 1 134 74" fill="none" stroke="#39ff8c" stroke-width="7" stroke-linecap="round" opacity="0.55"/>
+    </g>
+
+    <!-- Ícono de Publicidad en orbSY: un faro/destello de 4 puntas, cuerpo
+         sólido + brillo, en blanco-grisáceo (deliberadamente distinto a los
+         colores de marca, para marcarlo como contenido externo/pagado). -->
+    <g id="icono-publicidad-svg">
+      <linearGradient id="publicidadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#e8e8ec" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#e8e8ec" stop-opacity="0.6"/>
+      </linearGradient>
+      <polygon points="100,50 114,86 150,100 114,114 100,150 86,114 50,100 86,86" fill="url(#publicidadGrad)" stroke="#e8e8ec" stroke-width="6"/>
+      <circle cx="100" cy="100" r="10" fill="#e8e8ec"/>
     </g>
 
     <!-- Candado propio: anillo abierto + cuerpo, mismo lenguaje del logo -->
@@ -2370,6 +2475,7 @@
     try {
       await signInWithEmailAndPassword(auth, adminEmail.value.trim(), adminPass.value);
       reproducirIntroFlipbook("larga");
+      mostrarCapasDelTallerSiCorresponde();
       // onAuthStateChanged se encarga de mostrar el panel
     } catch (e) {
       loginError.textContent = "Correo o contraseña incorrectos";
@@ -5271,6 +5377,27 @@
 
   Promise.race([precargaFramesIntro, esperaMaximaPrecarga]).then(() => {
     reproducirIntroFlipbook("larga");
+  });
+
+  // ---------- Capas del Taller: Noticias en orbSY y Publicidad en orbSY ----------
+  // Aparecen la primera vez que se inicia sesión de Admin en esta sesión del
+  // navegador (sessionStorage se resetea solo al recargar la página o volver
+  // a entrar más tarde, así que no hace falta lógica extra para eso).
+  const CLAVE_SESION_CAPAS_TALLER = "orbsy_capas_taller_mostradas";
+
+  function mostrarCapasDelTallerSiCorresponde() {
+    if (sessionStorage.getItem(CLAVE_SESION_CAPAS_TALLER)) return;
+    document.getElementById("capaNoticiasOrbSY").style.display = "flex";
+  }
+
+  document.getElementById("cerrarCapaNoticiasBtn").addEventListener("click", () => {
+    document.getElementById("capaNoticiasOrbSY").style.display = "none";
+    document.getElementById("capaPublicidadOrbSY").style.display = "flex";
+  });
+
+  document.getElementById("cerrarCapaPublicidadBtn").addEventListener("click", () => {
+    document.getElementById("capaPublicidadOrbSY").style.display = "none";
+    sessionStorage.setItem(CLAVE_SESION_CAPAS_TALLER, "1");
   });
 </script>
 
