@@ -1978,6 +1978,7 @@
         <button type="button" class="taller-pestana-btn activa" data-seccion="galerias">Galerías</button>
         <button type="button" class="taller-pestana-btn" data-seccion="colecciones">Colecciones</button>
         <button type="button" class="taller-pestana-btn" data-seccion="publicaciones">Publicaciones</button>
+        <button type="button" class="taller-pestana-btn" data-seccion="configuracion">⚙ Configuración</button>
       </div>
 
       <div class="taller-seccion taller-galerias">
@@ -2103,21 +2104,35 @@
         <button id="publishBtn" style="flex:1;">Publicar</button>
         <button id="cancelarEdicionLibroBtn" style="display:none;flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:0 14px;border-radius:9px;">Cancelar</button>
       </div>
-      <button id="logoutBtn" style="margin-top:8px;width:100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:9px;cursor:pointer;">Cerrar sesión</button>
 
       <div class="admin-list">
         <h3>Libros publicados</h3>
         <div id="adminListContainer"></div>
       </div>
-
-      <div style="margin-top:26px;padding-top:16px;border-top:1px solid var(--border);">
-        <button type="button" id="mostrarZonaPeligroBtn" style="background:transparent;border:none;color:var(--violeta);font-size:0.78rem;cursor:pointer;padding:6px 0;">Eliminar perfil</button>
-        <div id="zonaPeligroCuenta" style="display:none;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.35);border-radius:12px;padding:14px;margin-top:8px;">
-          <p style="font-size:0.78rem;color:#f87171;font-weight:600;margin-bottom:4px;">⚠ Zona de peligro</p>
-          <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:10px;">Esto borra para siempre esta cuenta con la que estás conectado ahora mismo: su perfil, todas sus galerías, colecciones y publicaciones, y el correo/contraseña con el que entraste. No se puede deshacer, y no afecta a ninguna otra cuenta.</p>
-          <button id="eliminarCuentaBtn" style="width:100%;background:transparent;border:1px solid #f87171;color:#f87171;padding:9px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;">Eliminar esta cuenta para siempre</button>
-        </div>
       </div>
+
+      <div class="taller-seccion taller-configuracion" style="display:none;">
+        <div class="taller-seccion-header">
+          <svg class="taller-icono" viewBox="0 0 200 200"><use href="#icono-candado-svg"/></svg>
+          <div>
+            <div class="taller-seccion-eyebrow">CONFIGURACIÓN</div>
+            <h2>Configuración de orbSY</h2>
+          </div>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:18px;">Todas tus gestiones de cuenta, en un solo lugar — sin menús escondidos.</p>
+
+        <button type="button" id="editarPerfilBtn" style="width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px;border-radius:9px;cursor:pointer;font-weight:600;margin-bottom:10px;">✏️ Editar perfil (nombre, foto, color, resumen)</button>
+
+        <button id="logoutBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:9px;cursor:pointer;">Cerrar sesión</button>
+
+        <div style="margin-top:26px;padding-top:16px;border-top:1px solid var(--border);">
+          <button type="button" id="mostrarZonaPeligroBtn" style="background:transparent;border:none;color:var(--violeta);font-size:0.78rem;cursor:pointer;padding:6px 0;">Eliminar perfil</button>
+          <div id="zonaPeligroCuenta" style="display:none;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.35);border-radius:12px;padding:14px;margin-top:8px;">
+            <p style="font-size:0.78rem;color:#f87171;font-weight:600;margin-bottom:4px;">⚠ Zona de peligro</p>
+            <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:10px;">Esto borra para siempre esta cuenta con la que estás conectado ahora mismo: su perfil, todas sus galerías, colecciones y publicaciones, y el correo/contraseña con el que entraste. No se puede deshacer, y no afecta a ninguna otra cuenta.</p>
+            <button id="eliminarCuentaBtn" style="width:100%;background:transparent;border:1px solid #f87171;color:#f87171;padding:9px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;">Eliminar esta cuenta para siempre</button>
+          </div>
+        </div>
       </div>
       </div>
     </div>
@@ -2465,7 +2480,9 @@
   const loginError = document.getElementById("loginError");
 
   adminToggleBtn.addEventListener("click", () => {
-    adminPanel.style.display = adminPanel.style.display === "block" ? "none" : "block";
+    const seVaAAbrir = adminPanel.style.display !== "block";
+    adminPanel.style.display = seVaAAbrir ? "block" : "none";
+    if (seVaAAbrir && isAdmin) mostrarCapasDelTallerSiCorresponde();
   });
 
   loginBtn.addEventListener("click", async () => {
@@ -2647,6 +2664,17 @@
   });
 
   // ---------- Configurar perfil (nombre, foto, color de galaxia) ----------
+  document.getElementById("editarPerfilBtn").addEventListener("click", () => {
+    const miPerfil = usuarios.find(u => u.id === uidActual);
+    document.getElementById("perfilNombreInput").value = miPerfil ? (miPerfil.nombre || "") : "";
+    document.getElementById("perfilImagenInput").value = miPerfil && miPerfil.imagenId ? `https://drive.google.com/file/d/${miPerfil.imagenId}/view` : "";
+    document.getElementById("perfilColorInput").value = miPerfil ? (miPerfil.color || "verde") : "verde";
+    document.getElementById("perfilResumenInput").value = miPerfil ? (miPerfil.resumen || "") : "";
+    const seccion = document.getElementById("configurarPerfilSection");
+    seccion.style.display = "block";
+    seccion.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
   document.getElementById("guardarPerfilBtn").addEventListener("click", async () => {
     const nombre = document.getElementById("perfilNombreInput").value.trim();
     const imagenUrl = document.getElementById("perfilImagenInput").value.trim();
@@ -3033,7 +3061,8 @@
   const SECCIONES_TALLER = {
     galerias: document.querySelector(".taller-seccion.taller-galerias"),
     colecciones: document.querySelector(".taller-seccion.taller-colecciones"),
-    publicaciones: document.querySelector(".taller-seccion.taller-publicaciones")
+    publicaciones: document.querySelector(".taller-seccion.taller-publicaciones"),
+    configuracion: document.querySelector(".taller-seccion.taller-configuracion")
   };
   document.querySelectorAll(".taller-pestana-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -5380,13 +5409,16 @@
   });
 
   // ---------- Capas del Taller: Noticias en orbSY y Publicidad en orbSY ----------
-  // Aparecen la primera vez que se inicia sesión de Admin en esta sesión del
-  // navegador (sessionStorage se resetea solo al recargar la página o volver
-  // a entrar más tarde, así que no hace falta lógica extra para eso).
-  const CLAVE_SESION_CAPAS_TALLER = "orbsy_capas_taller_mostradas";
+  // Aparecen cada vez que se entra al Taller estando logueado: al iniciar
+  // sesión, y al reabrir el panel Admin después de haber salido a publicar
+  // o leer contenido (así siempre se ve la Noticia/Publicidad más reciente,
+  // sin necesitar un botón de "actualizar" aparte). Un pequeño candado en
+  // memoria evita que se dupare si el panel se abre/cierra muy rápido.
+  let capasTallerEnCurso = false;
 
   function mostrarCapasDelTallerSiCorresponde() {
-    if (sessionStorage.getItem(CLAVE_SESION_CAPAS_TALLER)) return;
+    if (capasTallerEnCurso) return;
+    capasTallerEnCurso = true;
     document.getElementById("capaNoticiasOrbSY").style.display = "flex";
   }
 
@@ -5397,7 +5429,7 @@
 
   document.getElementById("cerrarCapaPublicidadBtn").addEventListener("click", () => {
     document.getElementById("capaPublicidadOrbSY").style.display = "none";
-    sessionStorage.setItem(CLAVE_SESION_CAPAS_TALLER, "1");
+    capasTallerEnCurso = false;
   });
 </script>
 
