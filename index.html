@@ -336,10 +336,36 @@
     color:var(--verde);
     border-color:var(--verde);
   }
-  .plantilla-tipo-btn.activo{
-    background:var(--accent) !important;
-    border-color:var(--accent) !important;
-    color:#fff !important;
+  .plantilla-tipo-btn{
+    flex:1;
+    padding:10px 4px;
+    border-radius:8px;
+    font-size:0.8rem;
+    font-weight:600;
+    cursor:pointer;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+  }
+  .plantilla-tipo-btn[data-color="verde"].activo{ background:rgba(57,255,140,0.12) !important; border-color:var(--verde) !important; color:var(--verde) !important; }
+  .plantilla-tipo-btn[data-color="turquesa"].activo{ background:rgba(34,211,196,0.12) !important; border-color:var(--accent) !important; color:var(--accent) !important; }
+  .plantilla-tipo-btn[data-color="violeta"].activo{ background:rgba(155,124,246,0.12) !important; border-color:var(--violeta) !important; color:var(--violeta) !important; }
+
+  .taller-pestana-btn{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    padding:10px 4px;
+    border-radius:9px;
+    font-size:0.8rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .taller-pestana-btn.activa{
+    background:var(--card);
+    border-color:var(--accent);
+    color:var(--accent);
   }
 
   /* Insignia fija de orbSY: niño con telescopio, centrada abajo, en todas las páginas */
@@ -1701,34 +1727,34 @@
       <button id="eliminarPlantillaBtn" style="display:none;background:transparent;border:1px solid var(--border);color:#f87171;padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">Eliminar</button>
     </div>
 
-    <div style="padding:0 14px;">
+    <div id="plantillaTarjeta" style="margin:0 14px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;border-top:3px solid var(--verde);">
       <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:8px;">Una plantilla es para UN solo espacio: una galería, una colección, o una publicación. Elige cuál estás planeando:</p>
-      <div id="plantillaTipoSelector" style="display:flex;gap:6px;margin-bottom:16px;">
-        <button type="button" class="plantilla-tipo-btn" data-tipo="galeria" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-sec);">Galería</button>
-        <button type="button" class="plantilla-tipo-btn" data-tipo="coleccion" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-sec);">Colección</button>
-        <button type="button" class="plantilla-tipo-btn" data-tipo="publicacion" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-sec);">Publicación</button>
+      <div id="plantillaTipoSelector" style="display:flex;gap:6px;margin-bottom:18px;">
+        <button type="button" class="plantilla-tipo-btn" data-tipo="galeria" data-color="verde">🌌 Galería</button>
+        <button type="button" class="plantilla-tipo-btn" data-tipo="coleccion" data-color="turquesa">🗂️ Colección</button>
+        <button type="button" class="plantilla-tipo-btn" data-tipo="publicacion" data-color="violeta">📖 Publicación</button>
       </div>
 
-      <label id="plantillaNombreLabel">Nombre</label>
+      <label id="plantillaNombreLabel"><span class="etiqueta-icono">✏️</span> <span class="etiqueta-texto">Nombre</span></label>
       <div class="plantilla-campo-copiable">
         <input type="text" id="plantillaNombreInput" placeholder="Ej: La noche del nihilista">
         <button type="button" class="copiar-campo-btn" data-target="plantillaNombreInput">Copiar</button>
       </div>
 
-      <label id="plantillaResumenLabel">Resumen</label>
+      <label id="plantillaResumenLabel"><span class="etiqueta-icono">📝</span> <span class="etiqueta-texto">Resumen</span></label>
       <div class="plantilla-campo-copiable">
         <textarea id="plantillaResumenInput" placeholder="Resumen o frase de bienvenida..."></textarea>
         <button type="button" class="copiar-campo-btn" data-target="plantillaResumenInput">Copiar</button>
       </div>
 
-      <label>Enlace de Google Drive (imagen de portada)</label>
+      <label>🖼️ Enlace de Google Drive (imagen de portada)</label>
       <div class="plantilla-campo-copiable">
         <input type="text" id="plantillaPortadaInput" placeholder="https://drive.google.com/file/d/.../view">
         <button type="button" class="copiar-campo-btn" data-target="plantillaPortadaInput">Copiar</button>
       </div>
 
       <div id="plantillaFondoGrupo">
-        <label>Enlace de Google Drive (imagen de fondo, opcional)</label>
+        <label>🌠 Enlace de Google Drive (imagen de fondo, opcional)</label>
         <div class="plantilla-campo-copiable">
           <input type="text" id="plantillaFondoInput" placeholder="https://drive.google.com/file/d/.../view">
           <button type="button" class="copiar-campo-btn" data-target="plantillaFondoInput">Copiar</button>
@@ -1736,11 +1762,11 @@
       </div>
 
       <div id="plantillaRecursosGrupo" style="display:none;">
-        <label style="margin-top:16px;">Recursos (elige el formato y pega el enlace, agrega los que necesites)</label>
+        <label style="margin-top:16px;">📎 Recursos (elige el formato y pega el enlace, agrega los que necesites)</label>
         <div id="plantillaRecursosBuilderContainer"></div>
         <button type="button" id="plantillaAgregarRecursoBtn">+ Agregar recurso</button>
 
-        <label style="margin-top:16px;">Preguntas de reflexión (opcional)</label>
+        <label style="margin-top:16px;">🪞 Preguntas de reflexión (opcional)</label>
         <div id="plantillaPreguntasBuilderContainer"></div>
         <button type="button" id="plantillaAgregarPreguntaBtn">+ Agregar pregunta</button>
       </div>
@@ -1824,12 +1850,6 @@
       </div>
     </div>
 
-    <div id="zonaPeligroCuenta" style="display:none;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.35);border-radius:12px;padding:14px;margin-bottom:16px;">
-      <p style="font-size:0.78rem;color:#f87171;font-weight:600;margin-bottom:4px;">Zona de peligro</p>
-      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:10px;">Esto borra para siempre esta cuenta con la que estás conectado ahora mismo: su perfil, todas sus galerías, colecciones y publicaciones, y el correo/contraseña con el que entraste. No se puede deshacer, y no afecta a ninguna otra cuenta.</p>
-      <button id="eliminarCuentaBtn" style="width:100%;background:transparent;border:1px solid #f87171;color:#f87171;padding:9px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;">Eliminar esta cuenta para siempre</button>
-    </div>
-
     <div id="formSection" style="display:none;">
       <div id="solicitudesSection" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
         <h2 style="margin-bottom:4px;">🔄 Solicitudes de transferencia</h2>
@@ -1848,6 +1868,12 @@
       </div>
 
       <div id="tallerContenido">
+
+      <div id="tallerPestanas" style="display:flex;gap:6px;margin-bottom:20px;">
+        <button type="button" class="taller-pestana-btn activa" data-seccion="galerias">Galerías</button>
+        <button type="button" class="taller-pestana-btn" data-seccion="colecciones">Colecciones</button>
+        <button type="button" class="taller-pestana-btn" data-seccion="publicaciones">Publicaciones</button>
+      </div>
 
       <div class="taller-seccion taller-galerias">
         <div class="taller-seccion-header">
@@ -1977,6 +2003,15 @@
       <div class="admin-list">
         <h3>Libros publicados</h3>
         <div id="adminListContainer"></div>
+      </div>
+
+      <div style="margin-top:26px;padding-top:16px;border-top:1px solid var(--border);">
+        <button type="button" id="mostrarZonaPeligroBtn" style="background:transparent;border:none;color:var(--violeta);font-size:0.78rem;cursor:pointer;padding:6px 0;">Eliminar perfil</button>
+        <div id="zonaPeligroCuenta" style="display:none;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.35);border-radius:12px;padding:14px;margin-top:8px;">
+          <p style="font-size:0.78rem;color:#f87171;font-weight:600;margin-bottom:4px;">⚠ Zona de peligro</p>
+          <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:10px;">Esto borra para siempre esta cuenta con la que estás conectado ahora mismo: su perfil, todas sus galerías, colecciones y publicaciones, y el correo/contraseña con el que entraste. No se puede deshacer, y no afecta a ninguna otra cuenta.</p>
+          <button id="eliminarCuentaBtn" style="width:100%;background:transparent;border:1px solid #f87171;color:#f87171;padding:9px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;">Eliminar esta cuenta para siempre</button>
+        </div>
       </div>
       </div>
       </div>
@@ -2398,6 +2433,11 @@
   });
 
   // ---------- Eliminar esta cuenta para siempre (perfil + contenido + login) ----------
+  document.getElementById("mostrarZonaPeligroBtn").addEventListener("click", () => {
+    const zona = document.getElementById("zonaPeligroCuenta");
+    zona.style.display = zona.style.display === "none" ? "block" : "none";
+  });
+
   document.getElementById("eliminarCuentaBtn").addEventListener("click", async () => {
     const user = auth.currentUser;
     if (!user) return;
@@ -2464,7 +2504,7 @@
       loginSection.style.display = "none";
       formSection.style.display = "block";
       perfilInfo.style.display = "block";
-      document.getElementById("zonaPeligroCuenta").style.display = "block";
+      document.getElementById("zonaPeligroCuenta").style.display = "none";
       perfilEnlaceInput.value = `${location.origin}${location.pathname}?u=${user.uid}`;
 
       const opcionGeneralLabel = document.getElementById("inputEsGaleriaGeneral").closest("label");
@@ -2692,6 +2732,7 @@
   let libroEnEdicionId = null;
 
   function cargarLibroParaEditar(libro) {
+    irAPestanaTaller("publicaciones");
     libroEnEdicionId = libro.id;
     document.getElementById("inputTitulo").value = libro.titulo || "";
     document.getElementById("inputResumen").value = libro.resumen || "";
@@ -2882,6 +2923,33 @@
     tallerToggleBtn.textContent = colapsado ? "▲" : "▼";
   });
 
+  // ---------- Taller: pestañas Galerías / Colecciones / Publicaciones ----------
+  const SECCIONES_TALLER = {
+    galerias: document.querySelector(".taller-seccion.taller-galerias"),
+    colecciones: document.querySelector(".taller-seccion.taller-colecciones"),
+    publicaciones: document.querySelector(".taller-seccion.taller-publicaciones")
+  };
+  document.querySelectorAll(".taller-pestana-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".taller-pestana-btn").forEach(b => b.classList.remove("activa"));
+      btn.classList.add("activa");
+      Object.entries(SECCIONES_TALLER).forEach(([clave, el]) => {
+        if (el) el.style.display = (clave === btn.dataset.seccion) ? "block" : "none";
+      });
+    });
+  });
+  // Estado inicial: solo Galerías visible
+  SECCIONES_TALLER.colecciones.style.display = "none";
+  SECCIONES_TALLER.publicaciones.style.display = "none";
+
+  // Si el usuario edita una colección o publicación desde otra pestaña
+  // (por ejemplo al tocar "Editar" en la lista), cambiamos automáticamente
+  // a la pestaña correspondiente para que vea el formulario.
+  function irAPestanaTaller(seccion) {
+    const btn = document.querySelector(`.taller-pestana-btn[data-seccion="${seccion}"]`);
+    if (btn) btn.click();
+  }
+
   const crearGaleriaBtn = document.getElementById("crearGaleriaBtn");
   const cancelarEdicionGaleriaBtn = document.getElementById("cancelarEdicionGaleriaBtn");
   let galeriaEnEdicionId = null;
@@ -2963,6 +3031,7 @@
   let coleccionEnEdicionId = null;
 
   function cargarColeccionParaEditar(col) {
+    irAPestanaTaller("colecciones");
     coleccionEnEdicionId = col.id;
     document.getElementById("inputNombreColeccion").value = col.nombre || "";
     document.getElementById("inputGaleriaAsignada").value = col.galeriaId || "";
@@ -4529,10 +4598,13 @@
   function seleccionarTipoPlantilla(tipo) {
     plantillaTipoActivo = tipo;
     plantillaTipoBotones.forEach(b => b.classList.toggle("activo", b.dataset.tipo === tipo));
-    plantillaNombreLabel.textContent = ETIQUETAS_POR_TIPO[tipo].nombre;
-    plantillaResumenLabel.textContent = ETIQUETAS_POR_TIPO[tipo].resumen;
+    plantillaNombreLabel.querySelector(".etiqueta-texto").textContent = ETIQUETAS_POR_TIPO[tipo].nombre;
+    plantillaResumenLabel.querySelector(".etiqueta-texto").textContent = ETIQUETAS_POR_TIPO[tipo].resumen;
     plantillaFondoGrupo.style.display = (tipo === "galeria" || tipo === "coleccion") ? "block" : "none";
     plantillaRecursosGrupo.style.display = (tipo === "publicacion") ? "block" : "none";
+
+    const COLOR_BORDE = { galeria: "var(--verde)", coleccion: "var(--accent)", publicacion: "var(--violeta)" };
+    document.getElementById("plantillaTarjeta").style.borderTopColor = COLOR_BORDE[tipo];
   }
   plantillaTipoBotones.forEach(b => b.addEventListener("click", () => seleccionarTipoPlantilla(b.dataset.tipo)));
 
@@ -4547,10 +4619,10 @@
       row.className = "recurso-row";
       row.innerHTML = `
         <select class="pr-tipo">
-          <option value="texto" ${r.tipo === "texto" ? "selected" : ""}>Texto (PDF)</option>
-          <option value="audio" ${r.tipo === "audio" ? "selected" : ""}>Audio</option>
-          <option value="video" ${r.tipo === "video" ? "selected" : ""}>Video</option>
-          <option value="imagenes" ${r.tipo === "imagenes" ? "selected" : ""}>Galería de imágenes</option>
+          <option value="texto" ${r.tipo === "texto" ? "selected" : ""}>📄 Texto (PDF)</option>
+          <option value="audio" ${r.tipo === "audio" ? "selected" : ""}>🎧 Audio</option>
+          <option value="video" ${r.tipo === "video" ? "selected" : ""}>🎬 Video</option>
+          <option value="imagenes" ${r.tipo === "imagenes" ? "selected" : ""}>🖼️ Galería de imágenes</option>
         </select>
         <div class="plantilla-campo-copiable">
           <input type="text" class="pr-etiqueta" placeholder="Etiqueta, ej: Introducción" value="${escapeAttr(r.etiqueta)}">
@@ -4686,6 +4758,7 @@
   });
 
   const ETIQUETA_TIPO_BADGE = { galeria: "Galería", coleccion: "Colección", publicacion: "Publicación" };
+  const COLOR_BORDE_TIPO = { galeria: "#39ff8c", coleccion: "#22d3c4", publicacion: "#9b7cf6" };
 
   function renderPlantillasGuardadas() {
     const plantillasLista = document.getElementById("plantillasLista");
@@ -4694,18 +4767,19 @@
     plantillasLista.innerHTML = "";
 
     if (entradas.length === 0) {
-      plantillasLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes plantillas. Créalas para preparar el contenido de una galería, colección o publicación antes de ir al Taller.</div>`;
+      plantillasLista.innerHTML = `<div style="padding:26px 16px;text-align:center;color:var(--text-sec);font-size:0.82rem;"><div style="font-size:2rem;margin-bottom:8px;opacity:0.5;">📋</div>Aún no tienes plantillas. Créalas para preparar el contenido de una galería, colección o publicación antes de ir al Taller.</div>`;
       return;
     }
 
     entradas.forEach(([id, plantilla]) => {
       const item = document.createElement("div");
       item.className = "nota-guardada-item";
+      item.style.borderLeft = `3px solid ${COLOR_BORDE_TIPO[plantilla.tipo] || "var(--border)"}`;
       const detalle = plantilla.tipo === "publicacion"
         ? `${(plantilla.recursos || []).length} recurso(s) · ${(plantilla.preguntas || []).length} pregunta(s)`
         : "Contenido de planificación";
       item.innerHTML = `
-        <div class="nota-guardada-titulo">[${ETIQUETA_TIPO_BADGE[plantilla.tipo] || plantilla.tipo}] ${escapeHtml(plantilla.nombre)}</div>
+        <div class="nota-guardada-titulo"><span style="color:${COLOR_BORDE_TIPO[plantilla.tipo] || "var(--text-sec)"};">[${ETIQUETA_TIPO_BADGE[plantilla.tipo] || plantilla.tipo}]</span> ${escapeHtml(plantilla.nombre)}</div>
         <div class="nota-guardada-preview">${detalle}</div>
         <div class="nota-guardada-controles">
           <button class="abrir-plantilla">Editar</button>
@@ -4765,6 +4839,8 @@
   });
 
   function importarPlantillaEnTaller(tipo, plantilla) {
+    const MAPA_PESTANA = { galeria: "galerias", coleccion: "colecciones", publicacion: "publicaciones" };
+    irAPestanaTaller(MAPA_PESTANA[tipo]);
     if (tipo === "galeria") {
       document.getElementById("inputNombreGaleria").value = plantilla.nombre || "";
       document.getElementById("inputImagenGaleria").value = plantilla.portada || "";
