@@ -1731,6 +1731,17 @@
       <circle cx="100" cy="100" r="10" fill="#e8e8ec"/>
     </g>
 
+    <!-- Ícono de Seguir perfiles: mini constelación de 3 puntos conectados,
+         en turquesa (misma familia de "lo que guardaste tú" que la cápsula
+         del Historial de Referencias, pero con forma propia). -->
+    <g id="icono-seguidos-svg">
+      <line x1="62" y1="130" x2="100" y2="72" stroke="#22d3c4" stroke-width="5" opacity="0.65"/>
+      <line x1="100" y1="72" x2="138" y2="122" stroke="#22d3c4" stroke-width="5" opacity="0.65"/>
+      <circle cx="62" cy="130" r="14" fill="#22d3c4" opacity="0.35" stroke="#22d3c4" stroke-width="5"/>
+      <circle cx="100" cy="72" r="16" fill="#22d3c4" opacity="0.35" stroke="#22d3c4" stroke-width="5"/>
+      <circle cx="138" cy="122" r="14" fill="#22d3c4" opacity="0.35" stroke="#22d3c4" stroke-width="5"/>
+    </g>
+
     <!-- Candado propio: anillo abierto + cuerpo, mismo lenguaje del logo -->
     <g id="icono-candado-svg">
       <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="#e8e8ec" stroke-width="9" stroke-linecap="round"/>
@@ -1789,6 +1800,13 @@
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Historial de Referencias</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Palabras de otros autores que guardaste</div>
+      </div>
+    </div>
+    <div class="herramienta-item" id="abrirSeguidosBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-seguidos-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Perfiles que sigues</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Tu lista personal, nadie más la ve</div>
       </div>
     </div>
     <div class="herramienta-item" style="opacity:0.45;cursor:default;">
@@ -1885,6 +1903,14 @@
     </div>
     <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Palabras e ideas de otros autores que guardaste mientras explorabas orbSY, en orden alfabético.</p>
     <div class="notas-guardadas-lista" id="historialLista"></div>
+  </div>
+
+  <div id="seguidosVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasDesdeSeguidosBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Tu lista personal. No aumenta el contador de nadie ni nadie ve que los seguís.</p>
+    <div class="notas-guardadas-lista" id="seguidosLista"></div>
   </div>
 </div>
 
@@ -2123,6 +2149,12 @@
 
         <button type="button" id="editarPerfilBtn" style="width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px;border-radius:9px;cursor:pointer;font-weight:600;margin-bottom:10px;">✏️ Editar perfil (nombre, foto, color, resumen)</button>
 
+        <div style="background:#0e0e13;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
+          <p style="font-size:0.78rem;font-weight:600;margin-bottom:2px;">Modo de cuenta: <span id="modoActualTexto" style="color:var(--accent);">Creador</span></p>
+          <p style="font-size:0.73rem;color:var(--text-sec);margin-bottom:10px;" id="modoActualDescripcion">Tenés acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.</p>
+          <button type="button" id="cambiarModoCuentaBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-size:0.78rem;cursor:pointer;">Cambiar a modo Espectador</button>
+        </div>
+
         <button id="logoutBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:9px;cursor:pointer;">Cerrar sesión</button>
 
         <div style="margin-top:26px;padding-top:16px;border-top:1px solid var(--border);">
@@ -2176,6 +2208,7 @@
   <div id="vistaGalerias" style="display:none;">
     <button id="backToPerfilesBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;margin-bottom:14px;">← Perfiles</button>
     <button id="abrirBiografiaBtn" style="display:none;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:14px;margin-left:8px;">📖 Biografía y Diccionario de Referencias</button>
+    <button id="seguirPerfilBtn" style="display:none;background:transparent;border:1px dashed #22d3c4;color:#22d3c4;padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:14px;margin-left:8px;">＋ Seguir</button>
     <div class="galerias-eyebrow">Tus galerías</div>
     <div id="loadingMsgGalerias" class="empty-msg">Cargando...</div>
     <div id="galeriasGrid" class="galerias-grid"></div>
@@ -2400,6 +2433,7 @@
   const usuariosCol = collection(db, "usuarios");
   const referenciasCol = collection(db, "referencias");
   const historialCol = collection(db, "historial");
+  const seguidosCol = collection(db, "seguidos");
   const solicitudesCol = collection(db, "solicitudesTransferencia");
 
   // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
@@ -2413,6 +2447,7 @@
   let galerias = [];      // [{id, nombre, imagenId, fecha}]
   let referencias = [];   // [{id, ownerId, termino, definicion, fecha}] — Diccionario de Referencias
   let historial = [];     // [{id, ownerId, termino, definicion, autorNombre, fecha}] — Historial de Referencias (guardados personales)
+  let seguidos = [];      // [{id, ownerId, perfilSeguidoId, perfilSeguidoNombre, fecha}] — Seguir perfiles (lista personal)
   let vista = uidPerfilObjetivo ? "galerias" : "perfiles"; // "perfiles" | "galerias" | "colecciones" | "coleccion"
   let galeriaActualId = null;
   let coleccionActualId = null;
@@ -2632,6 +2667,8 @@
 
       const opcionGeneralLabel = document.getElementById("inputEsGaleriaGeneral").closest("label");
       opcionGeneralLabel.style.display = (user.uid === UID_ADMIN_GENERAL) ? "flex" : "none";
+
+      if (typeof aplicarModoCuenta === "function") aplicarModoCuenta();
 
       try {
         const perfilDoc = await getDoc(doc(db, "usuarios", user.uid));
@@ -3085,6 +3122,67 @@
     if (btn) btn.click();
   }
 
+  // ---------- Modo de cuenta: Creador (por defecto) vs Espectador ----------
+  // Espectador: el Taller no existe (ni oculto — directamente no se ofrece
+  // como opción), y en orbSY notes la pestaña de Plantillas tampoco aparece,
+  // ya que las plantillas solo sirven para preparar contenido del Taller.
+  // Notas, Historial de Referencias y Seguir perfiles siguen disponibles
+  // para cualquiera, porque le sirven tanto a quien crea como a quien solo
+  // lee y guarda.
+  function aplicarModoCuenta() {
+    if (!uidActual) return;
+    const miPerfil = usuarios.find(u => u.id === uidActual);
+    const modo = (miPerfil && miPerfil.tipoCuenta === "espectador") ? "espectador" : "creador";
+
+    const tallerPestanas = document.getElementById("tallerPestanas");
+    const tabPlantillasBtn = document.getElementById("tabPlantillasBtn");
+    const modoActualTexto = document.getElementById("modoActualTexto");
+    const modoActualDescripcion = document.getElementById("modoActualDescripcion");
+    const cambiarModoCuentaBtn = document.getElementById("cambiarModoCuentaBtn");
+
+    if (modo === "espectador") {
+      tallerPestanas.style.display = "none";
+      document.querySelectorAll(".taller-pestana-btn").forEach(b => b.classList.remove("activa"));
+      Object.entries(SECCIONES_TALLER).forEach(([clave, el]) => {
+        if (el) el.style.display = (clave === "configuracion") ? "block" : "none";
+      });
+      if (tabPlantillasBtn) tabPlantillasBtn.style.display = "none";
+
+      modoActualTexto.textContent = "Espectador";
+      modoActualTexto.style.color = "#22d3c4";
+      modoActualDescripcion.textContent = "Podés leer, guardar referencias y seguir perfiles. El Taller no está disponible en este modo.";
+      cambiarModoCuentaBtn.textContent = "Cambiar a modo Creador";
+    } else {
+      tallerPestanas.style.display = "flex";
+      if (tabPlantillasBtn) tabPlantillasBtn.style.display = "";
+      // Si no hay ninguna pestaña marcada como activa (viniendo de espectador), volvemos a Galerías
+      if (!document.querySelector(".taller-pestana-btn.activa")) {
+        irAPestanaTaller("galerias");
+      }
+      modoActualTexto.textContent = "Creador";
+      modoActualTexto.style.color = "var(--accent)";
+      modoActualDescripcion.textContent = "Tenés acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.";
+      cambiarModoCuentaBtn.textContent = "Cambiar a modo Espectador";
+    }
+  }
+
+  document.getElementById("cambiarModoCuentaBtn").addEventListener("click", async () => {
+    if (!uidActual) return;
+    const miPerfil = usuarios.find(u => u.id === uidActual);
+    const modoActual = (miPerfil && miPerfil.tipoCuenta === "espectador") ? "espectador" : "creador";
+    const nuevoModo = modoActual === "espectador" ? "creador" : "espectador";
+
+    if (nuevoModo === "espectador") {
+      const confirmar = confirm("Al cambiar a modo Espectador, el Taller deja de estar disponible para esta cuenta (podés volver a modo Creador cuando quieras, desde aquí mismo). ¿Continuar?");
+      if (!confirmar) return;
+    }
+    try {
+      await setDoc(doc(db, "usuarios", uidActual), { tipoCuenta: nuevoModo }, { merge: true });
+    } catch (e) {
+      alert("No se pudo cambiar el modo de cuenta: " + e.message);
+    }
+  });
+
   const crearGaleriaBtn = document.getElementById("crearGaleriaBtn");
   const cancelarEdicionGaleriaBtn = document.getElementById("cancelarEdicionGaleriaBtn");
   let galeriaEnEdicionId = null;
@@ -3380,6 +3478,15 @@
     console.error("Error al leer el Historial de Referencias:", error);
   });
 
+  // Seguir perfiles: lista personal (no aumenta contador público de nadie)
+  onSnapshot(seguidosCol, (snapshot) => {
+    seguidos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderSeguidosGuardados === "function") renderSeguidosGuardados();
+    if (typeof actualizarBotonSeguir === "function") actualizarBotonSeguir();
+  }, (error) => {
+    console.error("Error al leer los perfiles seguidos:", error);
+  });
+
   // ---------- Perfiles (galaxias): selector tipo Netflix ----------
   let usuarios = [];
   const errorMsgPerfiles = document.getElementById("errorMsgPerfiles");
@@ -3388,6 +3495,7 @@
     errorMsgPerfiles.style.display = "none";
     renderPerfiles();
     renderSolicitudes();
+    if (typeof aplicarModoCuenta === "function") aplicarModoCuenta();
   }, (error) => {
     loadingMsgPerfiles.style.display = "none";
     perfilesGrid.innerHTML = "";
@@ -3637,6 +3745,11 @@
 
     const btnBiografia = document.getElementById("abrirBiografiaBtn");
     btnBiografia.style.display = (uidPerfilObjetivo && uidPerfilObjetivo !== ID_PERFIL_GENERAL) ? "inline-block" : "none";
+
+    const btnSeguir = document.getElementById("seguirPerfilBtn");
+    const puedeSeguir = uidPerfilObjetivo && uidPerfilObjetivo !== ID_PERFIL_GENERAL && uidActual && uidPerfilObjetivo !== uidActual;
+    btnSeguir.style.display = puedeSeguir ? "inline-block" : "none";
+    if (puedeSeguir) actualizarBotonSeguir();
 
     const coleccionesGeneral = coleccionesDeGaleria(ID_GALERIA_GENERAL);
     const librosGeneral = librosDeColeccion(ID_GENERAL);
@@ -4575,6 +4688,91 @@
       alert("No se pudo guardar: " + e.message);
     }
   }
+
+  // ---------- Seguir perfiles: lista personal, sin contador público ----------
+  function actualizarBotonSeguir() {
+    const btnSeguir = document.getElementById("seguirPerfilBtn");
+    if (!btnSeguir || btnSeguir.style.display === "none") return;
+    if (!uidActual || !uidPerfilObjetivo) return;
+    const yaSigue = seguidos.some(s => s.ownerId === uidActual && s.perfilSeguidoId === uidPerfilObjetivo);
+    btnSeguir.textContent = yaSigue ? "✓ Siguiendo" : "＋ Seguir";
+    btnSeguir.classList.toggle("guardado", yaSigue);
+  }
+
+  document.getElementById("seguirPerfilBtn").addEventListener("click", async () => {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para seguir perfiles.");
+      return;
+    }
+    const existente = seguidos.find(s => s.ownerId === uidActual && s.perfilSeguidoId === uidPerfilObjetivo);
+    try {
+      if (existente) {
+        await deleteDoc(doc(db, "seguidos", existente.id));
+      } else {
+        const perfil = usuarios.find(u => u.id === uidPerfilObjetivo);
+        await addDoc(seguidosCol, {
+          ownerId: uidActual,
+          perfilSeguidoId: uidPerfilObjetivo,
+          perfilSeguidoNombre: perfil ? (perfil.nombre || "Usuario") : "Usuario",
+          fecha: serverTimestamp()
+        });
+      }
+    } catch (e) {
+      alert("No se pudo actualizar: " + e.message);
+    }
+  });
+
+  function renderSeguidosGuardados() {
+    const seguidosLista = document.getElementById("seguidosLista");
+    if (!seguidosLista) return;
+    if (!uidActual) {
+      seguidosLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Necesitas iniciar sesión (Admin) para ver tu lista.</div>`;
+      return;
+    }
+    const mios = seguidos
+      .filter(s => s.ownerId === uidActual)
+      .sort((a, b) => (a.perfilSeguidoNombre || "").localeCompare(b.perfilSeguidoNombre || "", "es", { sensitivity: "base" }));
+
+    if (mios.length === 0) {
+      seguidosLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Todavía no seguís a nadie. Cuando visites el perfil de alguien, tocá "＋ Seguir" para agregarlo aquí.</div>`;
+      return;
+    }
+    seguidosLista.innerHTML = "";
+    mios.forEach(s => {
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">${escapeHtml(s.perfilSeguidoNombre || "Usuario")}</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-plantilla">Visitar</button>
+          <button class="eliminar">Dejar de seguir</button>
+        </div>
+      `;
+      item.querySelector(".abrir-plantilla").addEventListener("click", () => {
+        document.getElementById("cerrarHerramientasBtn").click();
+        seleccionarPerfil(s.perfilSeguidoId);
+      });
+      item.querySelector(".eliminar").addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "seguidos", s.id));
+        } catch (e) {
+          alert("No se pudo quitar: " + e.message);
+        }
+      });
+      seguidosLista.appendChild(item);
+    });
+  }
+
+  const seguidosVista = document.getElementById("seguidosVista");
+  document.getElementById("abrirSeguidosBtn").addEventListener("click", () => {
+    herramientasMenu.style.display = "none";
+    seguidosVista.style.display = "flex";
+    renderSeguidosGuardados();
+  });
+  document.getElementById("volverAHerramientasDesdeSeguidosBtn").addEventListener("click", () => {
+    seguidosVista.style.display = "none";
+    herramientasMenu.style.display = "block";
+  });
 
   function renderNotasGuardadas() {
     const todas = leerTodasLasNotas();
