@@ -548,7 +548,7 @@
     opacity:0.85;
   }
   .taller-seccion-header h2{
-    color:#fff;
+    color:var(--text);
     font-size:1.05rem;
     font-weight:700;
     margin:2px 0 0;
@@ -594,6 +594,16 @@
     z-index:0;
     pointer-events:none;
     overflow:hidden;
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 10%, rgba(57,255,140,0.05), transparent 60%),
+      radial-gradient(ellipse 55% 45% at 88% 22%, rgba(34,211,196,0.05), transparent 60%),
+      radial-gradient(ellipse 60% 45% at 25% 92%, rgba(155,124,246,0.05), transparent 60%);
+  }
+  html[data-tema="claro"] #universoFondo{
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 10%, rgba(57,255,140,0.12), transparent 60%),
+      radial-gradient(ellipse 55% 45% at 88% 22%, rgba(34,211,196,0.12), transparent 60%),
+      radial-gradient(ellipse 60% 45% at 25% 92%, rgba(155,124,246,0.12), transparent 60%);
   }
   .capa-estrellas{
     position:absolute;
@@ -609,9 +619,16 @@
     opacity:0.55;
     box-shadow:0 0 6px currentColor;
   }
+  html[data-tema="claro"] .estrella-punto{
+    opacity:0.8;
+    box-shadow:0 0 5px rgba(0,0,0,0.12);
+  }
   .constelacion{
     position:absolute;
     opacity:0.3;
+  }
+  html[data-tema="claro"] .constelacion{
+    opacity:0.55;
   }
   #coleccionesWrap, #galeriasGrid, .orbsy-marca, .galerias-eyebrow, #buscadorInput{
     position:relative;
@@ -2025,7 +2042,10 @@
           Taller
 
         </h2>
-        <button id="tallerToggleBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);width:34px;height:34px;border-radius:8px;font-size:0.9rem;cursor:pointer;">▲</button>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button type="button" class="taller-pestana-btn" data-seccion="configuracion" id="botonConfiguracionTaller" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);width:34px;height:34px;border-radius:8px;font-size:1rem;cursor:pointer;">⚙</button>
+          <button id="tallerToggleBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);width:34px;height:34px;border-radius:8px;font-size:0.9rem;cursor:pointer;">▲</button>
+        </div>
       </div>
 
       <div id="tallerContenido">
@@ -2034,7 +2054,6 @@
         <button type="button" class="taller-pestana-btn activa" data-seccion="galerias">Galerías</button>
         <button type="button" class="taller-pestana-btn" data-seccion="colecciones">Colecciones</button>
         <button type="button" class="taller-pestana-btn" data-seccion="publicaciones">Publicaciones</button>
-        <button type="button" class="taller-pestana-btn" data-seccion="configuracion">⚙ Configuración</button>
       </div>
 
       <div class="taller-seccion taller-galerias">
@@ -3146,12 +3165,19 @@
     configuracion: document.querySelector(".taller-seccion.taller-configuracion")
   };
   document.querySelectorAll(".taller-pestana-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation(); // no debe burbujear al header y colapsar el Taller
       document.querySelectorAll(".taller-pestana-btn").forEach(b => b.classList.remove("activa"));
       btn.classList.add("activa");
       Object.entries(SECCIONES_TALLER).forEach(([clave, el]) => {
         if (el) el.style.display = (clave === btn.dataset.seccion) ? "block" : "none";
       });
+      // El botón de Configuración vive fuera del contenido colapsable, así
+      // que si el Taller estaba minimizado, lo expandimos para que se vea.
+      if (btn.dataset.seccion === "configuracion" && tallerContenido.style.display === "none") {
+        tallerContenido.style.display = "block";
+        tallerToggleBtn.textContent = "▲";
+      }
     });
   });
   // Estado inicial: solo Galerías visible
