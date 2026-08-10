@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>
+  // Aplicamos el tema guardado ANTES de pintar nada, para que no haya parpadeo
+  // (un instante en oscuro que salte a claro apenas carga la página).
+  try {
+    const temaGuardado = localStorage.getItem("orbsy_tema");
+    if (temaGuardado === "claro") document.documentElement.setAttribute("data-tema", "claro");
+  } catch (e) { /* si localStorage no está disponible, se queda en oscuro */ }
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Orbsy</title>
@@ -11,7 +19,8 @@
   :root{
     --bg:#0e0e12;
     --card:#1a1a20;
-    --text:#e8e8ec;
+    --superficie:var(--superficie);
+    --text:var(--text-sec);
     --text-sec:#8b8b96;
     --accent:#22d3c4;
     --turquesa:#22d3c4;
@@ -19,6 +28,15 @@
     --verde:#39ff8c;
     --violeta:#9b7cf6;
     --border:#2a2a32;
+  }
+  html[data-tema="claro"]{
+    --bg:#f4f4f7;
+    --card:#ffffff;
+    --superficie:#f0f0f4;
+    --text:#17171d;
+    --text-sec:#5c5c68;
+    --border:#dcdce2;
+    /* --accent, --verde, --violeta se mantienen: son la identidad de orbSY en ambos temas */
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{
@@ -238,7 +256,7 @@
     width:46px;
     flex-shrink:0;
     border-left:1px solid var(--border);
-    background:#0b0b0e;
+    background:var(--superficie);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -368,6 +386,17 @@
     color:var(--accent);
   }
 
+  .tema-btn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+  }
+  .tema-btn.activo{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+
   .capa-taller-overlay{
     position:fixed;
     inset:0;
@@ -418,7 +447,7 @@
   }
   .capa-taller-contenido{
     width:100%;
-    background:#0e0e13;
+    background:var(--superficie);
     border:1px dashed var(--border);
     border-radius:10px;
     padding:22px 14px;
@@ -928,7 +957,7 @@
     padding:10px 12px;
     border-radius:8px;
     border:1px solid var(--border);
-    background:#0e0e13;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.85rem;
   }
@@ -937,7 +966,7 @@
     padding:10px 12px;
     border-radius:8px;
     border:1px solid var(--border);
-    background:#0e0e13;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.85rem;
     resize:vertical;
@@ -991,7 +1020,7 @@
     padding:7px 8px;
     border-radius:7px;
     border:1px solid var(--border);
-    background:#0e0e13;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.78rem;
   }
@@ -1138,7 +1167,7 @@
     padding:10px 12px;
     border-radius:8px;
     border:1px solid var(--border);
-    background:#0e0e13;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.85rem;
   }
@@ -1157,7 +1186,7 @@
 
   /* CONSTRUCTOR DE RECURSOS (admin) */
   .recurso-row{
-    background:#0e0e13;
+    background:var(--superficie);
     border:1px solid var(--border);
     border-radius:10px;
     padding:12px;
@@ -1171,7 +1200,7 @@
     padding:9px 10px;
     border-radius:7px;
     border:1px solid var(--border);
-    background:#15151d;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.82rem;
   }
@@ -1180,7 +1209,7 @@
     padding:9px 10px;
     border-radius:7px;
     border:1px solid var(--border);
-    background:#15151d;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.82rem;
     font-family:inherit;
@@ -1213,7 +1242,7 @@
     font-size:0.82rem;
     cursor:pointer;
   }
-  #agregarRecursoBtn:active{ background:#0e0e13; }
+  #agregarRecursoBtn:active{ background:var(--superficie); }
 
   /* MODAL: ÍNDICE TEMÁTICO */
   #indiceModal{
@@ -1303,7 +1332,7 @@
   /* BARRA DE NAVEGACIÓN DENTRO DEL LECTOR (Anterior / Siguiente) */
   #navBar{
     display:none;
-    background:#0e0e13;
+    background:var(--superficie);
     border-bottom:1px solid var(--border);
     padding:10px 14px;
     gap:8px;
@@ -1510,7 +1539,7 @@
     width:100%;
     height:110px;
     flex-shrink:0;
-    background:#0b0b0e;
+    background:var(--superficie);
   }
 
   /* MODAL LECTOR PDF */
@@ -1568,45 +1597,45 @@
 <body>
 <div id="universoFondo" aria-hidden="true">
   <div class="capa-estrellas">
-      <span class="estrella-punto" style="top:62.7%; left:4.4%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
-      <span class="estrella-punto" style="top:15.3%; left:11.7%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:62.7%; left:4.4%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:15.3%; left:11.7%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
       <span class="estrella-punto" style="top:10.3%; left:42.1%; background:#39ff8c; width:2px; height:2px;"></span>
       <span class="estrella-punto" style="top:50.0%; left:4.5%; background:#9b7cf6; width:3px; height:3px;"></span>
-      <span class="estrella-punto" style="top:53.8%; left:22.9%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
-      <span class="estrella-punto" style="top:74.1%; left:17.2%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:16.8%; left:92.9%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
-      <span class="estrella-punto" style="top:38.1%; left:36.1%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:78.7%; left:71.3%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:9.5%; left:29.9%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:53.8%; left:22.9%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:74.1%; left:17.2%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:16.8%; left:92.9%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:38.1%; left:36.1%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:78.7%; left:71.3%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:9.5%; left:29.9%; background:var(--text-sec); width:2px; height:2px;"></span>
       <span class="estrella-punto" style="top:56.8%; left:68.9%; background:#39ff8c; width:2.5px; height:2.5px;"></span>
-      <span class="estrella-punto" style="top:95.6%; left:83.3%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:28.4%; left:62.4%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:35.8%; left:65.7%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
-      <span class="estrella-punto" style="top:59.9%; left:18.3%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
-      <span class="estrella-punto" style="top:45.9%; left:27.6%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
-      <span class="estrella-punto" style="top:22.9%; left:32.8%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
-      <span class="estrella-punto" style="top:23.8%; left:5.0%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:8.3%; left:88.7%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:22.2%; left:49.4%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:15.6%; left:15.3%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
-      <span class="estrella-punto" style="top:27.0%; left:57.5%; background:#e8e8ec; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:95.6%; left:83.3%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:28.4%; left:62.4%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:35.8%; left:65.7%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:59.9%; left:18.3%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:45.9%; left:27.6%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:22.9%; left:32.8%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:23.8%; left:5.0%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:8.3%; left:88.7%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:22.2%; left:49.4%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:15.6%; left:15.3%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:27.0%; left:57.5%; background:var(--text-sec); width:2px; height:2px;"></span>
       <span class="estrella-punto" style="top:36.4%; left:96.7%; background:#22d3c4; width:2px; height:2px;"></span>
       <span class="estrella-punto" style="top:73.8%; left:83.8%; background:#39ff8c; width:3px; height:3px;"></span>
-      <span class="estrella-punto" style="top:42.1%; left:8.0%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:52.3%; left:94.3%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
-      <span class="estrella-punto" style="top:66.6%; left:12.9%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:75.0%; left:34.3%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
-      <span class="estrella-punto" style="top:45.1%; left:92.6%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:94.3%; left:74.4%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
-      <span class="estrella-punto" style="top:84.7%; left:30.4%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:42.1%; left:8.0%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:52.3%; left:94.3%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:66.6%; left:12.9%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:75.0%; left:34.3%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:45.1%; left:92.6%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:94.3%; left:74.4%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:84.7%; left:30.4%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
       <span class="estrella-punto" style="top:20.9%; left:37.5%; background:#9b7cf6; width:2px; height:2px;"></span>
       <span class="estrella-punto" style="top:58.9%; left:48.4%; background:#22d3c4; width:2.5px; height:2.5px;"></span>
-      <span class="estrella-punto" style="top:24.7%; left:24.9%; background:#e8e8ec; width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:24.7%; left:24.9%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
       <span class="estrella-punto" style="top:10.1%; left:48.2%; background:#9b7cf6; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:14.2%; left:47.2%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:52.1%; left:59.6%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
-      <span class="estrella-punto" style="top:73.8%; left:67.5%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:96.5%; left:63.7%; background:#e8e8ec; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:14.2%; left:47.2%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:52.1%; left:59.6%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:73.8%; left:67.5%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:96.5%; left:63.7%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
       <span class="estrella-punto" style="top:44.9%; left:25.6%; background:#39ff8c; width:3px; height:3px;"></span>
 
       <svg class="constelacion" style="top:6%; left:8%;" viewBox="0 0 120 90" width="85" height="65">
@@ -1619,11 +1648,11 @@
         <circle cx="105" cy="10" r="2.2" fill="#22d3c4"/>
       </svg>
       <svg class="constelacion" style="top:18%; right:6%;" viewBox="0 0 120 90" width="75" height="55">
-        <line x1="8" y1="15" x2="40" y2="45" stroke="#e8e8ec" stroke-width="1"/>
-        <line x1="40" y1="45" x2="80" y2="30" stroke="#e8e8ec" stroke-width="1"/>
-        <circle cx="8" cy="15" r="2" fill="#e8e8ec"/>
-        <circle cx="40" cy="45" r="2" fill="#e8e8ec"/>
-        <circle cx="80" cy="30" r="2" fill="#e8e8ec"/>
+        <line x1="8" y1="15" x2="40" y2="45" stroke="var(--text-sec)" stroke-width="1"/>
+        <line x1="40" y1="45" x2="80" y2="30" stroke="var(--text-sec)" stroke-width="1"/>
+        <circle cx="8" cy="15" r="2" fill="var(--text-sec)"/>
+        <circle cx="40" cy="45" r="2" fill="var(--text-sec)"/>
+        <circle cx="80" cy="30" r="2" fill="var(--text-sec)"/>
       </svg>
       <svg class="constelacion" style="top:44%; left:4%;" viewBox="0 0 120 90" width="80" height="60">
         <line x1="12" y1="10" x2="38" y2="40" stroke="#9b7cf6" stroke-width="1"/>
@@ -1644,11 +1673,11 @@
         <circle cx="100" cy="55" r="2.2" fill="#39ff8c"/>
       </svg>
       <svg class="constelacion" style="bottom:5%; left:14%;" viewBox="0 0 120 90" width="80" height="60">
-        <line x1="8" y1="20" x2="35" y2="50" stroke="#e8e8ec" stroke-width="1"/>
-        <line x1="35" y1="50" x2="75" y2="35" stroke="#e8e8ec" stroke-width="1"/>
-        <circle cx="8" cy="20" r="2" fill="#e8e8ec"/>
-        <circle cx="35" cy="50" r="2" fill="#e8e8ec"/>
-        <circle cx="75" cy="35" r="2" fill="#e8e8ec"/>
+        <line x1="8" y1="20" x2="35" y2="50" stroke="var(--text-sec)" stroke-width="1"/>
+        <line x1="35" y1="50" x2="75" y2="35" stroke="var(--text-sec)" stroke-width="1"/>
+        <circle cx="8" cy="20" r="2" fill="var(--text-sec)"/>
+        <circle cx="35" cy="50" r="2" fill="var(--text-sec)"/>
+        <circle cx="75" cy="35" r="2" fill="var(--text-sec)"/>
       </svg>
   </div>
 </div>
@@ -1667,7 +1696,8 @@
     <svg viewBox="0 0 200 200" style="width:56px;height:56px;margin-bottom:10px;"><use href="#icono-noticias-svg"/></svg>
     <div class="capa-taller-titulo">Noticias en orbSY</div>
     <p class="capa-taller-subtitulo">Datos y novedades productivas — psicología, ciencia, arte, literatura.</p>
-    <div class="capa-taller-contenido">Próximamente habrá noticias aquí.</div>
+    <div class="capa-taller-contenido" id="capaNoticiasContenido">Próximamente habrá noticias aquí.</div>
+    <button type="button" id="leerNoticiaDestacadaBtn" style="display:none;width:100%;margin-top:14px;background:var(--verde);border:none;color:#000;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;">Leer completa</button>
   </div>
 </div>
 
@@ -1724,11 +1754,11 @@
          colores de marca, para marcarlo como contenido externo/pagado). -->
     <g id="icono-publicidad-svg">
       <linearGradient id="publicidadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#e8e8ec" stop-opacity="0.2"/>
-        <stop offset="100%" stop-color="#e8e8ec" stop-opacity="0.6"/>
+        <stop offset="0%" stop-color="var(--text-sec)" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="var(--text-sec)" stop-opacity="0.6"/>
       </linearGradient>
-      <polygon points="100,50 114,86 150,100 114,114 100,150 86,114 50,100 86,86" fill="url(#publicidadGrad)" stroke="#e8e8ec" stroke-width="6"/>
-      <circle cx="100" cy="100" r="10" fill="#e8e8ec"/>
+      <polygon points="100,50 114,86 150,100 114,114 100,150 86,114 50,100 86,86" fill="url(#publicidadGrad)" stroke="var(--text-sec)" stroke-width="6"/>
+      <circle cx="100" cy="100" r="10" fill="var(--text-sec)"/>
     </g>
 
     <!-- Ícono de Seguir perfiles: mini constelación de 3 puntos conectados,
@@ -1744,8 +1774,8 @@
 
     <!-- Candado propio: anillo abierto + cuerpo, mismo lenguaje del logo -->
     <g id="icono-candado-svg">
-      <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="#e8e8ec" stroke-width="9" stroke-linecap="round"/>
-      <rect x="62" y="92" width="76" height="60" rx="10" fill="#e8e8ec"/>
+      <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="var(--text-sec)" stroke-width="9" stroke-linecap="round"/>
+      <rect x="62" y="92" width="76" height="60" rx="10" fill="var(--text-sec)"/>
       <circle cx="100" cy="118" r="7" fill="#0e0e12"/>
       <rect x="94" y="120" width="12" height="16" rx="4" fill="#0e0e12"/>
     </g>
@@ -1976,7 +2006,7 @@
     <div id="perfilInfo" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;">
       <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:6px;">Tu enlace de perfil (compártelo para que otros vean solo tus galerías):</p>
       <div style="display:flex;gap:8px;">
-        <input type="text" id="perfilEnlaceInput" readonly style="flex:1;padding:8px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text-sec);font-size:0.72rem;">
+        <input type="text" id="perfilEnlaceInput" readonly style="flex:1;padding:8px 10px;border-radius:7px;border:1px solid var(--border);background:var(--superficie);color:var(--text-sec);font-size:0.72rem;">
         <button id="copiarEnlacePerfilBtn" style="background:var(--accent);border:none;color:#fff;padding:0 12px;border-radius:7px;font-size:0.75rem;cursor:pointer;">Copiar</button>
       </div>
     </div>
@@ -2029,6 +2059,11 @@
       <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:10px;">
         <input type="checkbox" id="inputEsGaleriaGeneral" style="width:auto;">
         Esta es la galería <strong>orbSY General</strong> (sin dueño, se muestra como la esfera principal arriba de todos los perfiles)
+      </label>
+
+      <label id="opcionNoticiasLabel" style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:6px;">
+        <input type="checkbox" id="inputEsGaleriaNoticias" style="width:auto;">
+        Esta es la galería de <strong>Noticias en orbSY</strong> (de aquí eliges qué se destaca en el Taller)
       </label>
 
       <div style="display:flex;gap:8px;">
@@ -2149,7 +2184,15 @@
 
         <button type="button" id="editarPerfilBtn" style="width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px;border-radius:9px;cursor:pointer;font-weight:600;margin-bottom:10px;">✏️ Editar perfil (nombre, foto, color, resumen)</button>
 
-        <div style="background:#0e0e13;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
+        <div style="background:var(--superficie);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
+          <p style="font-size:0.78rem;font-weight:600;margin-bottom:8px;">Tema de orbSY</p>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="tema-btn" data-tema="oscuro" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;">🌑 Oscuro</button>
+            <button type="button" class="tema-btn" data-tema="claro" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;">☀️ Claro</button>
+          </div>
+        </div>
+
+        <div style="background:var(--superficie);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
           <p style="font-size:0.78rem;font-weight:600;margin-bottom:2px;">Modo de cuenta: <span id="modoActualTexto" style="color:var(--accent);">Creador</span></p>
           <p style="font-size:0.73rem;color:var(--text-sec);margin-bottom:10px;" id="modoActualDescripcion">Tenés acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.</p>
           <button type="button" id="cambiarModoCuentaBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-size:0.78rem;cursor:pointer;">Cambiar a modo Espectador</button>
@@ -2247,7 +2290,7 @@
 <div id="claveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:340px;width:100%;padding:22px;">
     <h3 id="claveModalTitulo" style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:14px;">Colección protegida</h3>
-    <input type="password" id="claveModalInput" placeholder="Contraseña" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.88rem;">
+    <input type="password" id="claveModalInput" placeholder="Contraseña" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.88rem;">
     <p id="claveModalError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:8px;">Contraseña incorrecta</p>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button id="claveModalCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
@@ -2261,7 +2304,7 @@
   <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:340px;width:100%;padding:22px;">
     <h3 id="transferModalTitulo" style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:6px;">Transferir</h3>
     <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:14px;">Elige a quién quieres enviárselo. Pasará a ser suyo solo si acepta la solicitud.</p>
-    <select id="transferDestinoSelect" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.85rem;"></select>
+    <select id="transferDestinoSelect" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.85rem;"></select>
     <p id="transferModalError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:8px;"></p>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button id="transferModalCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
@@ -2667,6 +2710,7 @@
 
       const opcionGeneralLabel = document.getElementById("inputEsGaleriaGeneral").closest("label");
       opcionGeneralLabel.style.display = (user.uid === UID_ADMIN_GENERAL) ? "flex" : "none";
+      document.getElementById("opcionNoticiasLabel").style.display = (user.uid === UID_ADMIN_GENERAL) ? "flex" : "none";
 
       if (typeof aplicarModoCuenta === "function") aplicarModoCuenta();
 
@@ -3122,7 +3166,43 @@
     if (btn) btn.click();
   }
 
-  // ---------- Modo de cuenta: Creador (por defecto) vs Espectador ----------
+  // ---------- Tema: claro / oscuro ----------
+  const FRAMES_INTRO_OSCURO = ["intro-1.png", "intro-2.png", "intro-3.png", "intro-4.png", "intro-5.png"];
+  const FRAMES_INTRO_CLARO = ["intro-1-claro.png", "intro-2-claro.png", "intro-3-claro.png", "intro-4-claro.png", "intro-5-claro.png"];
+
+  function temaActual() {
+    return document.documentElement.getAttribute("data-tema") === "claro" ? "claro" : "oscuro";
+  }
+
+  function actualizarImagenesSegunTema() {
+    const claro = temaActual() === "claro";
+    document.getElementById("insigniaOrbsy").src = claro ? "orbsy-insignia-claro.png" : "orbsy-insignia.png";
+    FRAMES_INTRO.length = 0;
+    FRAMES_INTRO.push(...(claro ? FRAMES_INTRO_CLARO : FRAMES_INTRO_OSCURO));
+  }
+
+  function marcarBotonesDeTema() {
+    document.querySelectorAll(".tema-btn").forEach(b => {
+      b.classList.toggle("activo", b.dataset.tema === temaActual());
+    });
+  }
+
+  function aplicarTema(tema) {
+    if (tema === "claro") {
+      document.documentElement.setAttribute("data-tema", "claro");
+    } else {
+      document.documentElement.removeAttribute("data-tema");
+    }
+    try { localStorage.setItem("orbsy_tema", tema); } catch (e) { /* nada que hacer si no hay localStorage */ }
+    actualizarImagenesSegunTema();
+    marcarBotonesDeTema();
+  }
+
+  document.querySelectorAll(".tema-btn").forEach(btn => {
+    btn.addEventListener("click", () => aplicarTema(btn.dataset.tema));
+  });
+
+
   // Espectador: el Taller no existe (ni oculto — directamente no se ofrece
   // como opción), y en orbSY notes la pestaña de Plantillas tampoco aparece,
   // ya que las plantillas solo sirven para preparar contenido del Taller.
@@ -3193,6 +3273,7 @@
     document.getElementById("inputImagenGaleria").value = gal.imagenId ? `https://drive.google.com/file/d/${gal.imagenId}/view` : "";
     document.getElementById("inputFondoGaleria").value = gal.fondoId ? `https://drive.google.com/file/d/${gal.fondoId}/view` : "";
     document.getElementById("inputEsGaleriaGeneral").checked = !gal.ownerId;
+    document.getElementById("inputEsGaleriaNoticias").checked = !!gal.esNoticias;
     crearGaleriaBtn.textContent = "Guardar cambios";
     cancelarEdicionGaleriaBtn.style.display = "block";
     tallerContenido.style.display = "block";
@@ -3206,6 +3287,7 @@
     document.getElementById("inputImagenGaleria").value = "";
     document.getElementById("inputFondoGaleria").value = "";
     document.getElementById("inputEsGaleriaGeneral").checked = false;
+    document.getElementById("inputEsGaleriaNoticias").checked = false;
     crearGaleriaBtn.textContent = "Crear galería";
     cancelarEdicionGaleriaBtn.style.display = "none";
   }
@@ -3224,6 +3306,7 @@
     const imagenId = extraerIdDrive(imagenUrl);
     const fondoId = fondoUrl ? extraerIdDrive(fondoUrl) : "";
     const esGeneral = document.getElementById("inputEsGaleriaGeneral").checked;
+    const esNoticias = document.getElementById("inputEsGaleriaNoticias").checked;
     const ownerIdAsignado = esGeneral ? null : uidActual;
 
     crearGaleriaBtn.disabled = true;
@@ -3231,7 +3314,7 @@
 
     try {
       if (galeriaEnEdicionId) {
-        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId, ownerId: ownerIdAsignado });
+        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId, ownerId: ownerIdAsignado, esNoticias });
         cancelarEdicionGaleria();
       } else {
         await addDoc(galeriasCol, {
@@ -3239,12 +3322,14 @@
           imagenId,
           fondoId,
           ownerId: ownerIdAsignado,
+          esNoticias,
           fecha: serverTimestamp()
         });
         document.getElementById("inputNombreGaleria").value = "";
         document.getElementById("inputImagenGaleria").value = "";
         document.getElementById("inputFondoGaleria").value = "";
         document.getElementById("inputEsGaleriaGeneral").checked = false;
+        document.getElementById("inputEsGaleriaNoticias").checked = false;
       }
     } catch (e) {
       alert("Error al guardar la galería: " + e.message);
@@ -4216,6 +4301,14 @@
     return item.ownerId === uidActual;
   }
 
+  // Una publicación es "de Noticias" si su colección pertenece a una galería marcada esNoticias
+  function esLibroDeNoticias(libro) {
+    const col = colecciones.find(c => c.id === libro.coleccionId);
+    if (!col) return false;
+    const gal = galerias.find(g => g.id === col.galeriaId);
+    return !!(gal && gal.esNoticias);
+  }
+
   function renderAdminListaLibros() {
     adminListContainer.innerHTML = "";
     libros.filter(esMio).forEach(libro => {
@@ -4230,10 +4323,15 @@
         opciones[0] = `<option value="" selected>General (sin colección)</option>`;
       }
 
+      const miPerfilAdmin = usuarios.find(u => u.id === UID_ADMIN_GENERAL);
+      const yaEsDestacada = miPerfilAdmin && miPerfilAdmin.noticiaDestacadaId === libro.id;
+      const mostrarBotonDestacar = uidActual === UID_ADMIN_GENERAL && esLibroDeNoticias(libro);
+
       row.innerHTML = `
         <div class="admin-row-titulo">${escapeHtml(libro.titulo)}</div>
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
+          ${mostrarBotonDestacar ? `<button class="destacar-noticia-btn" style="${yaEsDestacada ? "background:var(--verde);color:#000;" : ""}">${yaEsDestacada ? "★ Destacada hoy" : "☆ Destacar en Noticias"}</button>` : ""}
           <button class="editar-btn">Editar</button>
           <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar</button>
@@ -4242,6 +4340,15 @@
       row.querySelector(".mover-select").addEventListener("change", async (e) => {
         await updateDoc(doc(db, "libros", libro.id), { coleccionId: e.target.value });
       });
+      if (mostrarBotonDestacar) {
+        row.querySelector(".destacar-noticia-btn").addEventListener("click", async () => {
+          try {
+            await setDoc(doc(db, "usuarios", UID_ADMIN_GENERAL), { noticiaDestacadaId: libro.id }, { merge: true });
+          } catch (e) {
+            alert("No se pudo destacar: " + e.message);
+          }
+        });
+      }
       row.querySelector(".editar-btn").addEventListener("click", () => cargarLibroParaEditar(libro));
       row.querySelector(".transferir-btn").addEventListener("click", () => abrirModalTransferir("libro", libro.id, libro.titulo));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
@@ -5555,8 +5662,14 @@
   // ---------- Animación de entrada tipo "flipbook" (5 cuadros) ----------
   const introFlipbook = document.getElementById("introFlipbook");
   const introFlipbookImg = document.getElementById("introFlipbookImg");
-  const FRAMES_INTRO = ["intro-1.png", "intro-2.png", "intro-3.png", "intro-4.png", "intro-5.png"];
+  const FRAMES_INTRO = temaActual() === "claro" ? [...FRAMES_INTRO_CLARO] : [...FRAMES_INTRO_OSCURO];
   let introEnCurso = false;
+
+  // Ahora que FRAMES_INTRO ya existe, aplicamos el estado inicial de tema
+  // (imagen de la insignia + botones marcados) sin riesgo de referenciar
+  // el arreglo antes de tiempo.
+  actualizarImagenesSegunTema();
+  marcarBotonesDeTema();
 
   function reproducirIntroFlipbook(velocidad) {
     if (introEnCurso) return;
@@ -5617,6 +5730,29 @@
   function mostrarCapasDelTallerSiCorresponde() {
     if (capasTallerEnCurso) return;
     capasTallerEnCurso = true;
+
+    const contenido = document.getElementById("capaNoticiasContenido");
+    const btnLeer = document.getElementById("leerNoticiaDestacadaBtn");
+    const miPerfilAdmin = usuarios.find(u => u.id === UID_ADMIN_GENERAL);
+    const libroDestacado = miPerfilAdmin && miPerfilAdmin.noticiaDestacadaId
+      ? libros.find(l => l.id === miPerfilAdmin.noticiaDestacadaId)
+      : null;
+
+    if (libroDestacado) {
+      contenido.innerHTML = `<strong style="display:block;margin-bottom:4px;color:var(--text);">${escapeHtml(libroDestacado.titulo)}</strong>${escapeHtml(libroDestacado.resumen || "")}`;
+      btnLeer.style.display = "block";
+      btnLeer.onclick = () => {
+        document.getElementById("capaNoticiasOrbSY").style.display = "none";
+        document.getElementById("capaPublicidadOrbSY").style.display = "none";
+        capasTallerEnCurso = false;
+        adminPanel.style.display = "none";
+        abrirPublicacion(libroDestacado.id, libroDestacado.titulo, libroDestacado.recursos, libroDestacado.preguntasReflexion || []);
+      };
+    } else {
+      contenido.textContent = "Próximamente habrá noticias aquí.";
+      btnLeer.style.display = "none";
+    }
+
     document.getElementById("capaNoticiasOrbSY").style.display = "flex";
   }
 
