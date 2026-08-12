@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<script>
-  // Aplicamos el tema guardado ANTES de pintar nada, para que no haya parpadeo
-  // (un instante en oscuro que salte a claro apenas carga la página).
-  try {
-    const temaGuardado = localStorage.getItem("orbsy_tema");
-    if (temaGuardado === "claro") document.documentElement.setAttribute("data-tema", "claro");
-  } catch (e) { /* si localStorage no está disponible, se queda en oscuro */ }
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Orbsy</title>
@@ -19,8 +11,8 @@
   :root{
     --bg:#0e0e12;
     --card:#1a1a20;
-    --superficie:var(--superficie);
-    --text:var(--text-sec);
+    --superficie:#0e0e13;
+    --text:#e8e8ec;
     --text-sec:#8b8b96;
     --accent:#22d3c4;
     --turquesa:#22d3c4;
@@ -28,15 +20,6 @@
     --verde:#39ff8c;
     --violeta:#9b7cf6;
     --border:#2a2a32;
-  }
-  html[data-tema="claro"]{
-    --bg:#f4f4f7;
-    --card:#ffffff;
-    --superficie:#f0f0f4;
-    --text:#17171d;
-    --text-sec:#5c5c68;
-    --border:#dcdce2;
-    /* --accent, --verde, --violeta se mantienen: son la identidad de orbSY en ambos temas */
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{
@@ -386,17 +369,6 @@
     color:var(--accent);
   }
 
-  .tema-btn{
-    background:transparent;
-    border:1px solid var(--border);
-    color:var(--text-sec);
-  }
-  .tema-btn.activo{
-    background:var(--accent);
-    border-color:var(--accent);
-    color:#fff;
-  }
-
   .capa-taller-overlay{
     position:fixed;
     inset:0;
@@ -631,12 +603,6 @@
       radial-gradient(ellipse 55% 45% at 88% 22%, rgba(34,211,196,0.05), transparent 60%),
       radial-gradient(ellipse 60% 45% at 25% 92%, rgba(155,124,246,0.05), transparent 60%);
   }
-  html[data-tema="claro"] #universoFondo{
-    background:
-      radial-gradient(ellipse 60% 40% at 15% 10%, rgba(57,255,140,0.12), transparent 60%),
-      radial-gradient(ellipse 55% 45% at 88% 22%, rgba(34,211,196,0.12), transparent 60%),
-      radial-gradient(ellipse 60% 45% at 25% 92%, rgba(155,124,246,0.12), transparent 60%);
-  }
   .capa-estrellas{
     position:absolute;
     inset:0;
@@ -651,16 +617,9 @@
     opacity:0.55;
     box-shadow:0 0 6px currentColor;
   }
-  html[data-tema="claro"] .estrella-punto{
-    opacity:0.8;
-    box-shadow:0 0 5px rgba(0,0,0,0.12);
-  }
   .constelacion{
     position:absolute;
     opacity:0.3;
-  }
-  html[data-tema="claro"] .constelacion{
-    opacity:0.55;
   }
   #coleccionesWrap, #galeriasGrid, .orbsy-marca, .galerias-eyebrow, #buscadorInput{
     position:relative;
@@ -2241,14 +2200,6 @@
         <button type="button" id="editarPerfilBtn" style="width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px;border-radius:9px;cursor:pointer;font-weight:600;margin-bottom:10px;">✏️ Editar perfil (nombre, foto, color, resumen)</button>
 
         <div style="background:var(--superficie);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
-          <p style="font-size:0.78rem;font-weight:600;margin-bottom:8px;">Tema de orbSY</p>
-          <div style="display:flex;gap:8px;">
-            <button type="button" class="tema-btn" data-tema="oscuro" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;">🌑 Oscuro</button>
-            <button type="button" class="tema-btn" data-tema="claro" style="flex:1;padding:9px 4px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;">☀️ Claro</button>
-          </div>
-        </div>
-
-        <div style="background:var(--superficie);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
           <p style="font-size:0.78rem;font-weight:600;margin-bottom:2px;">Modo de cuenta: <span id="modoActualTexto" style="color:var(--accent);">Creador</span></p>
           <p style="font-size:0.73rem;color:var(--text-sec);margin-bottom:10px;" id="modoActualDescripcion">Tenés acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.</p>
           <button type="button" id="cambiarModoCuentaBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-size:0.78rem;cursor:pointer;">Cambiar a modo Espectador</button>
@@ -3229,36 +3180,8 @@
     if (btn) btn.click();
   }
 
-  // ---------- Tema: claro / oscuro ----------
-  // La insignia y los cuadros de la intro ahora son siluetas negras sólidas
-  // con delineado claro (no dependen de que el fondo de la página sea
-  // oscuro para "fingir" el relleno negro), así que la misma imagen sirve
-  // igual de bien en los dos temas — no hace falta intercambiar archivos.
-
-  function temaActual() {
-    return document.documentElement.getAttribute("data-tema") === "claro" ? "claro" : "oscuro";
-  }
-
-  function marcarBotonesDeTema() {
-    document.querySelectorAll(".tema-btn").forEach(b => {
-      b.classList.toggle("activo", b.dataset.tema === temaActual());
-    });
-  }
-
-  function aplicarTema(tema) {
-    if (tema === "claro") {
-      document.documentElement.setAttribute("data-tema", "claro");
-    } else {
-      document.documentElement.removeAttribute("data-tema");
-    }
-    try { localStorage.setItem("orbsy_tema", tema); } catch (e) { /* nada que hacer si no hay localStorage */ }
-    marcarBotonesDeTema();
-  }
-
-  document.querySelectorAll(".tema-btn").forEach(btn => {
-    btn.addEventListener("click", () => aplicarTema(btn.dataset.tema));
-  });
-
+  // Las imágenes de la insignia y la intro son siluetas negras sólidas con
+  // delineado claro (no dependen del color de fondo de la página).
 
   // Espectador: el Taller no existe (ni oculto — directamente no se ofrece
   // como opción), y en orbSY notes la pestaña de Plantillas tampoco aparece,
@@ -4363,11 +4286,9 @@
     const col = colecciones.find(c => c.id === libro.coleccionId);
     if (!col) return false;
     const gal = galerias.find(g => g.id === col.galeriaId);
-    // Cuenta tanto una galería marcada explícitamente "esNoticias" (si en
-    // algún momento se crea aparte) como cualquier colección que viva
-    // dentro de la galería orbSY General (sin dueño) — que es como el
-    // usuario la está usando hoy.
-    return !!(gal && (gal.esNoticias || !gal.ownerId));
+    // Elegible solo si su colección vive dentro de la galería marcada
+    // explícitamente como "Noticias en orbSY" (separada de orbSY General).
+    return !!(gal && gal.esNoticias);
   }
 
   function renderAdminListaLibros() {
@@ -5725,9 +5646,6 @@
   const introFlipbookImg = document.getElementById("introFlipbookImg");
   const FRAMES_INTRO = ["intro-1.png", "intro-2.png", "intro-3.png", "intro-4.png", "intro-5.png"];
   let introEnCurso = false;
-
-  // Estado inicial de los botones de tema al cargar la página
-  marcarBotonesDeTema();
 
   function reproducirIntroFlipbook(velocidad) {
     if (introEnCurso) return;
