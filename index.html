@@ -405,33 +405,52 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:24px;
+    padding:18px;
   }
   .capa-taller-caja{
     position:relative;
     background:var(--card);
     border:1px solid var(--border);
-    border-radius:16px;
-    max-width:380px;
+    border-radius:18px;
+    max-width:460px;
     width:100%;
-    padding:30px 24px 24px;
+    max-height:90vh;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+  }
+  .capa-taller-imagen{
+    display:none;
+    width:100%;
+    aspect-ratio:16/9;
+    object-fit:cover;
+    border-radius:18px 18px 0 0;
+  }
+  .capa-taller-cuerpo{
+    padding:26px 22px 24px;
     text-align:center;
     display:flex;
     flex-direction:column;
     align-items:center;
   }
+  .capa-taller-caja.con-imagen .capa-taller-cuerpo{
+    text-align:left;
+    align-items:flex-start;
+    padding-top:20px;
+  }
   .capa-taller-cerrar{
     position:absolute;
     top:10px;
     right:10px;
-    background:transparent;
-    border:1px solid var(--border);
-    color:var(--text-sec);
+    background:rgba(0,0,0,0.45);
+    border:1px solid rgba(255,255,255,0.25);
+    color:#fff;
     width:30px;
     height:30px;
     border-radius:50%;
     font-size:0.85rem;
     cursor:pointer;
+    z-index:2;
   }
   .capa-taller-titulo{
     font-family:'Fraunces', serif;
@@ -445,6 +464,9 @@
     margin-bottom:18px;
     line-height:1.4;
   }
+  .capa-taller-caja.con-imagen .capa-taller-subtitulo{
+    margin-bottom:14px;
+  }
   .capa-taller-contenido{
     width:100%;
     background:var(--superficie);
@@ -453,6 +475,16 @@
     padding:22px 14px;
     font-size:0.8rem;
     color:var(--text-sec);
+    text-align:center;
+  }
+  .capa-taller-caja.con-imagen .capa-taller-contenido{
+    background:transparent;
+    border:none;
+    padding:0;
+    text-align:left;
+    color:var(--text);
+    font-size:0.88rem;
+    line-height:1.55;
   }
 
   /* Insignia fija de orbSY: niño con telescopio, centrada abajo, en todas las páginas */
@@ -1708,23 +1740,28 @@
 <!-- Capas del Taller: Noticias en orbSY y Publicidad en orbSY.
      Aparecen una vez por sesión, solo al iniciar sesión de Admin. -->
 <div id="capaNoticiasOrbSY" class="capa-taller-overlay" style="display:none;">
-  <div class="capa-taller-caja">
+  <div class="capa-taller-caja" id="capaNoticiasCaja">
     <button type="button" class="capa-taller-cerrar" id="cerrarCapaNoticiasBtn">✕</button>
-    <svg viewBox="0 0 200 200" style="width:56px;height:56px;margin-bottom:10px;"><use href="#icono-noticias-svg"/></svg>
-    <div class="capa-taller-titulo">Noticias en orbSY</div>
-    <p class="capa-taller-subtitulo">Datos y novedades productivas — psicología, ciencia, arte, literatura.</p>
-    <div class="capa-taller-contenido" id="capaNoticiasContenido">Próximamente habrá noticias aquí.</div>
-    <button type="button" id="leerNoticiaDestacadaBtn" style="display:none;width:100%;margin-top:14px;background:var(--verde);border:none;color:#000;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;">Leer completa</button>
+    <img id="capaNoticiasImagen" class="capa-taller-imagen" alt="">
+    <div class="capa-taller-cuerpo">
+      <svg id="capaNoticiasIcono" viewBox="0 0 200 200" style="width:56px;height:56px;margin-bottom:10px;"><use href="#icono-noticias-svg"/></svg>
+      <div class="capa-taller-titulo" id="capaNoticiasTitulo">Noticias en orbSY</div>
+      <p class="capa-taller-subtitulo" id="capaNoticiasSubtitulo">Datos y novedades productivas — psicología, ciencia, arte, literatura.</p>
+      <div class="capa-taller-contenido" id="capaNoticiasContenido">Próximamente habrá noticias aquí.</div>
+      <button type="button" id="leerNoticiaDestacadaBtn" style="display:none;width:100%;margin-top:16px;background:var(--verde);border:none;color:#000;padding:11px;border-radius:8px;font-weight:600;cursor:pointer;">Leer completa</button>
+    </div>
   </div>
 </div>
 
 <div id="capaPublicidadOrbSY" class="capa-taller-overlay" style="display:none;">
   <div class="capa-taller-caja">
     <button type="button" class="capa-taller-cerrar" id="cerrarCapaPublicidadBtn">✕</button>
-    <svg viewBox="0 0 200 200" style="width:56px;height:56px;margin-bottom:10px;"><use href="#icono-publicidad-svg"/></svg>
-    <div class="capa-taller-titulo">Publicidad en orbSY</div>
-    <p class="capa-taller-subtitulo">Espacio reservado para anunciantes.</p>
-    <div class="capa-taller-contenido">Próximamente se harán publicidades aquí.</div>
+    <svg viewBox="0 0 200 200" style="width:56px;height:56px;margin-bottom:10px;margin-top:26px;"><use href="#icono-publicidad-svg"/></svg>
+    <div class="capa-taller-cuerpo" style="padding-top:0;">
+      <div class="capa-taller-titulo">Publicidad en orbSY</div>
+      <p class="capa-taller-subtitulo">Espacio reservado para anunciantes.</p>
+      <div class="capa-taller-contenido">Próximamente se harán publicidades aquí.</div>
+    </div>
   </div>
 </div>
 
@@ -3193,18 +3230,13 @@
   }
 
   // ---------- Tema: claro / oscuro ----------
-  const FRAMES_INTRO_OSCURO = ["intro-1.png", "intro-2.png", "intro-3.png", "intro-4.png", "intro-5.png"];
-  const FRAMES_INTRO_CLARO = ["intro-1-claro.png", "intro-2-claro.png", "intro-3-claro.png", "intro-4-claro.png", "intro-5-claro.png"];
+  // La insignia y los cuadros de la intro ahora son siluetas negras sólidas
+  // con delineado claro (no dependen de que el fondo de la página sea
+  // oscuro para "fingir" el relleno negro), así que la misma imagen sirve
+  // igual de bien en los dos temas — no hace falta intercambiar archivos.
 
   function temaActual() {
     return document.documentElement.getAttribute("data-tema") === "claro" ? "claro" : "oscuro";
-  }
-
-  function actualizarImagenesSegunTema() {
-    const claro = temaActual() === "claro";
-    document.getElementById("insigniaOrbsy").src = claro ? "orbsy-insignia-claro.png" : "orbsy-insignia.png";
-    FRAMES_INTRO.length = 0;
-    FRAMES_INTRO.push(...(claro ? FRAMES_INTRO_CLARO : FRAMES_INTRO_OSCURO));
   }
 
   function marcarBotonesDeTema() {
@@ -3220,7 +3252,6 @@
       document.documentElement.removeAttribute("data-tema");
     }
     try { localStorage.setItem("orbsy_tema", tema); } catch (e) { /* nada que hacer si no hay localStorage */ }
-    actualizarImagenesSegunTema();
     marcarBotonesDeTema();
   }
 
@@ -4332,7 +4363,11 @@
     const col = colecciones.find(c => c.id === libro.coleccionId);
     if (!col) return false;
     const gal = galerias.find(g => g.id === col.galeriaId);
-    return !!(gal && gal.esNoticias);
+    // Cuenta tanto una galería marcada explícitamente "esNoticias" (si en
+    // algún momento se crea aparte) como cualquier colección que viva
+    // dentro de la galería orbSY General (sin dueño) — que es como el
+    // usuario la está usando hoy.
+    return !!(gal && (gal.esNoticias || !gal.ownerId));
   }
 
   function renderAdminListaLibros() {
@@ -5688,13 +5723,10 @@
   // ---------- Animación de entrada tipo "flipbook" (5 cuadros) ----------
   const introFlipbook = document.getElementById("introFlipbook");
   const introFlipbookImg = document.getElementById("introFlipbookImg");
-  const FRAMES_INTRO = temaActual() === "claro" ? [...FRAMES_INTRO_CLARO] : [...FRAMES_INTRO_OSCURO];
+  const FRAMES_INTRO = ["intro-1.png", "intro-2.png", "intro-3.png", "intro-4.png", "intro-5.png"];
   let introEnCurso = false;
 
-  // Ahora que FRAMES_INTRO ya existe, aplicamos el estado inicial de tema
-  // (imagen de la insignia + botones marcados) sin riesgo de referenciar
-  // el arreglo antes de tiempo.
-  actualizarImagenesSegunTema();
+  // Estado inicial de los botones de tema al cargar la página
   marcarBotonesDeTema();
 
   function reproducirIntroFlipbook(velocidad) {
@@ -5757,6 +5789,11 @@
     if (capasTallerEnCurso) return;
     capasTallerEnCurso = true;
 
+    const caja = document.getElementById("capaNoticiasCaja");
+    const imagen = document.getElementById("capaNoticiasImagen");
+    const icono = document.getElementById("capaNoticiasIcono");
+    const titulo = document.getElementById("capaNoticiasTitulo");
+    const subtitulo = document.getElementById("capaNoticiasSubtitulo");
     const contenido = document.getElementById("capaNoticiasContenido");
     const btnLeer = document.getElementById("leerNoticiaDestacadaBtn");
     const miPerfilAdmin = usuarios.find(u => u.id === UID_ADMIN_GENERAL);
@@ -5765,7 +5802,17 @@
       : null;
 
     if (libroDestacado) {
-      contenido.innerHTML = `<strong style="display:block;margin-bottom:4px;color:var(--text);">${escapeHtml(libroDestacado.titulo)}</strong>${escapeHtml(libroDestacado.resumen || "")}`;
+      caja.classList.add("con-imagen");
+      if (libroDestacado.portadaId) {
+        imagen.src = imagenDirecta(libroDestacado.portadaId);
+        imagen.style.display = "block";
+      } else {
+        imagen.style.display = "none";
+      }
+      icono.style.display = "none";
+      titulo.textContent = libroDestacado.titulo;
+      subtitulo.textContent = "Noticias en orbSY";
+      contenido.textContent = libroDestacado.resumen || "";
       btnLeer.style.display = "block";
       btnLeer.onclick = () => {
         document.getElementById("capaNoticiasOrbSY").style.display = "none";
@@ -5775,6 +5822,11 @@
         abrirPublicacion(libroDestacado.id, libroDestacado.titulo, libroDestacado.recursos, libroDestacado.preguntasReflexion || []);
       };
     } else {
+      caja.classList.remove("con-imagen");
+      imagen.style.display = "none";
+      icono.style.display = "block";
+      titulo.textContent = "Noticias en orbSY";
+      subtitulo.textContent = "Datos y novedades productivas — psicología, ciencia, arte, literatura.";
       contenido.textContent = "Próximamente habrá noticias aquí.";
       btnLeer.style.display = "none";
     }
