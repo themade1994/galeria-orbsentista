@@ -2073,12 +2073,12 @@
 
       <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:10px;">
         <input type="checkbox" id="inputEsGaleriaGeneral" style="width:auto;">
-        Mostrar esta galería dentro de la <strong>esfera principal orbSY General</strong> (podés tener varias ahí adentro — esto solo la agrega, no reemplaza a ninguna otra. Solo vos podés crearlas; los demás solo las ven)
+        Añadir esta galería a la esfera <strong>orbSY General</strong> (no reemplaza a las demás)
       </label>
 
       <label id="opcionNoticiasLabel" style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:6px;">
         <input type="checkbox" id="inputEsGaleriaNoticias" style="width:auto;">
-        Además, marcá esta si es tu galería de <strong>Noticias en orbSY</strong> (para elegir qué se destaca en el Taller). Si querés que aparezca junto a las demás en la esfera principal, marcá también la casilla de arriba.
+        Es la galería de <strong>Noticias en orbSY</strong> (para elegir qué se destaca en el Taller)
       </label>
 
       <div style="display:flex;gap:8px;">
@@ -3233,7 +3233,7 @@
     const nuevoModo = modoActual === "espectador" ? "creador" : "espectador";
 
     if (nuevoModo === "espectador") {
-      const confirmar = confirm("Al cambiar a modo Espectador, el Taller deja de estar disponible para esta cuenta (podés volver a modo Creador cuando quieras, desde aquí mismo). ¿Continuar?");
+      const confirmar = confirm("Al cambiar a modo Espectador, el Taller deja de estar disponible para esta cuenta (puedes volver a modo Creador cuando quieras, desde aquí mismo). ¿Continuar?");
       if (!confirmar) return;
     }
     try {
@@ -3598,7 +3598,9 @@
 
     const hayContenidoSinDueno = galerias.some(g => !g.ownerId);
     if (hayContenidoSinDueno) {
-      const galeriaSinDueno = galerias.find(g => !g.ownerId);
+      // La esfera de arriba siempre representa a orbSY General, nunca a
+      // Noticias en orbSY, aunque las dos convivan sin dueño.
+      const galeriaSinDueno = galerias.find(g => !g.ownerId && !g.esNoticias) || galerias.find(g => !g.ownerId);
       orbsyGeneralFlanco.classList.add("visible");
       orbsyGeneralFlanco.innerHTML = `
         <div class="perfil-tile-img" style="--color-galaxia:${COLORES_GALAXIA.gris};">
