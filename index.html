@@ -969,6 +969,70 @@
     color:var(--text);
     font-size:0.85rem;
   }
+
+  .opcion-esfera-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    margin-top:10px;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+    background:var(--superficie);
+  }
+  #adminPanel .opcion-esfera-card input{
+    position:absolute;
+    width:1px; height:1px;
+    padding:0;
+    border:0;
+    opacity:0;
+    pointer-events:none;
+  }
+  .opcion-esfera-icono{ flex-shrink:0; display:flex; }
+  .opcion-esfera-icono svg{ width:26px; height:26px; }
+  .opcion-esfera-texto{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+  }
+  .opcion-esfera-texto strong{
+    font-size:0.85rem;
+    font-weight:600;
+    color:var(--text);
+  }
+  .opcion-esfera-texto small{
+    font-size:0.72rem;
+    color:var(--text-sec);
+    font-weight:400;
+    line-height:1.4;
+  }
+  .opcion-esfera-check{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    border:1.5px solid var(--border);
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.7rem;
+    color:transparent;
+    transition:all .15s ease;
+  }
+  .opcion-esfera-card:has(input:checked){
+    border-color:var(--accent);
+    background:rgba(34,211,196,0.08);
+  }
+  .opcion-esfera-card:has(input:checked) .opcion-esfera-check{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#0e0e12;
+  }
+
   #adminPanel textarea{
     width:100%;
     padding:10px 12px;
@@ -1015,6 +1079,23 @@
   .admin-row-titulo{
     overflow:hidden;
     text-overflow:ellipsis;
+    white-space:nowrap;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .insignia-destacada{
+    flex-shrink:0;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    background:rgba(57,255,140,0.12);
+    border:1px solid rgba(57,255,140,0.4);
+    color:var(--verde);
+    font-size:0.66rem;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:99px;
     white-space:nowrap;
   }
   .admin-row-controles{
@@ -1804,6 +1885,13 @@
       <circle cx="100" cy="100" r="10" fill="#9b7cf6"/>
     </g>
 
+    <!-- Ícono de esfera orbSY General: pequeño astro con anillo, mismo
+         lenguaje visual que el logo -->
+    <g id="icono-esfera-svg">
+      <circle cx="100" cy="100" r="38" fill="#39ff8c" opacity="0.9"/>
+      <ellipse cx="100" cy="100" rx="72" ry="26" fill="none" stroke="#39ff8c" stroke-width="6" opacity="0.55"/>
+    </g>
+
     <!-- Candado propio: anillo abierto + cuerpo, mismo lenguaje del logo -->
     <g id="icono-candado-svg">
       <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="var(--text-sec)" stroke-width="9" stroke-linecap="round"/>
@@ -2105,14 +2193,24 @@
       <label>Enlace de Google Drive (imagen de fondo, opcional)</label>
       <input type="text" id="inputFondoGaleria" placeholder="https://drive.google.com/file/d/.../view">
 
-      <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:10px;">
-        <input type="checkbox" id="inputEsGaleriaGeneral" style="width:auto;">
-        Añadir esta galería a la esfera <strong>orbSY General</strong> (no reemplaza a las demás)
+      <label class="opcion-esfera-card" for="inputEsGaleriaGeneral">
+        <input type="checkbox" id="inputEsGaleriaGeneral">
+        <span class="opcion-esfera-icono"><svg viewBox="0 0 200 200"><use href="#icono-esfera-svg"/></svg></span>
+        <span class="opcion-esfera-texto">
+          <strong>Esfera orbSY General</strong>
+          <small>Se añade junto a las demás galerías generales, sin reemplazarlas</small>
+        </span>
+        <span class="opcion-esfera-check">✓</span>
       </label>
 
-      <label id="opcionNoticiasLabel" style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:6px;">
-        <input type="checkbox" id="inputEsGaleriaNoticias" style="width:auto;">
-        Es la galería de <strong>Noticias en orbSY</strong> (para elegir qué se destaca en el Taller)
+      <label class="opcion-esfera-card" id="opcionNoticiasLabel" for="inputEsGaleriaNoticias">
+        <input type="checkbox" id="inputEsGaleriaNoticias">
+        <span class="opcion-esfera-icono"><svg viewBox="0 0 200 200"><use href="#icono-noticias-svg"/></svg></span>
+        <span class="opcion-esfera-texto">
+          <strong>Galería de Noticias en orbSY</strong>
+          <small>Desde aquí eliges qué publicación se destaca en el Taller</small>
+        </span>
+        <span class="opcion-esfera-check">✓</span>
       </label>
 
       <div style="display:flex;gap:8px;">
@@ -4376,10 +4474,13 @@
       const mostrarBotonDestacar = uidActual === UID_ADMIN_GENERAL && esLibroDeNoticias(libro);
 
       row.innerHTML = `
-        <div class="admin-row-titulo">${escapeHtml(libro.titulo)}</div>
+        <div class="admin-row-titulo">
+          <span>${escapeHtml(libro.titulo)}</span>
+          ${yaEsDestacada ? `<span class="insignia-destacada">★ Destacada hoy</span>` : ""}
+        </div>
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
-          ${mostrarBotonDestacar ? `<button class="destacar-noticia-btn" style="${yaEsDestacada ? "background:var(--verde);color:#000;" : ""}">${yaEsDestacada ? "★ Destacada hoy" : "☆ Destacar en Noticias"}</button>` : ""}
+          ${mostrarBotonDestacar ? `<button class="destacar-noticia-btn">${yaEsDestacada ? "Quitar de Noticias" : "Destacar en Noticias"}</button>` : ""}
           <button class="editar-btn">Editar</button>
           <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar</button>
@@ -4391,9 +4492,9 @@
       if (mostrarBotonDestacar) {
         row.querySelector(".destacar-noticia-btn").addEventListener("click", async () => {
           try {
-            await setDoc(doc(db, "usuarios", UID_ADMIN_GENERAL), { noticiaDestacadaId: libro.id }, { merge: true });
+            await setDoc(doc(db, "usuarios", UID_ADMIN_GENERAL), { noticiaDestacadaId: yaEsDestacada ? null : libro.id }, { merge: true });
           } catch (e) {
-            alert("No se pudo destacar: " + e.message);
+            alert("No se pudo actualizar: " + e.message);
           }
         });
       }
