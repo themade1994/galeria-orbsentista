@@ -1348,6 +1348,9 @@
     align-items:center;
   }
   #navBar.active{ display:flex; }
+  #marcarComprendidoBtn.activo{ background:var(--verde); color:#0e0e12; }
+  #marcarCongelarBtn.activo{ background:var(--violeta); color:#0e0e12; }
+  #marcarRevisadoBtn.activo{ background:var(--accent); border-color:var(--accent); color:#0e0e12; }
   #navBar button{
     background:transparent;
     border:1px solid var(--border);
@@ -1785,6 +1788,15 @@
       <circle cx="138" cy="122" r="14" fill="#22d3c4" opacity="0.35" stroke="#22d3c4" stroke-width="5"/>
     </g>
 
+    <!-- Ícono de Congelados: copo de nieve simple, en violeta — herramienta
+         de estudio ("dejado a propósito para volver"), no un simple guardado. -->
+    <g id="icono-congelados-svg">
+      <line x1="100" y1="55" x2="100" y2="145" stroke="#9b7cf6" stroke-width="7" stroke-linecap="round"/>
+      <line x1="58" y1="77" x2="142" y2="123" stroke="#9b7cf6" stroke-width="7" stroke-linecap="round"/>
+      <line x1="142" y1="77" x2="58" y2="123" stroke="#9b7cf6" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="10" fill="#9b7cf6"/>
+    </g>
+
     <!-- Candado propio: anillo abierto + cuerpo, mismo lenguaje del logo -->
     <g id="icono-candado-svg">
       <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="var(--text-sec)" stroke-width="9" stroke-linecap="round"/>
@@ -1850,6 +1862,13 @@
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Perfiles que sigues</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Tu lista personal, nadie más la ve</div>
+      </div>
+    </div>
+    <div class="herramienta-item" id="abrirCongeladosBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-congelados-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Congelados</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Temas que dejaste para volver más profundo</div>
       </div>
     </div>
     <div class="herramienta-item" style="opacity:0.45;cursor:default;">
@@ -1952,8 +1971,16 @@
     <div style="padding:10px 14px;">
       <button id="volverAHerramientasDesdeSeguidosBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
     </div>
-    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Tu lista personal. No aumenta el contador de nadie ni nadie ve que los seguís.</p>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Tu lista personal. No aumenta el contador de nadie ni nadie ve a quién sigues.</p>
     <div class="notas-guardadas-lista" id="seguidosLista"></div>
+  </div>
+
+  <div id="congeladosVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasDesdeCongeladosBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Temas que marcaste "❄ Congelar" para retomar más adelante. Tocar "Retomar" te lleva directo ahí.</p>
+    <div class="notas-guardadas-lista" id="congeladosLista"></div>
   </div>
 </div>
 
@@ -2374,6 +2401,11 @@
     </button>
   </div>
   <div id="firmaLectorBar" style="text-align:center;font-style:italic;font-size:0.72rem;color:var(--text-sec);padding:3px 10px;border-bottom:1px solid var(--border);"></div>
+  <div id="progresoLectorBar" style="display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);align-items:center;flex-wrap:wrap;">
+    <button type="button" id="marcarComprendidoBtn" style="flex:1;min-width:110px;background:transparent;border:1px solid var(--verde);color:var(--verde);padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">✓ Comprendido</button>
+    <button type="button" id="marcarCongelarBtn" style="flex:1;min-width:110px;background:transparent;border:1px solid var(--violeta);color:var(--violeta);padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">❄ Congelar</button>
+    <button type="button" id="marcarRevisadoBtn" style="flex:0 0 100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">✓ Marcar publicación completa como revisada</button>
+  </div>
   <div id="navBar">
     <button id="anteriorBtn">← Anterior</button>
     <button id="siguienteBtn">Siguiente →</button>
@@ -2484,6 +2516,7 @@
   const referenciasCol = collection(db, "referencias");
   const historialCol = collection(db, "historial");
   const seguidosCol = collection(db, "seguidos");
+  const progresoCol = collection(db, "progreso");
   const solicitudesCol = collection(db, "solicitudesTransferencia");
 
   // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
@@ -2498,6 +2531,7 @@
   let referencias = [];   // [{id, ownerId, termino, definicion, fecha}] — Diccionario de Referencias
   let historial = [];     // [{id, ownerId, termino, definicion, autorNombre, fecha}] — Historial de Referencias (guardados personales)
   let seguidos = [];      // [{id, ownerId, perfilSeguidoId, perfilSeguidoNombre, fecha}] — Seguir perfiles (lista personal)
+  let progreso = [];      // [{id, ownerId, libroId, libroTitulo, estados:{idx:"comprendido"|"congelado"}, revisado, fecha}] — Progreso de lectura
   let vista = uidPerfilObjetivo ? "galerias" : "perfiles"; // "perfiles" | "galerias" | "colecciones" | "coleccion"
   let galeriaActualId = null;
   let coleccionActualId = null;
@@ -3552,6 +3586,23 @@
     console.error("Error al leer los perfiles seguidos:", error);
   });
 
+  // Progreso de lectura: comprendido / congelado por recurso, y revisado por publicación
+  onSnapshot(progresoCol, (snapshot) => {
+    progreso = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderCongeladosGuardados === "function") renderCongeladosGuardados();
+    if (typeof actualizarUIProgresoLector === "function") actualizarUIProgresoLector();
+    if (typeof renderAdminListaLibros === "function") renderAdminListaLibros();
+    // Refresca las insignias "✓ Revisado/a" en la vista que esté abierta ahora mismo,
+    // sin esperar a que la persona navegue de nuevo para verlas actualizadas.
+    if (typeof vista !== "undefined" && typeof renderGalerias === "function") {
+      if (vista === "galerias") renderGalerias();
+      else if (vista === "colecciones" && typeof renderHome === "function") renderHome();
+      else if (vista === "coleccion" && coleccionActualId && typeof renderColeccionDetalle === "function") renderColeccionDetalle(coleccionActualId);
+    }
+  }, (error) => {
+    console.error("Error al leer el progreso de lectura:", error);
+  });
+
   // ---------- Perfiles (galaxias): selector tipo Netflix ----------
   let usuarios = [];
   const errorMsgPerfiles = document.getElementById("errorMsgPerfiles");
@@ -3845,13 +3896,14 @@
   }
 
   function crearTarjetaGaleria(id, nombre, imagenId) {
+    const revisada = id !== ID_GALERIA_GENERAL && galeriaRevisada(id);
     const tile = document.createElement("div");
     tile.className = "galeria-tile";
     tile.innerHTML = `
       <div class="galeria-tile-img">
         <img src="${imagenDirecta(imagenId)}" data-alt-src="${imagenAlternativa(imagenId)}" data-tried-alt="0" alt="${escapeHtml(nombre)}" loading="lazy" onerror="manejarErrorImagen(this)">
       </div>
-      <div class="galeria-tile-nombre">${escapeHtml(nombre)}</div>
+      <div class="galeria-tile-nombre">${escapeHtml(nombre)}${revisada ? ` <span style="color:var(--verde);font-size:0.7rem;font-weight:700;">✓ Revisada</span>` : ""}</div>
     `;
     tile.addEventListener("click", () => abrirGaleria(id, nombre));
     return tile;
@@ -3930,6 +3982,7 @@
 
   function crearTarjetaColeccion(id, nombre, frase, imagenId, cantidad, clave) {
     const etiqueta = cantidad === 1 ? "1 publicación" : `${cantidad} publicaciones`;
+    const revisada = id !== ID_GENERAL && coleccionRevisada(id);
     const card = document.createElement("div");
     card.className = "coleccion-card";
     card.innerHTML = `
@@ -3937,6 +3990,7 @@
       <div class="coleccion-overlay">
         <div class="coleccion-titulo">${clave ? `<svg class="icono-candado" viewBox="0 0 200 200" width="15" height="15" style="vertical-align:-2px;margin-right:4px;"><use href="#icono-candado-svg"/></svg>` : ""}${escapeHtml(nombre)}</div>
         ${frase ? `<div class="coleccion-frase">${escapeHtml(frase)}</div>` : ""}
+        ${revisada ? `<div style="color:var(--verde);font-size:0.68rem;font-weight:700;margin-top:2px;">✓ Revisada</div>` : ""}
       </div>
       <div class="coleccion-contador">${etiqueta}</div>
     `;
@@ -4249,6 +4303,8 @@
   }
 
   function crearTarjetaLibro(libro) {
+    const p = progresoDeLibro(libro.id);
+    const revisado = !!(p && p.revisado);
     const card = document.createElement("div");
     card.className = "book-card";
     card.innerHTML = `
@@ -4256,7 +4312,7 @@
         <img src="${imagenDirecta(libro.portadaId)}" data-alt-src="${imagenAlternativa(libro.portadaId)}" data-tried-alt="0" alt="${escapeHtml(libro.titulo)}" loading="lazy" onerror="manejarErrorImagen(this)">
       </div>
       <div class="book-info">
-        <div class="book-title">${escapeHtml(libro.titulo)}</div>
+        <div class="book-title">${escapeHtml(libro.titulo)}${revisado ? ` <span style="color:var(--verde);font-size:0.7rem;font-weight:700;">✓ Revisado</span>` : ""}</div>
         <div class="book-summary">${escapeHtml(libro.resumen)}</div>
         <button class="read-btn">Ver publicación</button>
       </div>
@@ -4865,6 +4921,173 @@
     herramientasMenu.style.display = "block";
   });
 
+  // ---------- Progreso de lectura: Comprendido / Congelar / Revisado ----------
+  // No es "me gusta" ni "guardar" — es una marca de comprensión real.
+  // "Comprendido": ya te llevaste el mensaje. "Congelar": lo dejás a
+  // propósito para volver más profundo después (aparece en tu lista de
+  // Congelados en Herramientas, como atajo de estudio).
+
+  function idProgreso(libroId) {
+    return `${uidActual}_${libroId}`;
+  }
+
+  function progresoDeLibro(libroId) {
+    if (!uidActual) return null;
+    return progreso.find(p => p.id === idProgreso(libroId)) || null;
+  }
+
+  async function marcarEstadoRecurso(libroId, tituloPublicacion, recursoIndex, estado) {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para marcar tu progreso.");
+      return;
+    }
+    const existente = progresoDeLibro(libroId);
+    const estadosActuales = existente && existente.estados ? { ...existente.estados } : {};
+    // Tocar el mismo estado otra vez lo desmarca (vuelve a "sin marcar")
+    if (estadosActuales[recursoIndex] === estado) {
+      delete estadosActuales[recursoIndex];
+    } else {
+      estadosActuales[recursoIndex] = estado;
+    }
+    try {
+      await setDoc(doc(db, "progreso", idProgreso(libroId)), {
+        ownerId: uidActual,
+        libroId,
+        libroTitulo: tituloPublicacion,
+        estados: estadosActuales,
+        revisado: existente ? !!existente.revisado : false,
+        fecha: serverTimestamp()
+      }, { merge: true });
+    } catch (e) {
+      alert("No se pudo guardar tu progreso: " + e.message);
+    }
+  }
+
+  async function alternarPublicacionRevisada(libroId, tituloPublicacion) {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para marcar tu progreso.");
+      return;
+    }
+    const existente = progresoDeLibro(libroId);
+    const nuevoValor = !(existente && existente.revisado);
+    try {
+      await setDoc(doc(db, "progreso", idProgreso(libroId)), {
+        ownerId: uidActual,
+        libroId,
+        libroTitulo: tituloPublicacion,
+        estados: existente && existente.estados ? existente.estados : {},
+        revisado: nuevoValor,
+        fecha: serverTimestamp()
+      }, { merge: true });
+    } catch (e) {
+      alert("No se pudo guardar tu progreso: " + e.message);
+    }
+  }
+
+  // Una colección está "revisada" cuando todas sus publicaciones lo están (y tiene al menos una)
+  function coleccionRevisada(coleccionId) {
+    const librosDeEsta = libros.filter(l => l.coleccionId === coleccionId);
+    if (librosDeEsta.length === 0) return false;
+    return librosDeEsta.every(l => {
+      const p = progresoDeLibro(l.id);
+      return !!(p && p.revisado);
+    });
+  }
+
+  // Una galería está "revisada" cuando todas sus colecciones lo están (y tiene al menos una)
+  function galeriaRevisada(galeriaId) {
+    const colsDeEsta = colecciones.filter(c => c.galeriaId === galeriaId);
+    if (colsDeEsta.length === 0) return false;
+    return colsDeEsta.every(c => coleccionRevisada(c.id));
+  }
+
+  // ---------- Lista de Congelados: atajo de estudio en Herramientas ----------
+  function renderCongeladosGuardados() {
+    const lista = document.getElementById("congeladosLista");
+    if (!lista) return;
+    if (!uidActual) {
+      lista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Necesitas iniciar sesión (Admin) para ver tu lista.</div>`;
+      return;
+    }
+    const propios = progreso.filter(p => p.ownerId === uidActual && p.estados);
+    const congelados = [];
+    propios.forEach(p => {
+      Object.entries(p.estados).forEach(([idx, estado]) => {
+        if (estado === "congelado") {
+          congelados.push({ libroId: p.libroId, libroTitulo: p.libroTitulo, recursoIndex: parseInt(idx, 10) });
+        }
+      });
+    });
+
+    if (congelados.length === 0) {
+      lista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">No tienes nada congelado todavía. Cuando marques "❄ Congelar" en un tema, aparece aquí como atajo para volver.</div>`;
+      return;
+    }
+    lista.innerHTML = "";
+    congelados.forEach(c => {
+      const libro = libros.find(l => l.id === c.libroId);
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">❄ ${escapeHtml(c.libroTitulo)}</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-plantilla">Retomar</button>
+        </div>
+      `;
+      item.querySelector(".abrir-plantilla").addEventListener("click", () => {
+        document.getElementById("cerrarHerramientasBtn").click();
+        if (libro) {
+          abrirRecurso(libro.id, libro.titulo, libro.recursos, c.recursoIndex);
+        } else {
+          alert("Esta publicación ya no está disponible.");
+        }
+      });
+      lista.appendChild(item);
+    });
+  }
+
+  const congeladosVista = document.getElementById("congeladosVista");
+  document.getElementById("abrirCongeladosBtn").addEventListener("click", () => {
+    herramientasMenu.style.display = "none";
+    congeladosVista.style.display = "flex";
+    renderCongeladosGuardados();
+  });
+  document.getElementById("volverAHerramientasDesdeCongeladosBtn").addEventListener("click", () => {
+    congeladosVista.style.display = "none";
+    herramientasMenu.style.display = "block";
+  });
+
+  // Refleja en los 3 botones del lector el estado guardado del recurso/publicación actual
+  function actualizarUIProgresoLector() {
+    const btnComprendido = document.getElementById("marcarComprendidoBtn");
+    const btnCongelar = document.getElementById("marcarCongelarBtn");
+    const btnRevisado = document.getElementById("marcarRevisadoBtn");
+    if (!btnComprendido || !libroIdActual) return;
+
+    const p = progresoDeLibro(libroIdActual);
+    const estadoActual = p && p.estados ? p.estados[indiceActual] : undefined;
+
+    btnComprendido.classList.toggle("activo", estadoActual === "comprendido");
+    btnCongelar.classList.toggle("activo", estadoActual === "congelado");
+
+    const estaRevisado = !!(p && p.revisado);
+    btnRevisado.classList.toggle("activo", estaRevisado);
+    btnRevisado.textContent = estaRevisado ? "✓ Publicación revisada" : "✓ Marcar publicación completa como revisada";
+  }
+
+  document.getElementById("marcarComprendidoBtn").addEventListener("click", () => {
+    if (!libroIdActual) return;
+    marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "comprendido");
+  });
+  document.getElementById("marcarCongelarBtn").addEventListener("click", () => {
+    if (!libroIdActual) return;
+    marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "congelado");
+  });
+  document.getElementById("marcarRevisadoBtn").addEventListener("click", () => {
+    if (!libroIdActual) return;
+    alternarPublicacionRevisada(libroIdActual, tituloPublicacionActual);
+  });
+
   function renderNotasGuardadas() {
     const todas = leerTodasLasNotas();
     const entradas = Object.entries(todas).sort((a, b) => b[1].fecha - a[1].fecha);
@@ -5317,8 +5540,13 @@
     const libroActual = libros.find(l => l.id === libroId);
     indiceTitulo.textContent = tituloPublicacion;
     document.getElementById("firmaIndice").textContent = "De " + nombreCreador(libroActual ? libroActual.ownerId : null);
+    const progresoLibro = progresoDeLibro(libroId);
     indiceLista.innerHTML = "";
     recursos.forEach((r, i) => {
+      const estadoItem = progresoLibro && progresoLibro.estados ? progresoLibro.estados[i] : undefined;
+      const marca = estadoItem === "comprendido" ? `<span style="color:var(--verde);font-size:0.7rem;font-weight:700;">✓ Comprendido</span>`
+        : estadoItem === "congelado" ? `<span style="color:var(--violeta);font-size:0.7rem;font-weight:700;">❄ Congelado</span>`
+        : "";
       const item = document.createElement("div");
       item.className = "indice-item";
       item.innerHTML = `
@@ -5326,6 +5554,7 @@
         <div class="indice-info">
           <div class="indice-etiqueta">${escapeHtml(r.etiqueta)}</div>
           <div class="indice-tipo">${ETIQUETAS_TIPO[r.tipo] || r.tipo}</div>
+          ${marca}
         </div>
       `;
       item.addEventListener("click", () => {
@@ -5487,6 +5716,7 @@
       navBar.classList.remove("active");
       indiceToggleBtn.style.display = "none";
     }
+    actualizarUIProgresoLector();
   }
 
   // ---------- Visor de galería de imágenes ----------
@@ -5571,8 +5801,13 @@
   // ---------- Cortina deslizable: índice siempre accesible durante la lectura ----------
   function renderIndiceDrawer(recursos, indexActual) {
     indiceDrawerLista.innerHTML = "";
+    const progresoLibro = progresoDeLibro(libroIdActual);
     recursos.forEach((r, i) => {
       const esActual = i === indexActual;
+      const estadoItem = progresoLibro && progresoLibro.estados ? progresoLibro.estados[i] : undefined;
+      const marca = estadoItem === "comprendido" ? `<span style="color:var(--verde);font-size:0.68rem;font-weight:700;">✓ Comprendido</span>`
+        : estadoItem === "congelado" ? `<span style="color:var(--violeta);font-size:0.68rem;font-weight:700;">❄ Congelado</span>`
+        : "";
       const item = document.createElement("div");
       item.className = "indice-drawer-item";
       item.innerHTML = `
@@ -5580,6 +5815,7 @@
         <div class="indice-drawer-info">
           <div class="indice-drawer-etiqueta ${esActual ? "actual" : ""}">${escapeHtml(r.etiqueta)}${esActual ? " (estás aquí)" : ""}</div>
           <div class="indice-drawer-tipo">${ETIQUETAS_TIPO[r.tipo] || r.tipo}</div>
+          ${marca}
         </div>
       `;
       item.addEventListener("click", () => {
