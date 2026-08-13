@@ -3718,6 +3718,7 @@
     renderPerfiles();
     renderSolicitudes();
     if (typeof aplicarModoCuenta === "function") aplicarModoCuenta();
+    if (typeof renderAdminListaLibros === "function") renderAdminListaLibros();
   }, (error) => {
     loadingMsgPerfiles.style.display = "none";
     perfilesGrid.innerHTML = "";
