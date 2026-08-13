@@ -1592,6 +1592,13 @@
     text-overflow:ellipsis;
     white-space:nowrap;
   }
+  .notas-texto-corto{ display:none; }
+  @media (max-width: 480px){
+    .modal-bar #modalTitle{ display:none; }
+    .modal-bar button{ padding:9px 8px; flex-shrink:0; }
+    .notas-texto-completo{ display:none; }
+    .notas-texto-corto{ display:inline; }
+  }
   .pdf-body{
     flex:1;
     width:100%;
@@ -2397,7 +2404,8 @@
     <button id="reflexionToggleBtn" style="display:none;">🪞 Reflexión</button>
     <button id="notasToggleBtn">
       <svg viewBox="0 0 200 200"><use href="#meteorito-icono"/></svg>
-      Notas
+      <span class="notas-texto-completo">Notas</span>
+      <span class="notas-texto-corto">N</span>
     </button>
   </div>
   <div id="firmaLectorBar" style="text-align:center;font-style:italic;font-size:0.72rem;color:var(--text-sec);padding:3px 10px;border-bottom:1px solid var(--border);"></div>
