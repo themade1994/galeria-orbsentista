@@ -11,6 +11,7 @@
   :root{
     --bg:#0e0e12;
     --card:#1a1a20;
+    --superficie:#0e0e13;
     --text:#e8e8ec;
     --text-sec:#8b8b96;
     --accent:#22d3c4;
@@ -238,7 +239,7 @@
     width:46px;
     flex-shrink:0;
     border-left:1px solid var(--border);
-    background:#0b0b0e;
+    background:var(--superficie);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -293,6 +294,203 @@
 
   /* Lista de notas guardadas (desde el panel Herramientas) */
   .notas-guardadas-lista{ padding:10px; overflow-y:auto; flex:1; }
+
+  .bio-resumen{ font-size:0.85rem; line-height:1.55; color:var(--text); margin-bottom:16px; white-space:pre-wrap; }
+  .bio-arbol details{ border-left:2px solid var(--border); padding-left:10px; margin-bottom:6px; }
+  .bio-arbol summary{ cursor:pointer; font-size:0.85rem; padding:6px 0; list-style:none; }
+  .bio-arbol summary::-webkit-details-marker{ display:none; }
+  .bio-arbol summary::before{ content:"▸ "; color:var(--accent); }
+  .bio-arbol details[open] > summary::before{ content:"▾ "; }
+  .bio-arbol .bio-galeria > summary{ font-weight:600; color:var(--verde); }
+  .bio-arbol .bio-coleccion > summary{ font-weight:600; color:var(--accent); font-size:0.82rem; }
+  .bio-arbol .bio-publicacion > summary{ font-style:italic; color:var(--text-sec); font-size:0.8rem; }
+  .bio-termino-fila{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0 6px 4px; border-bottom:1px solid var(--border); }
+  .bio-termino-texto{ flex:1; }
+  .bio-termino-texto .palabra{ font-weight:600; font-size:0.85rem; color:var(--text); }
+  .bio-termino-texto .def{ font-size:0.8rem; color:var(--text-sec); margin-top:2px; line-height:1.4; }
+  .bio-guardar-btn{ flex-shrink:0; background:transparent; border:1px solid var(--accent); color:var(--accent); font-size:0.65rem; padding:4px 8px; border-radius:6px; cursor:pointer; white-space:nowrap; }
+  .bio-guardar-btn.guardado{ border-color:var(--verde); color:var(--verde); }
+  .bio-vacio{ font-size:0.8rem; color:var(--text-sec); padding:10px 0; }
+
+  .plantilla-campo-copiable{
+    display:flex;
+    gap:6px;
+    align-items:flex-start;
+  }
+  .plantilla-campo-copiable input,
+  .plantilla-campo-copiable textarea{
+    flex:1;
+  }
+  .copiar-campo-btn{
+    flex:0 0 auto;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    font-size:0.68rem;
+    padding:0 10px;
+    border-radius:8px;
+    cursor:pointer;
+    white-space:nowrap;
+    align-self:stretch;
+  }
+  .copiar-campo-btn.copiado{
+    color:var(--verde);
+    border-color:var(--verde);
+  }
+  .plantilla-tipo-btn{
+    flex:1;
+    padding:10px 4px;
+    border-radius:8px;
+    font-size:0.8rem;
+    font-weight:600;
+    cursor:pointer;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+  }
+  .plantilla-tipo-btn[data-color="verde"].activo{ background:rgba(57,255,140,0.12) !important; border-color:var(--verde) !important; color:var(--verde) !important; }
+  .plantilla-tipo-btn[data-color="turquesa"].activo{ background:rgba(34,211,196,0.12) !important; border-color:var(--accent) !important; color:var(--accent) !important; }
+  .plantilla-tipo-btn[data-color="violeta"].activo{ background:rgba(155,124,246,0.12) !important; border-color:var(--violeta) !important; color:var(--violeta) !important; }
+
+  .taller-pestana-btn{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    padding:10px 4px;
+    border-radius:9px;
+    font-size:0.8rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .taller-pestana-btn.activa{
+    background:var(--card);
+    border-color:var(--accent);
+    color:var(--accent);
+  }
+
+  .capa-taller-overlay{
+    position:fixed;
+    inset:0;
+    z-index:9998;
+    background:rgba(0,0,0,0.82);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  }
+  .capa-taller-caja{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    max-width:460px;
+    width:100%;
+    max-height:90vh;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+  }
+  .capa-taller-imagen{
+    display:none;
+    width:100%;
+    aspect-ratio:16/9;
+    object-fit:cover;
+    border-radius:18px 18px 0 0;
+  }
+  .capa-taller-cuerpo{
+    padding:26px 22px 24px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .capa-taller-caja.con-imagen .capa-taller-cuerpo{
+    text-align:left;
+    align-items:flex-start;
+    padding-top:20px;
+  }
+  .capa-taller-cerrar{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:rgba(0,0,0,0.45);
+    border:1px solid rgba(255,255,255,0.25);
+    color:#fff;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    font-size:0.85rem;
+    cursor:pointer;
+    z-index:2;
+  }
+  .capa-taller-titulo{
+    font-family:'Fraunces', serif;
+    font-size:1.15rem;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .capa-taller-subtitulo{
+    font-size:0.78rem;
+    color:var(--text-sec);
+    margin-bottom:18px;
+    line-height:1.4;
+  }
+  .capa-taller-caja.con-imagen .capa-taller-subtitulo{
+    margin-bottom:14px;
+  }
+  .capa-taller-contenido{
+    width:100%;
+    background:var(--superficie);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:22px 14px;
+    font-size:0.8rem;
+    color:var(--text-sec);
+    text-align:center;
+  }
+  .capa-taller-caja.con-imagen .capa-taller-contenido{
+    background:transparent;
+    border:none;
+    padding:0;
+    text-align:left;
+    color:var(--text);
+    font-size:0.88rem;
+    line-height:1.55;
+  }
+
+  /* Insignia fija de orbSY: niño con telescopio, centrada abajo, en todas las páginas */
+  #insigniaOrbsy{
+    position:fixed;
+    bottom:6px;
+    left:50%;
+    transform:translateX(-50%);
+    height:clamp(58px, 11vh, 92px);
+    width:auto;
+    z-index:40;
+    pointer-events:none;
+    opacity:0.94;
+    filter:drop-shadow(0 0 6px rgba(0,0,0,0.5));
+  }
+
+  /* Animación de entrada tipo "flipbook": 3 cuadros que alternan */
+  #introFlipbook{
+    position:fixed; inset:0; z-index:9999;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(155,124,246,0.10), transparent 55%),
+      radial-gradient(ellipse at 75% 70%, rgba(34,211,196,0.08), transparent 55%),
+      var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0;
+    pointer-events:none;
+  }
+  #introFlipbook.mostrar{ opacity:1; transition:opacity 0.2s ease; }
+  #introFlipbook.ocultando{ opacity:0; transition:opacity 0.4s ease; }
+  #introFlipbookImg{
+    height:min(46vh, 320px);
+    width:auto;
+    filter:drop-shadow(0 0 18px rgba(57,255,140,0.15));
+  }
   .nota-guardada-item{
     background:var(--surface);
     border:1px solid var(--border);
@@ -354,7 +552,7 @@
     opacity:0.85;
   }
   .taller-seccion-header h2{
-    color:#fff;
+    color:var(--text);
     font-size:1.05rem;
     font-weight:700;
     margin:2px 0 0;
@@ -392,12 +590,23 @@
     z-index:0;
   }
   #vistaGalerias{ position:relative; z-index:1; }
+  #vistaPerfiles{ position:relative; z-index:1; }
 
+  #universoFondo{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 10%, rgba(57,255,140,0.05), transparent 60%),
+      radial-gradient(ellipse 55% 45% at 88% 22%, rgba(34,211,196,0.05), transparent 60%),
+      radial-gradient(ellipse 60% 45% at 25% 92%, rgba(155,124,246,0.05), transparent 60%);
+  }
   .capa-estrellas{
     position:absolute;
     inset:0;
     pointer-events:none;
-    z-index:0;
     overflow:hidden;
   }
   .estrella-punto{
@@ -410,99 +619,11 @@
   }
   .constelacion{
     position:absolute;
-    opacity:0.35;
+    opacity:0.3;
   }
   #coleccionesWrap, #galeriasGrid, .orbsy-marca, .galerias-eyebrow, #buscadorInput{
     position:relative;
     z-index:1;
-  }
-
-  /* EL CINTURÓN: banda de tránsito entre el Taller y el contenido */
-  #elCinturon{
-    background:#f2f0ec;
-    border-top:2px solid transparent;
-    border-bottom:2px solid transparent;
-    border-image:linear-gradient(90deg, #39ff8c, #22d3c4, #9b7cf6) 1;
-    padding:14px 12px;
-    margin-bottom:24px;
-  }
-  #cinturonLista{
-    display:flex;
-    gap:12px;
-    max-width:1000px;
-    margin:0 auto;
-    overflow-x:auto;
-    scroll-snap-type:x mandatory;
-  }
-  .asteroide-card{
-    flex:1 0 260px;
-    max-width:340px;
-    min-height:120px;
-    scroll-snap-align:start;
-    background:#0b0b0e;
-    border-radius:12px;
-    padding:16px;
-    display:flex;
-    flex-direction:column;
-    position:relative;
-  }
-  @media (max-width: 640px){
-    .asteroide-card{ flex:1 0 100%; max-width:none; }
-  }
-  .asteroide-autor{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.65rem;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:#9a9aa4;
-    margin-bottom:8px;
-  }
-  .asteroide-texto{
-    font-family:'Fraunces', serif;
-    font-style:italic;
-    font-size:0.95rem;
-    color:#fff;
-    line-height:1.45;
-    flex:1;
-    margin-bottom:12px;
-  }
-  .asteroide-pie{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .asteroide-origen-btn{
-    background:transparent;
-    border:1px solid #3a3a44;
-    color:#e8e8ec;
-    padding:6px 11px;
-    border-radius:7px;
-    font-size:0.72rem;
-    cursor:pointer;
-  }
-  .asteroide-origen-btn:active{ background:#1a1a20; }
-  .asteroide-guardar-btn{
-    background:transparent;
-    border:none;
-    color:#9a9aa4;
-    font-size:1rem;
-    cursor:pointer;
-    padding:2px 6px;
-  }
-  .asteroide-guardar-btn.guardado{ color:var(--violeta); }
-
-  .asteroide-card-vacia{
-    align-items:center;
-    justify-content:center;
-    background:#141418;
-    border:1px dashed #35353d;
-  }
-  .asteroide-texto-vacio{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.72rem;
-    color:#6f6f78;
-    text-align:center;
-    margin:0;
   }
 
   /* PANTALLA: GALERÍAS (nivel superior, diseño propio) */
@@ -529,6 +650,57 @@
   }
   .orbsy-wordmark .orb{ color:var(--verde); text-shadow:0 0 14px rgba(57,255,140,0.4); }
   .orbsy-wordmark .sy{ color:var(--accent); text-shadow:0 0 14px rgba(34,211,196,0.4); }
+
+  /* Fila superior de la pantalla de perfiles: Galería de Usuarios (izq) · logo (centro) · orbSY General (der) */
+  .fila-superior-perfiles{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:4px;
+  }
+  .rotulo-galeria-usuarios{
+    flex:1;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:700;
+    font-size:clamp(0.85rem, 3.4vw, 1.15rem);
+    line-height:1.18;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    padding-top:16px;
+  }
+  .rotulo-galeria-usuarios .p1{ color:var(--verde); }
+  .rotulo-galeria-usuarios .p2{ color:var(--accent); }
+  .rotulo-galeria-usuarios .p3{ color:var(--violeta); }
+  .fila-superior-perfiles .orbsy-marca{ flex:0 0 auto; margin-bottom:0; }
+  .fila-superior-perfiles .orbsy-logo-svg{ width:clamp(56px, 13vw, 100px); height:clamp(56px, 13vw, 100px); }
+  .fila-superior-perfiles .orbsy-wordmark{ font-size:clamp(1.15rem, 4vw, 1.7rem); }
+
+  .orbsy-general-flanco{
+    flex:1;
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center;
+    cursor:pointer;
+    padding-top:6px;
+    visibility:hidden;
+  }
+  .orbsy-general-flanco.visible{ visibility:visible; }
+  .orbsy-general-flanco .perfil-tile-img{
+    width:clamp(78px, 19vw, 118px);
+    height:clamp(78px, 19vw, 118px);
+    margin-bottom:8px;
+  }
+  .orbsy-general-flanco .galeria-tile-nombre{ font-size:0.8rem; font-weight:600; }
+
+  /* La esfera de orbSY General es la única con los 3 colores juntos en su anillo */
+  .orbsy-general-flanco .perfil-tile-img::after{
+    background:conic-gradient(from 0deg, var(--verde), var(--accent), var(--violeta), var(--verde));
+    border:none;
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+    mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+    transform:none;
+    box-shadow:0 0 16px -2px rgba(155,124,246,0.5);
+  }
   .galerias-eyebrow{
     text-align:center;
     font-family:'IBM Plex Mono', monospace;
@@ -555,7 +727,6 @@
     width:96px;
     height:96px;
     border-radius:50%;
-    overflow:hidden;
     margin-bottom:10px;
   }
   .galeria-tile-img img{
@@ -563,6 +734,7 @@
     height:100%;
     object-fit:cover;
     display:block;
+    border-radius:50%;
   }
   .galeria-tile-img::after{
     content:"";
@@ -583,7 +755,6 @@
     width:104px;
     height:104px;
     border-radius:50%;
-    overflow:hidden;
     margin-bottom:10px;
   }
   .perfil-tile-img img{
@@ -591,6 +762,7 @@
     height:100%;
     object-fit:cover;
     display:block;
+    border-radius:50%;
   }
   .perfil-tile-img::after{
     content:"";
@@ -793,7 +965,7 @@
     padding:10px 12px;
     border-radius:8px;
     border:1px solid var(--border);
-    background:#0e0e13;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.85rem;
   }
@@ -802,7 +974,7 @@
     padding:10px 12px;
     border-radius:8px;
     border:1px solid var(--border);
-    background:#0e0e13;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.85rem;
     resize:vertical;
@@ -856,7 +1028,7 @@
     padding:7px 8px;
     border-radius:7px;
     border:1px solid var(--border);
-    background:#0e0e13;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.78rem;
   }
@@ -1003,7 +1175,7 @@
     padding:10px 12px;
     border-radius:8px;
     border:1px solid var(--border);
-    background:#0e0e13;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.85rem;
   }
@@ -1022,7 +1194,7 @@
 
   /* CONSTRUCTOR DE RECURSOS (admin) */
   .recurso-row{
-    background:#0e0e13;
+    background:var(--superficie);
     border:1px solid var(--border);
     border-radius:10px;
     padding:12px;
@@ -1036,7 +1208,7 @@
     padding:9px 10px;
     border-radius:7px;
     border:1px solid var(--border);
-    background:#15151d;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.82rem;
   }
@@ -1045,7 +1217,7 @@
     padding:9px 10px;
     border-radius:7px;
     border:1px solid var(--border);
-    background:#15151d;
+    background:var(--superficie);
     color:var(--text);
     font-size:0.82rem;
     font-family:inherit;
@@ -1078,7 +1250,7 @@
     font-size:0.82rem;
     cursor:pointer;
   }
-  #agregarRecursoBtn:active{ background:#0e0e13; }
+  #agregarRecursoBtn:active{ background:var(--superficie); }
 
   /* MODAL: ÍNDICE TEMÁTICO */
   #indiceModal{
@@ -1168,7 +1340,7 @@
   /* BARRA DE NAVEGACIÓN DENTRO DEL LECTOR (Anterior / Siguiente) */
   #navBar{
     display:none;
-    background:#0e0e13;
+    background:var(--superficie);
     border-bottom:1px solid var(--border);
     padding:10px 14px;
     gap:8px;
@@ -1176,6 +1348,9 @@
     align-items:center;
   }
   #navBar.active{ display:flex; }
+  #marcarComprendidoBtn.activo{ background:var(--verde); color:#0e0e12; }
+  #marcarCongelarBtn.activo{ background:var(--violeta); color:#0e0e12; }
+  #marcarRevisadoBtn.activo{ background:var(--accent); border-color:var(--accent); color:#0e0e12; }
   #navBar button{
     background:transparent;
     border:1px solid var(--border);
@@ -1375,7 +1550,7 @@
     width:100%;
     height:110px;
     flex-shrink:0;
-    background:#0b0b0e;
+    background:var(--superficie);
   }
 
   /* MODAL LECTOR PDF */
@@ -1417,6 +1592,13 @@
     text-overflow:ellipsis;
     white-space:nowrap;
   }
+  .notas-texto-corto{ display:none; }
+  @media (max-width: 480px){
+    .modal-bar #modalTitle{ display:none; }
+    .modal-bar button{ padding:9px 8px; flex-shrink:0; }
+    .notas-texto-completo{ display:none; }
+    .notas-texto-corto{ display:inline; }
+  }
   .pdf-body{
     flex:1;
     width:100%;
@@ -1431,6 +1613,126 @@
 </style>
 </head>
 <body>
+<div id="universoFondo" aria-hidden="true">
+  <div class="capa-estrellas">
+      <span class="estrella-punto" style="top:62.7%; left:4.4%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:15.3%; left:11.7%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:10.3%; left:42.1%; background:#39ff8c; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:50.0%; left:4.5%; background:#9b7cf6; width:3px; height:3px;"></span>
+      <span class="estrella-punto" style="top:53.8%; left:22.9%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:74.1%; left:17.2%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:16.8%; left:92.9%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:38.1%; left:36.1%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:78.7%; left:71.3%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:9.5%; left:29.9%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:56.8%; left:68.9%; background:#39ff8c; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:95.6%; left:83.3%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:28.4%; left:62.4%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:35.8%; left:65.7%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:59.9%; left:18.3%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:45.9%; left:27.6%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:22.9%; left:32.8%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:23.8%; left:5.0%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:8.3%; left:88.7%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:22.2%; left:49.4%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:15.6%; left:15.3%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:27.0%; left:57.5%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:36.4%; left:96.7%; background:#22d3c4; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:73.8%; left:83.8%; background:#39ff8c; width:3px; height:3px;"></span>
+      <span class="estrella-punto" style="top:42.1%; left:8.0%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:52.3%; left:94.3%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:66.6%; left:12.9%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:75.0%; left:34.3%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:45.1%; left:92.6%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:94.3%; left:74.4%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:84.7%; left:30.4%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:20.9%; left:37.5%; background:#9b7cf6; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:58.9%; left:48.4%; background:#22d3c4; width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:24.7%; left:24.9%; background:var(--text-sec); width:1.5px; height:1.5px;"></span>
+      <span class="estrella-punto" style="top:10.1%; left:48.2%; background:#9b7cf6; width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:14.2%; left:47.2%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:52.1%; left:59.6%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:73.8%; left:67.5%; background:var(--text-sec); width:2px; height:2px;"></span>
+      <span class="estrella-punto" style="top:96.5%; left:63.7%; background:var(--text-sec); width:2.5px; height:2.5px;"></span>
+      <span class="estrella-punto" style="top:44.9%; left:25.6%; background:#39ff8c; width:3px; height:3px;"></span>
+
+      <svg class="constelacion" style="top:6%; left:8%;" viewBox="0 0 120 90" width="85" height="65">
+        <line x1="10" y1="60" x2="45" y2="20" stroke="#22d3c4" stroke-width="1"/>
+        <line x1="45" y1="20" x2="90" y2="35" stroke="#22d3c4" stroke-width="1"/>
+        <line x1="90" y1="35" x2="105" y2="10" stroke="#22d3c4" stroke-width="1"/>
+        <circle cx="10" cy="60" r="2.2" fill="#22d3c4"/>
+        <circle cx="45" cy="20" r="2.2" fill="#22d3c4"/>
+        <circle cx="90" cy="35" r="2.2" fill="#22d3c4"/>
+        <circle cx="105" cy="10" r="2.2" fill="#22d3c4"/>
+      </svg>
+      <svg class="constelacion" style="top:18%; right:6%;" viewBox="0 0 120 90" width="75" height="55">
+        <line x1="8" y1="15" x2="40" y2="45" stroke="var(--text-sec)" stroke-width="1"/>
+        <line x1="40" y1="45" x2="80" y2="30" stroke="var(--text-sec)" stroke-width="1"/>
+        <circle cx="8" cy="15" r="2" fill="var(--text-sec)"/>
+        <circle cx="40" cy="45" r="2" fill="var(--text-sec)"/>
+        <circle cx="80" cy="30" r="2" fill="var(--text-sec)"/>
+      </svg>
+      <svg class="constelacion" style="top:44%; left:4%;" viewBox="0 0 120 90" width="80" height="60">
+        <line x1="12" y1="10" x2="38" y2="40" stroke="#9b7cf6" stroke-width="1"/>
+        <line x1="38" y1="40" x2="20" y2="70" stroke="#9b7cf6" stroke-width="1"/>
+        <line x1="38" y1="40" x2="75" y2="55" stroke="#9b7cf6" stroke-width="1"/>
+        <circle cx="12" cy="10" r="2.2" fill="#9b7cf6"/>
+        <circle cx="38" cy="40" r="2.2" fill="#9b7cf6"/>
+        <circle cx="20" cy="70" r="2.2" fill="#9b7cf6"/>
+        <circle cx="75" cy="55" r="2.2" fill="#9b7cf6"/>
+      </svg>
+      <svg class="constelacion" style="top:62%; right:10%;" viewBox="0 0 120 90" width="90" height="68">
+        <line x1="10" y1="50" x2="42" y2="15" stroke="#39ff8c" stroke-width="1"/>
+        <line x1="42" y1="15" x2="80" y2="25" stroke="#39ff8c" stroke-width="1"/>
+        <line x1="80" y1="25" x2="100" y2="55" stroke="#39ff8c" stroke-width="1"/>
+        <circle cx="10" cy="50" r="2.2" fill="#39ff8c"/>
+        <circle cx="42" cy="15" r="2.2" fill="#39ff8c"/>
+        <circle cx="80" cy="25" r="2.2" fill="#39ff8c"/>
+        <circle cx="100" cy="55" r="2.2" fill="#39ff8c"/>
+      </svg>
+      <svg class="constelacion" style="bottom:5%; left:14%;" viewBox="0 0 120 90" width="80" height="60">
+        <line x1="8" y1="20" x2="35" y2="50" stroke="var(--text-sec)" stroke-width="1"/>
+        <line x1="35" y1="50" x2="75" y2="35" stroke="var(--text-sec)" stroke-width="1"/>
+        <circle cx="8" cy="20" r="2" fill="var(--text-sec)"/>
+        <circle cx="35" cy="50" r="2" fill="var(--text-sec)"/>
+        <circle cx="75" cy="35" r="2" fill="var(--text-sec)"/>
+      </svg>
+  </div>
+</div>
+
+<img id="insigniaOrbsy" src="orbsy-insignia.png" alt="" aria-hidden="true">
+
+<div id="introFlipbook" aria-hidden="true">
+  <img id="introFlipbookImg" src="intro-1.png" alt="">
+</div>
+
+<!-- Capas del Taller: Noticias en orbSY y Publicidad en orbSY.
+     Aparecen una vez por sesión, solo al iniciar sesión de Admin. -->
+<div id="capaNoticiasOrbSY" class="capa-taller-overlay" style="display:none;">
+  <div class="capa-taller-caja" id="capaNoticiasCaja">
+    <button type="button" class="capa-taller-cerrar" id="cerrarCapaNoticiasBtn">✕</button>
+    <img id="capaNoticiasImagen" class="capa-taller-imagen" alt="">
+    <div class="capa-taller-cuerpo">
+      <svg id="capaNoticiasIcono" viewBox="0 0 200 200" style="width:56px;height:56px;margin-bottom:10px;"><use href="#icono-noticias-svg"/></svg>
+      <div class="capa-taller-titulo" id="capaNoticiasTitulo">Noticias en orbSY</div>
+      <p class="capa-taller-subtitulo" id="capaNoticiasSubtitulo">Datos y novedades productivas — psicología, ciencia, arte, literatura.</p>
+      <div class="capa-taller-contenido" id="capaNoticiasContenido">Próximamente habrá noticias aquí.</div>
+      <button type="button" id="leerNoticiaDestacadaBtn" style="display:none;width:100%;margin-top:16px;background:var(--verde);border:none;color:#000;padding:11px;border-radius:8px;font-weight:600;cursor:pointer;">Leer completa</button>
+    </div>
+  </div>
+</div>
+
+<div id="capaPublicidadOrbSY" class="capa-taller-overlay" style="display:none;">
+  <div class="capa-taller-caja">
+    <button type="button" class="capa-taller-cerrar" id="cerrarCapaPublicidadBtn">✕</button>
+    <svg viewBox="0 0 200 200" style="width:56px;height:56px;margin-bottom:10px;margin-top:26px;"><use href="#icono-publicidad-svg"/></svg>
+    <div class="capa-taller-cuerpo" style="padding-top:0;">
+      <div class="capa-taller-titulo">Publicidad en orbSY</div>
+      <p class="capa-taller-subtitulo">Espacio reservado para anunciantes.</p>
+      <div class="capa-taller-contenido">Próximamente se harán publicidades aquí.</div>
+    </div>
+  </div>
+</div>
 
 <!-- Definición reutilizable del ícono meteorito (orbSY notes) -->
 <svg width="0" height="0" style="position:absolute;">
@@ -1444,10 +1746,68 @@
       <polygon points="98,92 122,100 130,124 116,148 88,150 68,130 72,104" fill="#9b7cf6" stroke="#9b7cf6" stroke-width="2"/>
     </g>
 
+    <!-- Ícono de Historial de Referencias: cápsula de muestra sellada, con un
+         fragmento brillante adentro. Mismo lenguaje de forma sólida + brillo
+         que el meteorito, pero en turquesa, y quieta en vez de cayendo. -->
+    <g id="icono-capsula-svg">
+      <linearGradient id="capsulaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#22d3c4" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#22d3c4" stop-opacity="0.55"/>
+      </linearGradient>
+      <rect x="72" y="46" width="56" height="112" rx="28" fill="url(#capsulaGrad)" stroke="#22d3c4" stroke-width="6"/>
+      <line x1="72" y1="100" x2="128" y2="100" stroke="#22d3c4" stroke-width="4"/>
+      <polygon points="100,72 108,88 124,90 112,101 115,117 100,109 85,117 88,101 76,90 92,88" fill="#22d3c4"/>
+    </g>
+
+    <!-- Ícono de Noticias en orbSY: un pequeño emisor con ondas de señal,
+         cuerpo sólido + brillo, en verde (mismo verde del logo/wordmark
+         "orb", para marcarlo como contenido oficial de la plataforma). -->
+    <g id="icono-noticias-svg">
+      <linearGradient id="noticiasGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#39ff8c" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#39ff8c" stop-opacity="0.55"/>
+      </linearGradient>
+      <circle cx="100" cy="112" r="20" fill="url(#noticiasGrad)" stroke="#39ff8c" stroke-width="6"/>
+      <path d="M 78 90 A 46 46 0 0 1 122 90" fill="none" stroke="#39ff8c" stroke-width="7" stroke-linecap="round"/>
+      <path d="M 66 74 A 68 68 0 0 1 134 74" fill="none" stroke="#39ff8c" stroke-width="7" stroke-linecap="round" opacity="0.55"/>
+    </g>
+
+    <!-- Ícono de Publicidad en orbSY: un faro/destello de 4 puntas, cuerpo
+         sólido + brillo, en blanco-grisáceo (deliberadamente distinto a los
+         colores de marca, para marcarlo como contenido externo/pagado). -->
+    <g id="icono-publicidad-svg">
+      <linearGradient id="publicidadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="var(--text-sec)" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="var(--text-sec)" stop-opacity="0.6"/>
+      </linearGradient>
+      <polygon points="100,50 114,86 150,100 114,114 100,150 86,114 50,100 86,86" fill="url(#publicidadGrad)" stroke="var(--text-sec)" stroke-width="6"/>
+      <circle cx="100" cy="100" r="10" fill="var(--text-sec)"/>
+    </g>
+
+    <!-- Ícono de Seguir perfiles: mini constelación de 3 puntos conectados,
+         en turquesa (misma familia de "lo que guardaste tú" que la cápsula
+         del Historial de Referencias, pero con forma propia). -->
+    <g id="icono-seguidos-svg">
+      <line x1="62" y1="130" x2="100" y2="72" stroke="#22d3c4" stroke-width="5" opacity="0.65"/>
+      <line x1="100" y1="72" x2="138" y2="122" stroke="#22d3c4" stroke-width="5" opacity="0.65"/>
+      <circle cx="62" cy="130" r="14" fill="#22d3c4" opacity="0.35" stroke="#22d3c4" stroke-width="5"/>
+      <circle cx="100" cy="72" r="16" fill="#22d3c4" opacity="0.35" stroke="#22d3c4" stroke-width="5"/>
+      <circle cx="138" cy="122" r="14" fill="#22d3c4" opacity="0.35" stroke="#22d3c4" stroke-width="5"/>
+    </g>
+
+    <!-- Ícono de Congelados: copo de nieve simple, en violeta — herramienta
+         de estudio ("dejado a propósito para volver"), no un simple guardado. -->
+    <g id="icono-congelados-svg">
+      <line x1="100" y1="55" x2="100" y2="145" stroke="#9b7cf6" stroke-width="7" stroke-linecap="round"/>
+      <line x1="58" y1="77" x2="142" y2="123" stroke="#9b7cf6" stroke-width="7" stroke-linecap="round"/>
+      <line x1="142" y1="77" x2="58" y2="123" stroke="#9b7cf6" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="10" fill="#9b7cf6"/>
+    </g>
+
     <!-- Candado propio: anillo abierto + cuerpo, mismo lenguaje del logo -->
     <g id="icono-candado-svg">
-      <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="#e8e8ec" stroke-width="9" stroke-linecap="round"/>
-      <rect x="62" y="92" width="76" height="60" rx="10" fill="#e8e8ec"/>
+      <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="var(--text-sec)" stroke-width="9" stroke-linecap="round"/>
+      <rect x="62" y="92" width="76" height="60" rx="10" fill="var(--text-sec)"/>
       <circle cx="100" cy="118" r="7" fill="#0e0e12"/>
       <rect x="94" y="120" width="12" height="16" rx="4" fill="#0e0e12"/>
     </g>
@@ -1497,11 +1857,25 @@
         <div style="font-size:0.72rem;color:var(--text-sec);">Tus apuntes guardados</div>
       </div>
     </div>
-    <div class="herramienta-item" id="abrirAsteroidesGuardadosBtn">
-      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🪨</div>
+    <div class="herramienta-item" id="abrirHistorialBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-capsula-svg"/></svg>
       <div>
-        <div style="font-size:0.85rem;font-weight:600;">Guardados del Cinturón</div>
-        <div style="font-size:0.72rem;color:var(--text-sec);">Fragmentos que guardaste para después</div>
+        <div style="font-size:0.85rem;font-weight:600;">Historial de Referencias</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Palabras de otros autores que guardaste</div>
+      </div>
+    </div>
+    <div class="herramienta-item" id="abrirSeguidosBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-seguidos-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Perfiles que sigues</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Tu lista personal, nadie más la ve</div>
+      </div>
+    </div>
+    <div class="herramienta-item" id="abrirCongeladosBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-congelados-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Congelados</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Temas que dejaste para volver más profundo</div>
       </div>
     </div>
     <div class="herramienta-item" style="opacity:0.45;cursor:default;">
@@ -1521,23 +1895,107 @@
   </div>
 
   <div id="notasGuardadasVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
-    <div style="padding:10px 14px;">
+    <div style="padding:10px 14px 0;">
       <button id="volverAHerramientasBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
     </div>
+    <div style="display:flex;gap:8px;padding:12px 14px 8px;border-bottom:1px solid var(--border);">
+      <button class="notas-tab-btn activo" id="tabNotasBtn" type="button" style="flex:1;background:var(--accent);border:none;color:#fff;padding:8px 0;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;">Notas</button>
+      <button class="notas-tab-btn" id="tabPlantillasBtn" type="button" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:8px 0;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;">Plantillas de Recursos</button>
+    </div>
     <div class="notas-guardadas-lista" id="notasGuardadasLista"></div>
+    <div id="plantillasVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+      <div style="padding:12px 14px 0;">
+        <button id="nuevaPlantillaBtn" style="width:100%;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">+ Nueva plantilla de recursos</button>
+      </div>
+      <div class="notas-guardadas-lista" id="plantillasLista"></div>
+    </div>
   </div>
 
-  <div id="asteroidesGuardadosVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
-    <div style="padding:10px 14px;">
-      <button id="volverAHerramientasBtn2" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+  <!-- Editor de plantilla de recursos: FORMULARIO estructurado (no texto libre) -->
+  <div id="plantillaEditorVista" style="display:none;flex-direction:column;flex:1;overflow-y:auto;">
+    <div style="padding:10px 14px;display:flex;gap:8px;">
+      <button id="volverAPlantillasBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Plantillas</button>
+      <button id="guardarPlantillaBtn" style="flex:1;background:var(--accent);border:none;color:#fff;padding:7px 12px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;">Guardar plantilla</button>
+      <button id="eliminarPlantillaBtn" style="display:none;background:transparent;border:1px solid var(--border);color:#f87171;padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">Eliminar</button>
     </div>
-    <div class="notas-guardadas-lista" id="asteroidesGuardadosLista"></div>
+
+    <div id="plantillaTarjeta" style="margin:0 14px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;border-top:3px solid var(--verde);">
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:8px;">Una plantilla es para UN solo espacio: una galería, una colección, o una publicación. Elige cuál estás planeando:</p>
+      <div id="plantillaTipoSelector" style="display:flex;gap:6px;margin-bottom:18px;">
+        <button type="button" class="plantilla-tipo-btn" data-tipo="galeria" data-color="verde">🌌 Galería</button>
+        <button type="button" class="plantilla-tipo-btn" data-tipo="coleccion" data-color="turquesa">🗂️ Colección</button>
+        <button type="button" class="plantilla-tipo-btn" data-tipo="publicacion" data-color="violeta">📖 Publicación</button>
+      </div>
+
+      <label id="plantillaNombreLabel"><span class="etiqueta-icono">✏️</span> <span class="etiqueta-texto">Nombre</span></label>
+      <div class="plantilla-campo-copiable">
+        <input type="text" id="plantillaNombreInput" placeholder="Ej: La noche del nihilista">
+        <button type="button" class="copiar-campo-btn" data-target="plantillaNombreInput">Copiar</button>
+      </div>
+
+      <label id="plantillaResumenLabel"><span class="etiqueta-icono">📝</span> <span class="etiqueta-texto">Resumen</span></label>
+      <div class="plantilla-campo-copiable">
+        <textarea id="plantillaResumenInput" placeholder="Resumen o frase de bienvenida..."></textarea>
+        <button type="button" class="copiar-campo-btn" data-target="plantillaResumenInput">Copiar</button>
+      </div>
+
+      <label>🖼️ Enlace de Google Drive (imagen de portada)</label>
+      <div class="plantilla-campo-copiable">
+        <input type="text" id="plantillaPortadaInput" placeholder="https://drive.google.com/file/d/.../view">
+        <button type="button" class="copiar-campo-btn" data-target="plantillaPortadaInput">Copiar</button>
+      </div>
+
+      <div id="plantillaFondoGrupo">
+        <label>🌠 Enlace de Google Drive (imagen de fondo, opcional)</label>
+        <div class="plantilla-campo-copiable">
+          <input type="text" id="plantillaFondoInput" placeholder="https://drive.google.com/file/d/.../view">
+          <button type="button" class="copiar-campo-btn" data-target="plantillaFondoInput">Copiar</button>
+        </div>
+      </div>
+
+      <div id="plantillaRecursosGrupo" style="display:none;">
+        <label style="margin-top:16px;">📎 Recursos (elige el formato y pega el enlace, agrega los que necesites)</label>
+        <div id="plantillaRecursosBuilderContainer"></div>
+        <button type="button" id="plantillaAgregarRecursoBtn">+ Agregar recurso</button>
+
+        <label style="margin-top:16px;">🪞 Preguntas de reflexión (opcional)</label>
+        <div id="plantillaPreguntasBuilderContainer"></div>
+        <button type="button" id="plantillaAgregarPreguntaBtn">+ Agregar pregunta</button>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+
+  <div id="historialVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasDesdeHistorialBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Palabras e ideas de otros autores que guardaste mientras explorabas orbSY, en orden alfabético.</p>
+    <div class="notas-guardadas-lista" id="historialLista"></div>
+  </div>
+
+  <div id="seguidosVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasDesdeSeguidosBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Tu lista personal. No aumenta el contador de nadie ni nadie ve a quién sigues.</p>
+    <div class="notas-guardadas-lista" id="seguidosLista"></div>
+  </div>
+
+  <div id="congeladosVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasDesdeCongeladosBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Temas que marcaste "❄ Congelar" para retomar más adelante. Tocar "Retomar" te lleva directo ahí.</p>
+    <div class="notas-guardadas-lista" id="congeladosLista"></div>
   </div>
 </div>
+
 
 <header id="headerColecciones" style="display:none;">
   <button id="backToGaleriasBtn" style="position:absolute;left:16px;top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:6px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Galerías</button>
   <h1 id="tituloGaleriaHeader" aria-label="Galería"></h1>
+  <div id="firmaGaleriaHeader" style="text-align:center;font-style:italic;font-size:0.8rem;color:var(--text-sec);margin-top:2px;"></div>
 </header>
 
 <main>
@@ -1587,28 +2045,46 @@
         <option value="violeta">Morado</option>
         <option value="gris">Blanco grisáceo</option>
       </select>
+      <label>Resumen / biografía (opcional)</label>
+      <textarea id="perfilResumenInput" rows="3" placeholder="Tu categoría, estilo y dirección del trabajo. Aparece cuando alguien consulta tu biografía."></textarea>
       <button id="guardarPerfilBtn" style="margin-top:10px;">Guardar perfil</button>
     </div>
 
     <div id="perfilInfo" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;">
       <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:6px;">Tu enlace de perfil (compártelo para que otros vean solo tus galerías):</p>
       <div style="display:flex;gap:8px;">
-        <input type="text" id="perfilEnlaceInput" readonly style="flex:1;padding:8px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text-sec);font-size:0.72rem;">
+        <input type="text" id="perfilEnlaceInput" readonly style="flex:1;padding:8px 10px;border-radius:7px;border:1px solid var(--border);background:var(--superficie);color:var(--text-sec);font-size:0.72rem;">
         <button id="copiarEnlacePerfilBtn" style="background:var(--accent);border:none;color:#fff;padding:0 12px;border-radius:7px;font-size:0.75rem;cursor:pointer;">Copiar</button>
       </div>
     </div>
 
     <div id="formSection" style="display:none;">
+      <div id="solicitudesSection" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+        <h2 style="margin-bottom:4px;">🔄 Solicitudes de transferencia</h2>
+        <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:12px;">Galerías, colecciones o publicaciones que otros perfiles quieren pasarte, o que tú les enviaste.</p>
+        <div id="solicitudesEntrantesContainer"></div>
+        <div id="solicitudesEnviadasContainer" style="margin-top:10px;"></div>
+      </div>
+
       <div id="tallerHeader" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:16px;">
         <h2 style="margin:0;display:flex;align-items:center;gap:8px;">
           <svg class="icono-taller" viewBox="0 0 200 200" width="22" height="22"><use href="#icono-taller-svg"/></svg>
           Taller
 
         </h2>
-        <button id="tallerToggleBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);width:34px;height:34px;border-radius:8px;font-size:0.9rem;cursor:pointer;">▲</button>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button type="button" class="taller-pestana-btn" data-seccion="configuracion" id="botonConfiguracionTaller" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);width:34px;height:34px;border-radius:8px;font-size:1rem;cursor:pointer;">⚙</button>
+          <button id="tallerToggleBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);width:34px;height:34px;border-radius:8px;font-size:0.9rem;cursor:pointer;">▲</button>
+        </div>
       </div>
 
       <div id="tallerContenido">
+
+      <div id="tallerPestanas" style="display:flex;gap:6px;margin-bottom:20px;">
+        <button type="button" class="taller-pestana-btn activa" data-seccion="galerias">Galerías</button>
+        <button type="button" class="taller-pestana-btn" data-seccion="colecciones">Colecciones</button>
+        <button type="button" class="taller-pestana-btn" data-seccion="publicaciones">Publicaciones</button>
+      </div>
 
       <div class="taller-seccion taller-galerias">
         <div class="taller-seccion-header">
@@ -1618,6 +2094,8 @@
             <h2>Crear nueva galería</h2>
           </div>
         </div>
+      <button type="button" class="usar-plantilla-btn" data-tipo="galeria" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Usar plantilla</button>
+
       <label>Nombre de la galería</label>
       <input type="text" id="inputNombreGaleria" placeholder="Ej: Orbsentismo, MICSES...">
 
@@ -1626,6 +2104,16 @@
 
       <label>Enlace de Google Drive (imagen de fondo, opcional)</label>
       <input type="text" id="inputFondoGaleria" placeholder="https://drive.google.com/file/d/.../view">
+
+      <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:10px;">
+        <input type="checkbox" id="inputEsGaleriaGeneral" style="width:auto;">
+        Añadir esta galería a la esfera <strong>orbSY General</strong> (no reemplaza a las demás)
+      </label>
+
+      <label id="opcionNoticiasLabel" style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:6px;">
+        <input type="checkbox" id="inputEsGaleriaNoticias" style="width:auto;">
+        Es la galería de <strong>Noticias en orbSY</strong> (para elegir qué se destaca en el Taller)
+      </label>
 
       <div style="display:flex;gap:8px;">
         <button id="crearGaleriaBtn" style="flex:1;">Crear galería</button>
@@ -1646,6 +2134,8 @@
             <h2>Crear nueva colección</h2>
           </div>
         </div>
+      <button type="button" class="usar-plantilla-btn" data-tipo="coleccion" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Usar plantilla</button>
+
       <label>Nombre de la colección</label>
       <input type="text" id="inputNombreColeccion" placeholder="Ej: Una noche con el nihilismo">
 
@@ -1686,6 +2176,8 @@
             <h2>Publicar nuevo libro</h2>
           </div>
         </div>
+      <button type="button" class="usar-plantilla-btn" data-tipo="publicacion" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Usar plantilla</button>
+
       <label>Título del libro</label>
       <input type="text" id="inputTitulo" placeholder="Ej: Meditaciones del Exadicto">
 
@@ -1708,89 +2200,99 @@
       <div id="preguntasBuilderContainer"></div>
       <button type="button" id="agregarPreguntaBtn">+ Agregar pregunta</button>
 
-      <label style="margin-top:16px;">Texto de propagación al Cinturón (opcional)</label>
-      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Un bocado corto de esta publicación, para que otros lo vean de paso y decidan si quieren ir al contenido completo.</p>
-      <textarea id="inputTextoPropagacion" maxlength="200" placeholder="Ej: Hay orbsentistas de luz, otros de muerte..." rows="3"></textarea>
-      <p style="font-size:0.7rem;color:var(--text-sec);text-align:right;margin-top:2px;"><span id="contadorPropagacion">0</span>/200</p>
+      <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:18px;">
+        <input type="checkbox" id="inputAgregarDiccionario" style="width:auto;">
+        📖 Agregar Diccionario de Referencias
+      </label>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin:2px 0 8px;">Explica aquí las palabras o ideas propias que uses en esta publicación. Esto enriquece aún más la esencia de tu usuario.</p>
+      <div id="diccionarioSeccion" style="display:none;">
+        <div id="diccionarioBuilderContainer"></div>
+        <button type="button" id="agregarTerminoBtn">+ Agregar término</button>
+      </div>
 
       <div style="display:flex;gap:8px;margin-top:16px;">
         <button id="publishBtn" style="flex:1;">Publicar</button>
         <button id="cancelarEdicionLibroBtn" style="display:none;flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:0 14px;border-radius:9px;">Cancelar</button>
       </div>
-      <button id="logoutBtn" style="margin-top:8px;width:100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:9px;cursor:pointer;">Cerrar sesión</button>
 
       <div class="admin-list">
         <h3>Libros publicados</h3>
         <div id="adminListContainer"></div>
       </div>
       </div>
+
+      <div class="taller-seccion taller-configuracion" style="display:none;">
+        <div class="taller-seccion-header">
+          <svg class="taller-icono" viewBox="0 0 200 200"><use href="#icono-candado-svg"/></svg>
+          <div>
+            <div class="taller-seccion-eyebrow">CONFIGURACIÓN</div>
+            <h2>Configuración de orbSY</h2>
+          </div>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:18px;">Todas tus gestiones de cuenta, en un solo lugar — sin menús escondidos.</p>
+
+        <button type="button" id="editarPerfilBtn" style="width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px;border-radius:9px;cursor:pointer;font-weight:600;margin-bottom:10px;">✏️ Editar perfil (nombre, foto, color, resumen)</button>
+
+        <div style="background:var(--superficie);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
+          <p style="font-size:0.78rem;font-weight:600;margin-bottom:2px;">Modo de cuenta: <span id="modoActualTexto" style="color:var(--accent);">Creador</span></p>
+          <p style="font-size:0.73rem;color:var(--text-sec);margin-bottom:10px;" id="modoActualDescripcion">Tenés acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.</p>
+          <button type="button" id="cambiarModoCuentaBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-size:0.78rem;cursor:pointer;">Cambiar a modo Espectador</button>
+        </div>
+
+        <button id="logoutBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:9px;cursor:pointer;">Cerrar sesión</button>
+
+        <div style="margin-top:26px;padding-top:16px;border-top:1px solid var(--border);">
+          <button type="button" id="mostrarZonaPeligroBtn" style="background:transparent;border:none;color:var(--violeta);font-size:0.78rem;cursor:pointer;padding:6px 0;">Eliminar perfil</button>
+          <div id="zonaPeligroCuenta" style="display:none;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.35);border-radius:12px;padding:14px;margin-top:8px;">
+            <p style="font-size:0.78rem;color:#f87171;font-weight:600;margin-bottom:4px;">⚠ Zona de peligro</p>
+            <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:10px;">Esto borra para siempre esta cuenta con la que estás conectado ahora mismo: su perfil, todas sus galerías, colecciones y publicaciones, y el correo/contraseña con el que entraste. No se puede deshacer, y no afecta a ninguna otra cuenta.</p>
+            <button id="eliminarCuentaBtn" style="width:100%;background:transparent;border:1px solid #f87171;color:#f87171;padding:9px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;">Eliminar esta cuenta para siempre</button>
+          </div>
+        </div>
+      </div>
       </div>
     </div>
   </div>
 
-  <!-- EL CINTURÓN: banda de tránsito de fragmentos cortos (asteroides) -->
-  <div id="elCinturon">
-    <div id="cinturonLista"></div>
-  </div>
-
   <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
   <div id="vistaPerfiles">
+    <div class="fila-superior-perfiles">
+      <div class="rotulo-galeria-usuarios"><span class="p1">Galería</span><br><span class="p2">de</span><br><span class="p3">Usuarios</span></div>
 
-    <div class="orbsy-marca">
-      <svg class="orbsy-logo-svg" viewBox="0 0 200 200" style="margin-bottom:14px;">
-        <defs>
-          <radialGradient id="esferaGradPerfiles" cx="38%" cy="35%" r="70%">
-            <stop offset="0%" stop-color="#3a3a44"/>
-            <stop offset="55%" stop-color="#202027"/>
-            <stop offset="100%" stop-color="#121216"/>
-          </radialGradient>
-        </defs>
-        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(-18 100 100)"/>
-        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(42 100 100)"/>
-        <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(102 100 100)"/>
-        <circle cx="100" cy="100" r="52" fill="url(#esferaGradPerfiles)" stroke="#3d3d47" stroke-width="1"/>
-        <circle cx="168" cy="78" r="10" fill="#39ff8c"/>
-        <circle cx="40" cy="128" r="8.5" fill="#22d3c4"/>
-        <circle cx="118" cy="172" r="7" fill="#9b7cf6"/>
-      </svg>
-      <div class="orbsy-wordmark"><span class="orb">orb</span><span class="sy">SY</span></div>
+      <div class="orbsy-marca">
+        <svg class="orbsy-logo-svg" viewBox="0 0 200 200" style="margin-bottom:14px;">
+          <defs>
+            <radialGradient id="esferaGradPerfiles" cx="38%" cy="35%" r="70%">
+              <stop offset="0%" stop-color="#3a3a44"/>
+              <stop offset="55%" stop-color="#202027"/>
+              <stop offset="100%" stop-color="#121216"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(-18 100 100)"/>
+          <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(42 100 100)"/>
+          <ellipse cx="100" cy="100" rx="88" ry="32" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1" transform="rotate(102 100 100)"/>
+          <circle cx="100" cy="100" r="52" fill="url(#esferaGradPerfiles)" stroke="#3d3d47" stroke-width="1"/>
+          <circle cx="168" cy="78" r="10" fill="#39ff8c"/>
+          <circle cx="40" cy="128" r="8.5" fill="#22d3c4"/>
+          <circle cx="118" cy="172" r="7" fill="#9b7cf6"/>
+        </svg>
+        <div class="orbsy-wordmark"><span class="orb">orb</span><span class="sy">SY</span></div>
+      </div>
+
+      <div id="orbsyGeneralFlanco" class="orbsy-general-flanco"></div>
     </div>
-    <div class="galerias-eyebrow">Elige un perfil</div>
+    <div class="galerias-eyebrow">Tus galerías, tus mundos</div>
     <div id="loadingMsgPerfiles" class="empty-msg">Cargando perfiles...</div>
     <div id="perfilesGrid" class="galerias-grid"></div>
     <div id="emptyMsgPerfiles" class="empty-msg" style="display:none;">Aún no hay perfiles creados.</div>
+    <div id="errorMsgPerfiles" class="empty-msg" style="display:none;color:#f87171;">No se pudieron cargar los perfiles (permiso denegado). Revisa las reglas de Firestore para la colección "usuarios".</div>
   </div>
 
   <!-- VISTA: GALERÍAS (nivel superior, pantalla de inicio) -->
   <div id="vistaGalerias" style="display:none;">
     <button id="backToPerfilesBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;margin-bottom:14px;">← Perfiles</button>
-    <!-- Motivos de galaxia sutiles, solo decorativos -->
-    <div class="capa-estrellas" aria-hidden="true">
-      <span class="estrella-punto" style="top:8%; left:6%; background:#39ff8c;"></span>
-      <span class="estrella-punto" style="top:14%; left:18%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="top:6%; right:12%; background:#22d3c4;"></span>
-      <span class="estrella-punto" style="top:22%; right:6%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="bottom:10%; left:9%; background:#9b7cf6;"></span>
-      <span class="estrella-punto" style="bottom:18%; left:22%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <span class="estrella-punto" style="bottom:8%; right:8%; background:#39ff8c;"></span>
-      <span class="estrella-punto" style="bottom:26%; right:20%; background:#e8e8ec; width:2px; height:2px;"></span>
-      <svg class="constelacion" style="top:4%; right:4%;" viewBox="0 0 120 90" width="90" height="70">
-        <line x1="10" y1="60" x2="45" y2="20" stroke="#22d3c4" stroke-width="1"/>
-        <line x1="45" y1="20" x2="90" y2="35" stroke="#22d3c4" stroke-width="1"/>
-        <line x1="90" y1="35" x2="105" y2="10" stroke="#22d3c4" stroke-width="1"/>
-        <circle cx="10" cy="60" r="2.5" fill="#22d3c4"/>
-        <circle cx="45" cy="20" r="2.5" fill="#22d3c4"/>
-        <circle cx="90" cy="35" r="2.5" fill="#22d3c4"/>
-        <circle cx="105" cy="10" r="2.5" fill="#22d3c4"/>
-      </svg>
-      <svg class="constelacion" style="bottom:6%; left:5%;" viewBox="0 0 120 90" width="80" height="60">
-        <line x1="8" y1="15" x2="40" y2="45" stroke="#39ff8c" stroke-width="1"/>
-        <line x1="40" y1="45" x2="80" y2="30" stroke="#39ff8c" stroke-width="1"/>
-        <circle cx="8" cy="15" r="2.5" fill="#39ff8c"/>
-        <circle cx="40" cy="45" r="2.5" fill="#39ff8c"/>
-        <circle cx="80" cy="30" r="2.5" fill="#39ff8c"/>
-      </svg>
-    </div>
+    <button id="abrirBiografiaBtn" style="display:none;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:14px;margin-left:8px;">📖 Biografía y Diccionario de Referencias</button>
+    <button id="seguirPerfilBtn" style="display:none;background:transparent;border:1px dashed #22d3c4;color:#22d3c4;padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:14px;margin-left:8px;">＋ Seguir</button>
     <div class="galerias-eyebrow">Tus galerías</div>
     <div id="loadingMsgGalerias" class="empty-msg">Cargando...</div>
     <div id="galeriasGrid" class="galerias-grid"></div>
@@ -1815,6 +2317,8 @@
       <div id="coleccionHeaderInfo">
         <h2 id="coleccionDetalleTitulo"></h2>
         <p id="coleccionDetalleFrase"></p>
+        <div id="firmaColeccionDetalle" style="font-style:italic;font-size:0.78rem;color:var(--text-sec);margin-top:-6px;margin-bottom:10px;"></div>
+        <button id="abrirDiccionarioBtn" style="display:none;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:10px;">📖 Diccionario de Referencias</button>
       </div>
     </div>
     <div id="gridContainer" class="grid"></div>
@@ -1827,12 +2331,55 @@
 <div id="claveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:340px;width:100%;padding:22px;">
     <h3 id="claveModalTitulo" style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:14px;">Colección protegida</h3>
-    <input type="password" id="claveModalInput" placeholder="Contraseña" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.88rem;">
+    <input type="password" id="claveModalInput" placeholder="Contraseña" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.88rem;">
     <p id="claveModalError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:8px;">Contraseña incorrecta</p>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button id="claveModalCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
       <button id="claveModalEntrar" style="flex:1;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">Entrar</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL: TRANSFERIR CONTENIDO A OTRO PERFIL -->
+<div id="transferModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:340px;width:100%;padding:22px;">
+    <h3 id="transferModalTitulo" style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:6px;">Transferir</h3>
+    <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:14px;">Elige a quién quieres enviárselo. Pasará a ser suyo solo si acepta la solicitud.</p>
+    <select id="transferDestinoSelect" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.85rem;"></select>
+    <p id="transferModalError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:8px;"></p>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button id="transferModalCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
+      <button id="transferModalEnviar" style="flex:1;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">Enviar solicitud</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: IMPORTAR PLANTILLA DE RECURSOS AL TALLER -->
+<div id="importarPlantillaModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:400px;width:100%;padding:22px;max-height:80vh;display:flex;flex-direction:column;">
+    <h3 style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:6px;">Importar Plantilla de Recursos</h3>
+    <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:14px;">Elige una plantilla creada en orbSY notes. Se llenará automáticamente el título, el resumen, los recursos y las preguntas de reflexión.</p>
+    <div id="importarPlantillaLista" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;"></div>
+    <button id="importarPlantillaCancelar" style="margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL: BIOGRAFÍA Y DICCIONARIO DE REFERENCIAS DEL AUTOR -->
+<div id="biografiaModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;max-height:82vh;display:flex;flex-direction:column;">
+    <h3 id="biografiaModalTitulo" style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:10px;"></h3>
+    <div id="biografiaModalCuerpo" style="overflow-y:auto;flex:1;"></div>
+    <button id="cerrarBiografiaBtn" style="margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;flex-shrink:0;">Cerrar</button>
+  </div>
+</div>
+
+<!-- MODAL: DICCIONARIO DE REFERENCIAS -->
+<div id="diccionarioModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;padding:22px;max-height:80vh;display:flex;flex-direction:column;">
+    <h3 style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:2px;">📖 Diccionario de Referencias</h3>
+    <p id="diccionarioModalSubtitulo" style="font-size:0.76rem;color:var(--text-sec);margin-bottom:14px;"></p>
+    <div id="diccionarioModalLista" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px;"></div>
+    <button id="cerrarDiccionarioBtn" style="margin-top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cerrar</button>
   </div>
 </div>
 
@@ -1843,6 +2390,7 @@
       <h3 id="indiceTitulo">Índice temático</h3>
       <button class="indice-cerrar" id="cerrarIndiceBtn">✕</button>
     </div>
+    <div id="firmaIndice" style="text-align:center;font-style:italic;font-size:0.76rem;color:var(--text-sec);padding:0 14px 10px;margin-top:-8px;"></div>
     <div class="indice-lista" id="indiceLista"></div>
   </div>
 </div>
@@ -1856,8 +2404,15 @@
     <button id="reflexionToggleBtn" style="display:none;">🪞 Reflexión</button>
     <button id="notasToggleBtn">
       <svg viewBox="0 0 200 200"><use href="#meteorito-icono"/></svg>
-      Notas
+      <span class="notas-texto-completo">Notas</span>
+      <span class="notas-texto-corto">N</span>
     </button>
+  </div>
+  <div id="firmaLectorBar" style="text-align:center;font-style:italic;font-size:0.72rem;color:var(--text-sec);padding:3px 10px;border-bottom:1px solid var(--border);"></div>
+  <div id="progresoLectorBar" style="display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);align-items:center;flex-wrap:wrap;">
+    <button type="button" id="marcarComprendidoBtn" style="flex:1;min-width:110px;background:transparent;border:1px solid var(--verde);color:var(--verde);padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">✓ Comprendido</button>
+    <button type="button" id="marcarCongelarBtn" style="flex:1;min-width:110px;background:transparent;border:1px solid var(--violeta);color:var(--violeta);padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">❄ Congelar</button>
+    <button type="button" id="marcarRevisadoBtn" style="flex:0 0 100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">✓ Marcar publicación completa como revisada</button>
   </div>
   <div id="navBar">
     <button id="anteriorBtn">← Anterior</button>
@@ -1944,7 +2499,10 @@
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    deleteUser,
+    reauthenticateWithCredential,
+    EmailAuthProvider
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
@@ -1963,15 +2521,25 @@
   const coleccionesCol = collection(db, "colecciones");
   const galeriasCol = collection(db, "galerias");
   const usuariosCol = collection(db, "usuarios");
-  const asteroidesCol = collection(db, "asteroides");
+  const referenciasCol = collection(db, "referencias");
+  const historialCol = collection(db, "historial");
+  const seguidosCol = collection(db, "seguidos");
+  const progresoCol = collection(db, "progreso");
+  const solicitudesCol = collection(db, "solicitudesTransferencia");
+
+  // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
+  // (Declarado aquí arriba porque "vista" lo necesita para inicializarse)
+  const parametrosUrl = new URLSearchParams(location.search);
+  let uidPerfilObjetivo = parametrosUrl.get("u");
 
   // Estado en memoria: se llenan con los listeners de Firestore más abajo
   let libros = [];        // [{id, titulo, resumen, portadaId, coleccionId, recursos, fecha}]
   let colecciones = [];   // [{id, nombre, imagenId, frase, clave, galeriaId, fecha}]
   let galerias = [];      // [{id, nombre, imagenId, fecha}]
-  const parametrosUrl = new URLSearchParams(location.search);
-  let uidPerfilObjetivo = parametrosUrl.get("u");
-
+  let referencias = [];   // [{id, ownerId, termino, definicion, fecha}] — Diccionario de Referencias
+  let historial = [];     // [{id, ownerId, termino, definicion, autorNombre, fecha}] — Historial de Referencias (guardados personales)
+  let seguidos = [];      // [{id, ownerId, perfilSeguidoId, perfilSeguidoNombre, fecha}] — Seguir perfiles (lista personal)
+  let progreso = [];      // [{id, ownerId, libroId, libroTitulo, estados:{idx:"comprendido"|"congelado"}, revisado, fecha}] — Progreso de lectura
   let vista = uidPerfilObjetivo ? "galerias" : "perfiles"; // "perfiles" | "galerias" | "colecciones" | "coleccion"
   let galeriaActualId = null;
   let coleccionActualId = null;
@@ -2025,10 +2593,6 @@
   // estar autenticado para poder publicar o borrar libros.
   let isAdmin = false;
   let uidActual = null;
-  let usuarios = [];
-  let libroSnapshotListo = false;
-  let coleccionSnapshotListo = false;
-  let galeriaSnapshotListo = false;
 
   const COLORES_GALAXIA = { verde: "#39ff8c", turquesa: "#22d3c4", violeta: "#9b7cf6", gris: "#c7c7cf" };
   const ID_PERFIL_GENERAL = "__perfil_general__"; // agrupa contenido sin dueño asignado
@@ -2043,7 +2607,9 @@
   const loginError = document.getElementById("loginError");
 
   adminToggleBtn.addEventListener("click", () => {
-    adminPanel.style.display = adminPanel.style.display === "block" ? "none" : "block";
+    const seVaAAbrir = adminPanel.style.display !== "block";
+    adminPanel.style.display = seVaAAbrir ? "block" : "none";
+    if (seVaAAbrir && isAdmin) mostrarCapasDelTallerSiCorresponde();
   });
 
   loginBtn.addEventListener("click", async () => {
@@ -2052,6 +2618,8 @@
     loginBtn.textContent = "Entrando...";
     try {
       await signInWithEmailAndPassword(auth, adminEmail.value.trim(), adminPass.value);
+      reproducirIntroFlipbook("larga");
+      mostrarCapasDelTallerSiCorresponde();
       // onAuthStateChanged se encarga de mostrar el panel
     } catch (e) {
       loginError.textContent = "Correo o contraseña incorrectos";
@@ -2114,6 +2682,69 @@
     }
   });
 
+  // ---------- Eliminar esta cuenta para siempre (perfil + contenido + login) ----------
+  document.getElementById("mostrarZonaPeligroBtn").addEventListener("click", () => {
+    const zona = document.getElementById("zonaPeligroCuenta");
+    zona.style.display = zona.style.display === "none" ? "block" : "none";
+  });
+
+  document.getElementById("eliminarCuentaBtn").addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const nombrePerfilActual = (usuarios.find(u => u.id === user.uid) || {}).nombre || user.email;
+    const primeraConfirmacion = confirm(
+      `¿Eliminar para siempre la cuenta "${nombrePerfilActual}" (${user.email})?\n\n` +
+      `Esto borra su perfil, todas sus galerías, colecciones y publicaciones, y el correo/contraseña. No hay forma de deshacerlo.`
+    );
+    if (!primeraConfirmacion) return;
+
+    const segundaConfirmacion = prompt(`Para confirmar, escribe ELIMINAR en mayúsculas:`);
+    if (segundaConfirmacion !== "ELIMINAR") {
+      alert("No se escribió \"ELIMINAR\" exactamente. No se borró nada.");
+      return;
+    }
+
+    const btn = document.getElementById("eliminarCuentaBtn");
+    btn.disabled = true;
+    btn.textContent = "Eliminando...";
+
+    try {
+      const misLibros = libros.filter(l => l.ownerId === user.uid);
+      const misColecciones = colecciones.filter(c => c.ownerId === user.uid);
+      const misGalerias = galerias.filter(g => g.ownerId === user.uid);
+
+      for (const l of misLibros) await deleteDoc(doc(db, "libros", l.id));
+      for (const c of misColecciones) await deleteDoc(doc(db, "colecciones", c.id));
+      for (const g of misGalerias) await deleteDoc(doc(db, "galerias", g.id));
+
+      await deleteDoc(doc(db, "usuarios", user.uid));
+
+      await deleteUser(user);
+      alert("Cuenta eliminada por completo. Vas a salir de la sesión ahora.");
+      // signOut no es necesario: deleteUser ya cierra la sesión automáticamente
+    } catch (e) {
+      if (e.code === "auth/requires-recent-login") {
+        const clave = prompt("Por seguridad, Firebase pide confirmar tu contraseña de nuevo antes de borrar la cuenta. Escríbela:");
+        if (clave) {
+          try {
+            const credencial = EmailAuthProvider.credential(user.email, clave);
+            await reauthenticateWithCredential(user, credencial);
+            await deleteUser(user);
+            alert("Cuenta eliminada por completo.");
+          } catch (e2) {
+            alert("No se pudo eliminar la cuenta: " + e2.message);
+          }
+        }
+      } else {
+        alert("No se pudo eliminar la cuenta: " + e.message);
+      }
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Eliminar esta cuenta para siempre";
+  });
+
   // Detecta automáticamente si ya hay sesión iniciada (por ejemplo si
   // recargas la página después de haber entrado como admin)
   onAuthStateChanged(auth, async (user) => {
@@ -2123,7 +2754,14 @@
       loginSection.style.display = "none";
       formSection.style.display = "block";
       perfilInfo.style.display = "block";
+      document.getElementById("zonaPeligroCuenta").style.display = "none";
       perfilEnlaceInput.value = `${location.origin}${location.pathname}?u=${user.uid}`;
+
+      const opcionGeneralLabel = document.getElementById("inputEsGaleriaGeneral").closest("label");
+      opcionGeneralLabel.style.display = (user.uid === UID_ADMIN_GENERAL) ? "flex" : "none";
+      document.getElementById("opcionNoticiasLabel").style.display = (user.uid === UID_ADMIN_GENERAL) ? "flex" : "none";
+
+      if (typeof aplicarModoCuenta === "function") aplicarModoCuenta();
 
       try {
         const perfilDoc = await getDoc(doc(db, "usuarios", user.uid));
@@ -2134,11 +2772,17 @@
         }
       } catch (e) {
         console.error("No se pudo revisar el perfil:", e);
+        // Si falla la lectura (típicamente por permisos de Firestore), igual
+        // mostramos el formulario para no dejar al usuario sin poder
+        // configurar su perfil, y avisamos del problema real.
+        document.getElementById("configurarPerfilSection").style.display = "block";
+        alert("No se pudo verificar tu perfil (" + e.code + "). Es probable que las reglas de seguridad de Firestore aún no permitan leer/escribir la colección \"usuarios\". Puedes seguir e intentar guardar tu perfil de todas formas.");
       }
     } else {
       loginSection.style.display = "block";
       formSection.style.display = "none";
       perfilInfo.style.display = "none";
+      document.getElementById("zonaPeligroCuenta").style.display = "none";
       document.getElementById("configurarPerfilSection").style.display = "none";
     }
     if (libroSnapshotListo && coleccionSnapshotListo && galeriaSnapshotListo) {
@@ -2146,13 +2790,26 @@
       renderAdminListaColecciones();
       renderAdminListaLibros();
     }
+    renderSolicitudes();
   });
 
   // ---------- Configurar perfil (nombre, foto, color de galaxia) ----------
+  document.getElementById("editarPerfilBtn").addEventListener("click", () => {
+    const miPerfil = usuarios.find(u => u.id === uidActual);
+    document.getElementById("perfilNombreInput").value = miPerfil ? (miPerfil.nombre || "") : "";
+    document.getElementById("perfilImagenInput").value = miPerfil && miPerfil.imagenId ? `https://drive.google.com/file/d/${miPerfil.imagenId}/view` : "";
+    document.getElementById("perfilColorInput").value = miPerfil ? (miPerfil.color || "verde") : "verde";
+    document.getElementById("perfilResumenInput").value = miPerfil ? (miPerfil.resumen || "") : "";
+    const seccion = document.getElementById("configurarPerfilSection");
+    seccion.style.display = "block";
+    seccion.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
   document.getElementById("guardarPerfilBtn").addEventListener("click", async () => {
     const nombre = document.getElementById("perfilNombreInput").value.trim();
     const imagenUrl = document.getElementById("perfilImagenInput").value.trim();
     const color = document.getElementById("perfilColorInput").value;
+    const resumen = document.getElementById("perfilResumenInput").value.trim();
 
     if (!nombre || !imagenUrl) {
       alert("Ponle un nombre y una foto a tu perfil.");
@@ -2165,7 +2822,7 @@
     btn.disabled = true;
     btn.textContent = "Guardando...";
     try {
-      await setDoc(doc(db, "usuarios", uidActual), { nombre, imagenId, color }, { merge: true });
+      await setDoc(doc(db, "usuarios", uidActual), { nombre, imagenId, color, resumen }, { merge: true });
       document.getElementById("configurarPerfilSection").style.display = "none";
     } catch (e) {
       alert("Error al guardar tu perfil: " + e.message);
@@ -2290,21 +2947,61 @@
 
   renderPreguntasBuilder();
 
+  // ---------- Constructor del Diccionario de Referencias (opcional, por publicación) ----------
+  let diccionarioBuilder = [];
+  const diccionarioBuilderContainer = document.getElementById("diccionarioBuilderContainer");
+  const diccionarioSeccion = document.getElementById("diccionarioSeccion");
+  const inputAgregarDiccionario = document.getElementById("inputAgregarDiccionario");
+
+  function renderDiccionarioBuilder() {
+    diccionarioBuilderContainer.innerHTML = "";
+    diccionarioBuilder.forEach((par, i) => {
+      const row = document.createElement("div");
+      row.className = "recurso-row";
+      row.innerHTML = `
+        <input type="text" class="termino-palabra" placeholder="Palabra o idea, ej: orbe" value="${escapeAttr(par.termino)}">
+        <textarea class="termino-definicion" placeholder="Explicación o referencia..." rows="2">${escapeAttr(par.definicion)}</textarea>
+        <div class="recurso-controles">
+          <button type="button" class="termino-quitar">✕ Quitar</button>
+        </div>
+      `;
+      row.querySelector(".termino-palabra").addEventListener("input", (e) => { diccionarioBuilder[i].termino = e.target.value; });
+      row.querySelector(".termino-definicion").addEventListener("input", (e) => { diccionarioBuilder[i].definicion = e.target.value; });
+      row.querySelector(".termino-quitar").addEventListener("click", () => {
+        diccionarioBuilder.splice(i, 1);
+        renderDiccionarioBuilder();
+      });
+      diccionarioBuilderContainer.appendChild(row);
+    });
+  }
+
+  document.getElementById("agregarTerminoBtn").addEventListener("click", () => {
+    diccionarioBuilder.push({ termino: "", definicion: "" });
+    renderDiccionarioBuilder();
+  });
+
+  inputAgregarDiccionario.addEventListener("change", () => {
+    diccionarioSeccion.style.display = inputAgregarDiccionario.checked ? "block" : "none";
+    if (inputAgregarDiccionario.checked && diccionarioBuilder.length === 0) {
+      diccionarioBuilder.push({ termino: "", definicion: "" });
+      renderDiccionarioBuilder();
+    }
+  });
+
+  renderDiccionarioBuilder();
+
   // ---------- Publicar libro (con su índice temático de recursos) ----------
   const publishBtn = document.getElementById("publishBtn");
   const cancelarEdicionLibroBtn = document.getElementById("cancelarEdicionLibroBtn");
   let libroEnEdicionId = null;
 
   function cargarLibroParaEditar(libro) {
+    irAPestanaTaller("publicaciones");
     libroEnEdicionId = libro.id;
     document.getElementById("inputTitulo").value = libro.titulo || "";
     document.getElementById("inputResumen").value = libro.resumen || "";
     document.getElementById("inputPortada").value = libro.portadaId ? `https://drive.google.com/file/d/${libro.portadaId}/view` : "";
     document.getElementById("inputColeccionAsignada").value = libro.coleccionId || "";
-
-    const asteroideExistente = asteroides.find(a => a.libroId === libro.id);
-    document.getElementById("inputTextoPropagacion").value = asteroideExistente ? asteroideExistente.texto : "";
-    document.getElementById("contadorPropagacion").textContent = asteroideExistente ? asteroideExistente.texto.length : "0";
 
     const recursosOriginales = recursosDeLibro(libro);
     recursosBuilder = recursosOriginales.map(r => {
@@ -2329,6 +3026,21 @@
     preguntasBuilder = Array.isArray(libro.preguntasReflexion) ? [...libro.preguntasReflexion] : (libro.preguntaReflexion ? [libro.preguntaReflexion] : []);
     renderPreguntasBuilder();
 
+    const terminosDelLibro = Array.isArray(libro.terminosReferencia) ? libro.terminosReferencia : [];
+    if (terminosDelLibro.length > 0) {
+      diccionarioBuilder = terminosDelLibro.map(termino => {
+        const ref = referencias.find(r => r.ownerId === (libro.ownerId || uidActual) && r.termino.toLowerCase() === termino.toLowerCase());
+        return { termino, definicion: ref ? ref.definicion : "" };
+      });
+      inputAgregarDiccionario.checked = true;
+      diccionarioSeccion.style.display = "block";
+    } else {
+      diccionarioBuilder = [];
+      inputAgregarDiccionario.checked = false;
+      diccionarioSeccion.style.display = "none";
+    }
+    renderDiccionarioBuilder();
+
     publishBtn.textContent = "Guardar cambios";
     cancelarEdicionLibroBtn.style.display = "block";
     tallerContenido.style.display = "block";
@@ -2345,8 +3057,10 @@
     renderRecursosBuilder();
     preguntasBuilder = [];
     renderPreguntasBuilder();
-    document.getElementById("inputTextoPropagacion").value = "";
-    document.getElementById("contadorPropagacion").textContent = "0";
+    diccionarioBuilder = [];
+    inputAgregarDiccionario.checked = false;
+    diccionarioSeccion.style.display = "none";
+    renderDiccionarioBuilder();
     publishBtn.textContent = "Publicar";
     cancelarEdicionLibroBtn.style.display = "none";
   }
@@ -2378,6 +3092,9 @@
 
     const portadaId = extraerIdDrive(portadaUrl);
     const preguntasReflexion = preguntasBuilder.map(p => p.trim()).filter(p => p !== "");
+    const terminosValidos = inputAgregarDiccionario.checked
+      ? diccionarioBuilder.map(par => ({ termino: par.termino.trim(), definicion: par.definicion.trim() })).filter(par => par.termino !== "" && par.definicion !== "")
+      : [];
     const recursos = recursosBuilder.map(r => {
       if (r.tipo === "imagenes") {
         const imagenes = (r.enlacesMultiples || "")
@@ -2410,19 +3127,18 @@
       portadaId,
       recursos,
       preguntasReflexion,
-      coleccionId: coleccionSeleccionada
+      coleccionId: coleccionSeleccionada,
+      terminosReferencia: terminosValidos.map(par => par.termino)
     };
 
-    const textoPropagacion = document.getElementById("inputTextoPropagacion").value.trim();
-
     try {
-      let libroIdFinal = libroEnEdicionId;
       if (libroEnEdicionId) {
         await updateDoc(doc(db, "libros", libroEnEdicionId), { ...datosLibro, ownerId: uidActual });
+        await sincronizarDiccionario(terminosValidos);
         cancelarEdicionLibro();
       } else {
-        const refCreado = await addDoc(librosCol, { ...datosLibro, ownerId: uidActual, fecha: serverTimestamp() });
-        libroIdFinal = refCreado.id;
+        await addDoc(librosCol, { ...datosLibro, ownerId: uidActual, fecha: serverTimestamp() });
+        await sincronizarDiccionario(terminosValidos);
         document.getElementById("inputTitulo").value = "";
         document.getElementById("inputResumen").value = "";
         document.getElementById("inputPortada").value = "";
@@ -2430,25 +3146,11 @@
         renderRecursosBuilder();
         preguntasBuilder = [];
         renderPreguntasBuilder();
+        diccionarioBuilder = [];
+        inputAgregarDiccionario.checked = false;
+        diccionarioSeccion.style.display = "none";
+        renderDiccionarioBuilder();
       }
-
-      // Sincronizar el fragmento en El Cinturón (crear, actualizar o quitar)
-      if (libroIdFinal) {
-        if (textoPropagacion) {
-          const perfilPropio = usuarios.find(u => u.id === uidActual);
-          await setDoc(doc(db, "asteroides", libroIdFinal), {
-            texto: textoPropagacion,
-            autorId: uidActual,
-            autorNombre: perfilPropio ? perfilPropio.nombre : "Alguien de Orbsy",
-            libroId: libroIdFinal,
-            fecha: serverTimestamp()
-          });
-        } else {
-          await deleteDoc(doc(db, "asteroides", libroIdFinal)).catch(() => {});
-        }
-      }
-      document.getElementById("inputTextoPropagacion").value = "";
-      document.getElementById("contadorPropagacion").textContent = "0";
     } catch (e) {
       alert("Error al publicar: " + e.message);
     }
@@ -2457,9 +3159,24 @@
     if (!libroEnEdicionId) publishBtn.textContent = "Publicar";
   });
 
-  document.getElementById("inputTextoPropagacion").addEventListener("input", (e) => {
-    document.getElementById("contadorPropagacion").textContent = e.target.value.length;
-  });
+  // Guarda o actualiza cada término en el Diccionario de Referencias global del usuario
+  // (así no hay que reescribir la misma definición en cada publicación que la use).
+  async function sincronizarDiccionario(pares) {
+    for (const par of pares) {
+      const existente = referencias.find(r => r.ownerId === uidActual && r.termino.toLowerCase() === par.termino.toLowerCase());
+      try {
+        if (existente) {
+          if (existente.definicion !== par.definicion) {
+            await updateDoc(doc(db, "referencias", existente.id), { definicion: par.definicion });
+          }
+        } else {
+          await addDoc(referenciasCol, { ownerId: uidActual, termino: par.termino, definicion: par.definicion, fecha: serverTimestamp() });
+        }
+      } catch (e) {
+        console.error("No se pudo sincronizar el término \"" + par.termino + "\":", e);
+      }
+    }
+  }
 
   // ---------- Taller: colapsar/expandir el contenido de configuración ----------
   const tallerContenido = document.getElementById("tallerContenido");
@@ -2468,6 +3185,104 @@
     const colapsado = tallerContenido.style.display === "none";
     tallerContenido.style.display = colapsado ? "block" : "none";
     tallerToggleBtn.textContent = colapsado ? "▲" : "▼";
+  });
+
+  // ---------- Taller: pestañas Galerías / Colecciones / Publicaciones ----------
+  const SECCIONES_TALLER = {
+    galerias: document.querySelector(".taller-seccion.taller-galerias"),
+    colecciones: document.querySelector(".taller-seccion.taller-colecciones"),
+    publicaciones: document.querySelector(".taller-seccion.taller-publicaciones"),
+    configuracion: document.querySelector(".taller-seccion.taller-configuracion")
+  };
+  document.querySelectorAll(".taller-pestana-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation(); // no debe burbujear al header y colapsar el Taller
+      document.querySelectorAll(".taller-pestana-btn").forEach(b => b.classList.remove("activa"));
+      btn.classList.add("activa");
+      Object.entries(SECCIONES_TALLER).forEach(([clave, el]) => {
+        if (el) el.style.display = (clave === btn.dataset.seccion) ? "block" : "none";
+      });
+      // El botón de Configuración vive fuera del contenido colapsable, así
+      // que si el Taller estaba minimizado, lo expandimos para que se vea.
+      if (btn.dataset.seccion === "configuracion" && tallerContenido.style.display === "none") {
+        tallerContenido.style.display = "block";
+        tallerToggleBtn.textContent = "▲";
+      }
+    });
+  });
+  // Estado inicial: solo Galerías visible
+  SECCIONES_TALLER.colecciones.style.display = "none";
+  SECCIONES_TALLER.publicaciones.style.display = "none";
+
+  // Si el usuario edita una colección o publicación desde otra pestaña
+  // (por ejemplo al tocar "Editar" en la lista), cambiamos automáticamente
+  // a la pestaña correspondiente para que vea el formulario.
+  function irAPestanaTaller(seccion) {
+    const btn = document.querySelector(`.taller-pestana-btn[data-seccion="${seccion}"]`);
+    if (btn) btn.click();
+  }
+
+  // Las imágenes de la insignia y la intro son siluetas negras sólidas con
+  // delineado claro (no dependen del color de fondo de la página).
+
+  // Espectador: el Taller no existe (ni oculto — directamente no se ofrece
+  // como opción), y en orbSY notes la pestaña de Plantillas tampoco aparece,
+  // ya que las plantillas solo sirven para preparar contenido del Taller.
+  // Notas, Historial de Referencias y Seguir perfiles siguen disponibles
+  // para cualquiera, porque le sirven tanto a quien crea como a quien solo
+  // lee y guarda.
+  function aplicarModoCuenta() {
+    if (!uidActual) return;
+    const miPerfil = usuarios.find(u => u.id === uidActual);
+    const modo = (miPerfil && miPerfil.tipoCuenta === "espectador") ? "espectador" : "creador";
+
+    const tallerPestanas = document.getElementById("tallerPestanas");
+    const tabPlantillasBtn = document.getElementById("tabPlantillasBtn");
+    const modoActualTexto = document.getElementById("modoActualTexto");
+    const modoActualDescripcion = document.getElementById("modoActualDescripcion");
+    const cambiarModoCuentaBtn = document.getElementById("cambiarModoCuentaBtn");
+
+    if (modo === "espectador") {
+      tallerPestanas.style.display = "none";
+      document.querySelectorAll(".taller-pestana-btn").forEach(b => b.classList.remove("activa"));
+      Object.entries(SECCIONES_TALLER).forEach(([clave, el]) => {
+        if (el) el.style.display = (clave === "configuracion") ? "block" : "none";
+      });
+      if (tabPlantillasBtn) tabPlantillasBtn.style.display = "none";
+
+      modoActualTexto.textContent = "Espectador";
+      modoActualTexto.style.color = "#22d3c4";
+      modoActualDescripcion.textContent = "Podés leer, guardar referencias y seguir perfiles. El Taller no está disponible en este modo.";
+      cambiarModoCuentaBtn.textContent = "Cambiar a modo Creador";
+    } else {
+      tallerPestanas.style.display = "flex";
+      if (tabPlantillasBtn) tabPlantillasBtn.style.display = "";
+      // Si no hay ninguna pestaña marcada como activa (viniendo de espectador), volvemos a Galerías
+      if (!document.querySelector(".taller-pestana-btn.activa")) {
+        irAPestanaTaller("galerias");
+      }
+      modoActualTexto.textContent = "Creador";
+      modoActualTexto.style.color = "var(--accent)";
+      modoActualDescripcion.textContent = "Tenés acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.";
+      cambiarModoCuentaBtn.textContent = "Cambiar a modo Espectador";
+    }
+  }
+
+  document.getElementById("cambiarModoCuentaBtn").addEventListener("click", async () => {
+    if (!uidActual) return;
+    const miPerfil = usuarios.find(u => u.id === uidActual);
+    const modoActual = (miPerfil && miPerfil.tipoCuenta === "espectador") ? "espectador" : "creador";
+    const nuevoModo = modoActual === "espectador" ? "creador" : "espectador";
+
+    if (nuevoModo === "espectador") {
+      const confirmar = confirm("Al cambiar a modo Espectador, el Taller deja de estar disponible para esta cuenta (puedes volver a modo Creador cuando quieras, desde aquí mismo). ¿Continuar?");
+      if (!confirmar) return;
+    }
+    try {
+      await setDoc(doc(db, "usuarios", uidActual), { tipoCuenta: nuevoModo }, { merge: true });
+    } catch (e) {
+      alert("No se pudo cambiar el modo de cuenta: " + e.message);
+    }
   });
 
   const crearGaleriaBtn = document.getElementById("crearGaleriaBtn");
@@ -2479,6 +3294,8 @@
     document.getElementById("inputNombreGaleria").value = gal.nombre || "";
     document.getElementById("inputImagenGaleria").value = gal.imagenId ? `https://drive.google.com/file/d/${gal.imagenId}/view` : "";
     document.getElementById("inputFondoGaleria").value = gal.fondoId ? `https://drive.google.com/file/d/${gal.fondoId}/view` : "";
+    document.getElementById("inputEsGaleriaGeneral").checked = !gal.ownerId;
+    document.getElementById("inputEsGaleriaNoticias").checked = !!gal.esNoticias;
     crearGaleriaBtn.textContent = "Guardar cambios";
     cancelarEdicionGaleriaBtn.style.display = "block";
     tallerContenido.style.display = "block";
@@ -2491,6 +3308,8 @@
     document.getElementById("inputNombreGaleria").value = "";
     document.getElementById("inputImagenGaleria").value = "";
     document.getElementById("inputFondoGaleria").value = "";
+    document.getElementById("inputEsGaleriaGeneral").checked = false;
+    document.getElementById("inputEsGaleriaNoticias").checked = false;
     crearGaleriaBtn.textContent = "Crear galería";
     cancelarEdicionGaleriaBtn.style.display = "none";
   }
@@ -2508,25 +3327,31 @@
 
     const imagenId = extraerIdDrive(imagenUrl);
     const fondoId = fondoUrl ? extraerIdDrive(fondoUrl) : "";
+    const esGeneral = document.getElementById("inputEsGaleriaGeneral").checked;
+    const esNoticias = document.getElementById("inputEsGaleriaNoticias").checked;
+    const ownerIdAsignado = esGeneral ? null : uidActual;
 
     crearGaleriaBtn.disabled = true;
     crearGaleriaBtn.textContent = galeriaEnEdicionId ? "Guardando..." : "Creando...";
 
     try {
       if (galeriaEnEdicionId) {
-        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId, ownerId: uidActual });
+        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId, ownerId: ownerIdAsignado, esNoticias });
         cancelarEdicionGaleria();
       } else {
         await addDoc(galeriasCol, {
           nombre,
           imagenId,
           fondoId,
-          ownerId: uidActual,
+          ownerId: ownerIdAsignado,
+          esNoticias,
           fecha: serverTimestamp()
         });
         document.getElementById("inputNombreGaleria").value = "";
         document.getElementById("inputImagenGaleria").value = "";
         document.getElementById("inputFondoGaleria").value = "";
+        document.getElementById("inputEsGaleriaGeneral").checked = false;
+        document.getElementById("inputEsGaleriaNoticias").checked = false;
       }
     } catch (e) {
       alert("Error al guardar la galería: " + e.message);
@@ -2546,6 +3371,7 @@
   let coleccionEnEdicionId = null;
 
   function cargarColeccionParaEditar(col) {
+    irAPestanaTaller("colecciones");
     coleccionEnEdicionId = col.id;
     document.getElementById("inputNombreColeccion").value = col.nombre || "";
     document.getElementById("inputGaleriaAsignada").value = col.galeriaId || "";
@@ -2679,8 +3505,11 @@
     vistaGaleriasEl.style.display = "none";
     vistaPerfilesEl.style.display = "block";
     history.replaceState(null, "", location.pathname);
-    renderCinturon();
   });
+
+  let libroSnapshotListo = false;
+  let coleccionSnapshotListo = false;
+  let galeriaSnapshotListo = false;
 
   // Convierte un nombre de galería en el mismo estilo de letras espaciadas
   // que ya usabas para "GALERÍA DEL ORBSENTISTA", para cualquier galería.
@@ -2741,128 +3570,73 @@
     console.error("Error al leer las galerías:", error);
   });
 
+  // Diccionario de Referencias: se carga entero (no hace falta orden, es poco volumen)
+  onSnapshot(referenciasCol, (snapshot) => {
+    referencias = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  }, (error) => {
+    console.error("Error al leer el Diccionario de Referencias:", error);
+  });
+
+  // Historial de Referencias: guardados personales (curados por cada usuario)
+  onSnapshot(historialCol, (snapshot) => {
+    historial = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderHistorialGuardado === "function") renderHistorialGuardado();
+  }, (error) => {
+    console.error("Error al leer el Historial de Referencias:", error);
+  });
+
+  // Seguir perfiles: lista personal (no aumenta contador público de nadie)
+  onSnapshot(seguidosCol, (snapshot) => {
+    seguidos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderSeguidosGuardados === "function") renderSeguidosGuardados();
+    if (typeof actualizarBotonSeguir === "function") actualizarBotonSeguir();
+  }, (error) => {
+    console.error("Error al leer los perfiles seguidos:", error);
+  });
+
+  // Progreso de lectura: comprendido / congelado por recurso, y revisado por publicación
+  onSnapshot(progresoCol, (snapshot) => {
+    progreso = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderCongeladosGuardados === "function") renderCongeladosGuardados();
+    if (typeof actualizarUIProgresoLector === "function") actualizarUIProgresoLector();
+    if (typeof renderAdminListaLibros === "function") renderAdminListaLibros();
+    // Refresca las insignias "✓ Revisado/a" en la vista que esté abierta ahora mismo,
+    // sin esperar a que la persona navegue de nuevo para verlas actualizadas.
+    if (typeof vista !== "undefined" && typeof renderGalerias === "function") {
+      if (vista === "galerias") renderGalerias();
+      else if (vista === "colecciones" && typeof renderHome === "function") renderHome();
+      else if (vista === "coleccion" && coleccionActualId && typeof renderColeccionDetalle === "function") renderColeccionDetalle(coleccionActualId);
+    }
+  }, (error) => {
+    console.error("Error al leer el progreso de lectura:", error);
+  });
+
   // ---------- Perfiles (galaxias): selector tipo Netflix ----------
+  let usuarios = [];
+  const errorMsgPerfiles = document.getElementById("errorMsgPerfiles");
   onSnapshot(usuariosCol, (snapshot) => {
     usuarios = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    errorMsgPerfiles.style.display = "none";
     renderPerfiles();
+    renderSolicitudes();
+    if (typeof aplicarModoCuenta === "function") aplicarModoCuenta();
   }, (error) => {
     loadingMsgPerfiles.style.display = "none";
+    perfilesGrid.innerHTML = "";
+    emptyMsgPerfiles.style.display = "none";
+    errorMsgPerfiles.style.display = "block";
     console.error("Error al leer los perfiles:", error);
   });
-
-  // ---------- EL CINTURÓN: fragmentos cortos en tránsito ----------
-  let asteroides = [];
-  let ultimoGrupoCinturon = [];
-  const elCinturon = document.getElementById("elCinturon");
-  const cinturonLista = document.getElementById("cinturonLista");
-
-  onSnapshot(asteroidesCol, (snapshot) => {
-    asteroides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderCinturon();
-  }, (error) => {
-    console.error("Error al leer El Cinturón:", error);
-  });
-
-  function cuantosCaben() {
-    const ancho = window.innerWidth;
-    if (ancho >= 1000) return 3;
-    if (ancho >= 640) return 2;
-    return 1;
-  }
-
-  function leerAsteroidesGuardados() {
-    try {
-      return JSON.parse(localStorage.getItem("orbsy_asteroides_guardados")) || [];
-    } catch (e) {
-      return [];
-    }
-  }
-  function guardarAsteroidesGuardados(lista) {
-    localStorage.setItem("orbsy_asteroides_guardados", JSON.stringify(lista));
-  }
-
-  function renderCinturon() {
-    elCinturon.classList.remove("vacio");
-    const cantidad = cuantosCaben();
-    cinturonLista.innerHTML = "";
-
-    if (asteroides.length === 0) {
-      // Sin ningún fragmento publicado todavía: mostramos casillas vacías
-      for (let i = 0; i < cantidad; i++) {
-        const card = document.createElement("div");
-        card.className = "asteroide-card asteroide-card-vacia";
-        card.innerHTML = `<div class="asteroide-texto-vacio">Aún no hay fragmentos publicados aquí.</div>`;
-        cinturonLista.appendChild(card);
-      }
-      return;
-    }
-
-    const cantidadReal = Math.min(cantidad, asteroides.length);
-    let disponibles = asteroides.filter(a => !ultimoGrupoCinturon.includes(a.id));
-    if (disponibles.length < cantidadReal) disponibles = asteroides; // ya no hay suficientes nuevos, repetimos
-
-    const grupo = [...disponibles].sort(() => Math.random() - 0.5).slice(0, cantidadReal);
-    ultimoGrupoCinturon = grupo.map(a => a.id);
-
-    const guardados = leerAsteroidesGuardados().map(a => a.id);
-    grupo.forEach(ast => {
-      const card = document.createElement("div");
-      card.className = "asteroide-card";
-      const yaGuardado = guardados.includes(ast.id);
-      card.innerHTML = `
-        <div class="asteroide-autor">${escapeHtml(ast.autorNombre || "Alguien de Orbsy")}</div>
-        <div class="asteroide-texto">"${escapeHtml(ast.texto)}"</div>
-        <div class="asteroide-pie">
-          <button class="asteroide-origen-btn">Ir al origen →</button>
-          <button class="asteroide-guardar-btn ${yaGuardado ? "guardado" : ""}" title="Guardar fragmento">${yaGuardado ? "📌" : "📍"}</button>
-        </div>
-      `;
-      card.querySelector(".asteroide-origen-btn").addEventListener("click", () => irAlOrigenAsteroide(ast));
-      card.querySelector(".asteroide-guardar-btn").addEventListener("click", (e) => {
-        toggleGuardarAsteroide(ast);
-        e.target.classList.toggle("guardado");
-        e.target.textContent = e.target.classList.contains("guardado") ? "📌" : "📍";
-      });
-      cinturonLista.appendChild(card);
-    });
-
-    // Si faltan casillas para llenar el espacio (pocos fragmentos existentes), se completan vacías
-    for (let i = grupo.length; i < cantidad; i++) {
-      const card = document.createElement("div");
-      card.className = "asteroide-card asteroide-card-vacia";
-      card.innerHTML = `<div class="asteroide-texto-vacio">Aún no hay más fragmentos por aquí.</div>`;
-      cinturonLista.appendChild(card);
-    }
-  }
-
-  function irAlOrigenAsteroide(ast) {
-    const libro = libros.find(l => l.id === ast.libroId);
-    if (!libro) {
-      alert("Este contenido ya no está disponible.");
-      return;
-    }
-    abrirPublicacion(libro.id, libro.titulo, recursosDeLibro(libro), libro.preguntasReflexion || []);
-  }
-
-  function toggleGuardarAsteroide(ast) {
-    let lista = leerAsteroidesGuardados();
-    if (lista.some(a => a.id === ast.id)) {
-      lista = lista.filter(a => a.id !== ast.id);
-    } else {
-      lista.push({ id: ast.id, texto: ast.texto, autorNombre: ast.autorNombre, libroId: ast.libroId });
-    }
-    guardarAsteroidesGuardados(lista);
-  }
-
-  window.addEventListener("resize", () => { renderCinturon(); });
 
   function renderPerfiles() {
     loadingMsgPerfiles.style.display = "none";
     perfilesGrid.innerHTML = "";
+    const orbsyGeneralFlanco = document.getElementById("orbsyGeneralFlanco");
     const hayGeneral = galerias.some(g => !g.ownerId);
 
     if (usuarios.length === 0 && !hayGeneral) {
       emptyMsgPerfiles.style.display = "block";
+      orbsyGeneralFlanco.classList.remove("visible");
       return;
     }
     emptyMsgPerfiles.style.display = "none";
@@ -2883,30 +3657,186 @@
 
     const hayContenidoSinDueno = galerias.some(g => !g.ownerId);
     if (hayContenidoSinDueno) {
-      const tile = document.createElement("div");
-      tile.className = "galeria-tile";
-      const galeriaSinDueno = galerias.find(g => !g.ownerId);
-      tile.innerHTML = `
+      // La esfera de arriba siempre representa a orbSY General, nunca a
+      // Noticias en orbSY, aunque las dos convivan sin dueño.
+      const galeriaSinDueno = galerias.find(g => !g.ownerId && !g.esNoticias) || galerias.find(g => !g.ownerId);
+      orbsyGeneralFlanco.classList.add("visible");
+      orbsyGeneralFlanco.innerHTML = `
         <div class="perfil-tile-img" style="--color-galaxia:${COLORES_GALAXIA.gris};">
-          <img src="${imagenDirecta(galeriaSinDueno.imagenId)}" data-alt-src="${imagenAlternativa(galeriaSinDueno.imagenId)}" data-tried-alt="0" alt="General" loading="lazy" onerror="manejarErrorImagen(this)">
+          <img src="${imagenDirecta(galeriaSinDueno.imagenId)}" data-alt-src="${imagenAlternativa(galeriaSinDueno.imagenId)}" data-tried-alt="0" alt="orbSY General" loading="lazy" onerror="manejarErrorImagen(this)">
         </div>
-        <div class="galeria-tile-nombre">General</div>
+        <div class="galeria-tile-nombre">${escapeHtml(galeriaSinDueno.nombre || "orbSY General")}</div>
       `;
-      tile.addEventListener("click", () => seleccionarPerfil(ID_PERFIL_GENERAL));
-      perfilesGrid.appendChild(tile);
+      orbsyGeneralFlanco.onclick = () => seleccionarPerfil(ID_PERFIL_GENERAL);
+    } else {
+      orbsyGeneralFlanco.classList.remove("visible");
     }
   }
 
   function seleccionarPerfil(uid) {
+    reproducirIntroFlipbook("rafaga");
     uidPerfilObjetivo = uid;
     vista = "galerias";
     vistaPerfilesEl.style.display = "none";
     vistaGaleriasEl.style.display = "block";
     history.replaceState(null, "", `${location.pathname}?u=${uid}`);
     renderGalerias();
-    renderCinturon();
     window.scrollTo(0, 0);
   }
+
+  // ---------- Solicitudes de transferencia entre perfiles ----------
+  // Permite enviarle a otro perfil una galería, colección o publicación:
+  // no cambia de dueño hasta que el destinatario acepta la solicitud.
+  let solicitudes = [];
+  const solicitudesSection = document.getElementById("solicitudesSection");
+  const solicitudesEntrantesContainer = document.getElementById("solicitudesEntrantesContainer");
+  const solicitudesEnviadasContainer = document.getElementById("solicitudesEnviadasContainer");
+
+  onSnapshot(solicitudesCol, (snapshot) => {
+    solicitudes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderSolicitudes();
+  }, (error) => {
+    console.error("Error al leer las solicitudes de transferencia:", error);
+  });
+
+  function nombrePerfil(uid) {
+    const u = usuarios.find(u => u.id === uid);
+    return u && u.nombre ? u.nombre : "Alguien";
+  }
+
+  const ETIQUETAS_TIPO_TRANSFER = { galeria: "Galería", coleccion: "Colección", libro: "Publicación" };
+
+  function renderSolicitudes() {
+    if (!isAdmin) { solicitudesSection.style.display = "none"; return; }
+
+    const entrantes = solicitudes.filter(s => s.paraUid === uidActual && s.estado === "pendiente");
+    const enviadas = solicitudes.filter(s => s.deUid === uidActual && s.estado === "pendiente");
+
+    solicitudesSection.style.display = (entrantes.length > 0 || enviadas.length > 0) ? "block" : "none";
+
+    solicitudesEntrantesContainer.innerHTML = "";
+    entrantes.forEach(s => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+      row.innerHTML = `
+        <div class="admin-row-titulo">${escapeHtml(s.itemNombre || "Sin título")}<br>
+          <span style="font-size:0.72rem;color:var(--text-sec);font-weight:400;">${ETIQUETAS_TIPO_TRANSFER[s.tipo] || s.tipo} · de ${escapeHtml(s.deNombre || "Alguien")}</span>
+        </div>
+        <div class="admin-row-controles">
+          <button class="aceptar-btn">Aceptar</button>
+          <button class="delete-btn">Rechazar</button>
+        </div>
+      `;
+      row.querySelector(".aceptar-btn").addEventListener("click", () => aceptarSolicitud(s));
+      row.querySelector(".delete-btn").addEventListener("click", () => rechazarSolicitud(s));
+      solicitudesEntrantesContainer.appendChild(row);
+    });
+
+    solicitudesEnviadasContainer.innerHTML = "";
+    enviadas.forEach(s => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+      row.innerHTML = `
+        <div class="admin-row-titulo">${escapeHtml(s.itemNombre || "Sin título")}<br>
+          <span style="font-size:0.72rem;color:var(--text-sec);font-weight:400;">Enviada a ${escapeHtml(nombrePerfil(s.paraUid))} · esperando respuesta</span>
+        </div>
+        <div class="admin-row-controles">
+          <button class="delete-btn">Cancelar</button>
+        </div>
+      `;
+      row.querySelector(".delete-btn").addEventListener("click", () => cancelarSolicitud(s));
+      solicitudesEnviadasContainer.appendChild(row);
+    });
+  }
+
+  async function aceptarSolicitud(sol) {
+    const coleccionFirestore = sol.tipo === "galeria" ? "galerias" : sol.tipo === "coleccion" ? "colecciones" : "libros";
+    const cambios = { ownerId: uidActual };
+    // Colecciones y publicaciones llegan sueltas ("General" de tu perfil) para
+    // que tú decidas después, desde el Taller, en qué galería o colección guardarlas.
+    if (sol.tipo === "coleccion") cambios.galeriaId = "";
+    if (sol.tipo === "libro") cambios.coleccionId = "";
+    try {
+      await updateDoc(doc(db, coleccionFirestore, sol.itemId), cambios);
+      await deleteDoc(doc(db, "solicitudesTransferencia", sol.id));
+    } catch (e) {
+      alert("No se pudo aceptar la transferencia: " + e.message);
+    }
+  }
+
+  async function rechazarSolicitud(sol) {
+    try {
+      await deleteDoc(doc(db, "solicitudesTransferencia", sol.id));
+    } catch (e) {
+      alert("No se pudo rechazar la solicitud: " + e.message);
+    }
+  }
+
+  async function cancelarSolicitud(sol) {
+    try {
+      await deleteDoc(doc(db, "solicitudesTransferencia", sol.id));
+    } catch (e) {
+      alert("No se pudo cancelar la solicitud: " + e.message);
+    }
+  }
+
+  // ---------- Modal para elegir a quién transferir ----------
+  const transferModal = document.getElementById("transferModal");
+  const transferModalTitulo = document.getElementById("transferModalTitulo");
+  const transferDestinoSelect = document.getElementById("transferDestinoSelect");
+  const transferModalError = document.getElementById("transferModalError");
+  let itemActualTransferir = null;
+
+  function abrirModalTransferir(tipo, itemId, itemNombre) {
+    const otrosPerfiles = usuarios.filter(u => u.id !== uidActual);
+    if (otrosPerfiles.length === 0) {
+      alert("Todavía no hay otros perfiles creados a quién transferirle esto.");
+      return;
+    }
+    itemActualTransferir = { tipo, itemId, itemNombre };
+    transferModalTitulo.textContent = `Transferir "${itemNombre}"`;
+    transferModalError.style.display = "none";
+    transferDestinoSelect.innerHTML = otrosPerfiles
+      .map(u => `<option value="${u.id}">${escapeHtml(u.nombre || "Sin nombre")}</option>`)
+      .join("");
+    transferModal.style.display = "flex";
+  }
+
+  document.getElementById("transferModalCancelar").addEventListener("click", () => {
+    transferModal.style.display = "none";
+    itemActualTransferir = null;
+  });
+
+  document.getElementById("transferModalEnviar").addEventListener("click", async () => {
+    if (!itemActualTransferir) return;
+    const paraUid = transferDestinoSelect.value;
+    if (!paraUid) return;
+    const yaHayPendiente = solicitudes.some(s =>
+      s.itemId === itemActualTransferir.itemId && s.estado === "pendiente"
+    );
+    if (yaHayPendiente) {
+      transferModalError.textContent = "Ya hay una solicitud pendiente para esto.";
+      transferModalError.style.display = "block";
+      return;
+    }
+    try {
+      await addDoc(solicitudesCol, {
+        tipo: itemActualTransferir.tipo,
+        itemId: itemActualTransferir.itemId,
+        itemNombre: itemActualTransferir.itemNombre,
+        deUid: uidActual,
+        deNombre: nombrePerfil(uidActual),
+        paraUid,
+        estado: "pendiente",
+        fecha: serverTimestamp()
+      });
+      transferModal.style.display = "none";
+      itemActualTransferir = null;
+    } catch (e) {
+      transferModalError.textContent = "No se pudo enviar la solicitud: " + e.message;
+      transferModalError.style.display = "block";
+    }
+  });
 
   // Libros de una colección (o de la "General" virtual, que agrupa los
   // libros sin colección asignada o cuya colección fue borrada).
@@ -2938,6 +3868,15 @@
   function renderGalerias() {
     galeriasGrid.innerHTML = "";
     const galeriasAMostrar = galeriasVisibles();
+
+    const btnBiografia = document.getElementById("abrirBiografiaBtn");
+    btnBiografia.style.display = (uidPerfilObjetivo && uidPerfilObjetivo !== ID_PERFIL_GENERAL) ? "inline-block" : "none";
+
+    const btnSeguir = document.getElementById("seguirPerfilBtn");
+    const puedeSeguir = uidPerfilObjetivo && uidPerfilObjetivo !== ID_PERFIL_GENERAL && uidActual && uidPerfilObjetivo !== uidActual;
+    btnSeguir.style.display = puedeSeguir ? "inline-block" : "none";
+    if (puedeSeguir) actualizarBotonSeguir();
+
     const coleccionesGeneral = coleccionesDeGaleria(ID_GALERIA_GENERAL);
     const librosGeneral = librosDeColeccion(ID_GENERAL);
     // El cajón "General" (sin dueño claro) solo se muestra en el enlace genérico,
@@ -2965,13 +3904,14 @@
   }
 
   function crearTarjetaGaleria(id, nombre, imagenId) {
+    const revisada = id !== ID_GALERIA_GENERAL && galeriaRevisada(id);
     const tile = document.createElement("div");
     tile.className = "galeria-tile";
     tile.innerHTML = `
       <div class="galeria-tile-img">
         <img src="${imagenDirecta(imagenId)}" data-alt-src="${imagenAlternativa(imagenId)}" data-tried-alt="0" alt="${escapeHtml(nombre)}" loading="lazy" onerror="manejarErrorImagen(this)">
       </div>
-      <div class="galeria-tile-nombre">${escapeHtml(nombre)}</div>
+      <div class="galeria-tile-nombre">${escapeHtml(nombre)}${revisada ? ` <span style="color:var(--verde);font-size:0.7rem;font-weight:700;">✓ Revisada</span>` : ""}</div>
     `;
     tile.addEventListener("click", () => abrirGaleria(id, nombre));
     return tile;
@@ -2994,6 +3934,7 @@
   }
 
   function abrirGaleria(id, nombre) {
+    reproducirIntroFlipbook("rafaga");
     vista = "colecciones";
     galeriaActualId = id;
     vistaGaleriasEl.style.display = "none";
@@ -3003,9 +3944,9 @@
     tituloGaleriaHeaderEl.setAttribute("aria-label", nombre);
     document.getElementById("buscadorInput").value = "";
     const galeriaActual = galerias.find(g => g.id === id);
+    document.getElementById("firmaGaleriaHeader").textContent = "De " + nombreCreador(galeriaActual ? galeriaActual.ownerId : null);
     aplicarFondo(vistaColeccionesEl, galeriaActual ? galeriaActual.fondoId : "");
     aplicarFiltro();
-    renderCinturon();
     window.scrollTo(0, 0);
   }
 
@@ -3020,7 +3961,6 @@
     quitarFondo(vistaColeccionesEl);
     quitarFondo(vistaColeccionDetalleEl);
     renderGalerias();
-    renderCinturon();
     window.scrollTo(0, 0);
   });
 
@@ -3050,6 +3990,7 @@
 
   function crearTarjetaColeccion(id, nombre, frase, imagenId, cantidad, clave) {
     const etiqueta = cantidad === 1 ? "1 publicación" : `${cantidad} publicaciones`;
+    const revisada = id !== ID_GENERAL && coleccionRevisada(id);
     const card = document.createElement("div");
     card.className = "coleccion-card";
     card.innerHTML = `
@@ -3057,6 +3998,7 @@
       <div class="coleccion-overlay">
         <div class="coleccion-titulo">${clave ? `<svg class="icono-candado" viewBox="0 0 200 200" width="15" height="15" style="vertical-align:-2px;margin-right:4px;"><use href="#icono-candado-svg"/></svg>` : ""}${escapeHtml(nombre)}</div>
         ${frase ? `<div class="coleccion-frase">${escapeHtml(frase)}</div>` : ""}
+        ${revisada ? `<div style="color:var(--verde);font-size:0.68rem;font-weight:700;margin-top:2px;">✓ Revisada</div>` : ""}
       </div>
       <div class="coleccion-contador">${etiqueta}</div>
     `;
@@ -3098,6 +4040,7 @@
   }
 
   function abrirColeccion(id, nombre, frase) {
+    reproducirIntroFlipbook("rafaga");
     vista = "coleccion";
     coleccionActualId = id;
     vistaColeccionesEl.style.display = "none";
@@ -3107,15 +4050,186 @@
     renderColeccionDetalle(id);
 
     const coleccionActual = colecciones.find(c => c.id === id);
+    document.getElementById("firmaColeccionDetalle").textContent = "De " + nombreCreador(coleccionActual ? coleccionActual.ownerId : null);
+
+    const libroConTerminos = libros.some(l => l.coleccionId === id && Array.isArray(l.terminosReferencia) && l.terminosReferencia.length > 0);
+    document.getElementById("abrirDiccionarioBtn").style.display = libroConTerminos ? "inline-block" : "none";
+
     const galeriaActual = galerias.find(g => g.id === galeriaActualId);
     const fondoEfectivo = (coleccionActual && coleccionActual.fondoId)
       ? coleccionActual.fondoId
       : (galeriaActual ? galeriaActual.fondoId : "");
     aplicarFondo(vistaColeccionDetalleEl, fondoEfectivo);
-    renderCinturon();
 
     window.scrollTo(0, 0);
   }
+
+  // ---------- Diccionario de Referencias: lista filtrada por colección ----------
+  document.getElementById("abrirDiccionarioBtn").addEventListener("click", () => {
+    const terminosDeLaColeccion = new Map(); // termino en minúscula -> {termino, definicion}
+    libros
+      .filter(l => l.coleccionId === coleccionActualId && Array.isArray(l.terminosReferencia))
+      .forEach(l => {
+        l.terminosReferencia.forEach(termino => {
+          const clave = termino.toLowerCase();
+          if (terminosDeLaColeccion.has(clave)) return;
+          const ref = referencias.find(r => r.ownerId === l.ownerId && r.termino.toLowerCase() === clave);
+          if (ref) terminosDeLaColeccion.set(clave, ref);
+        });
+      });
+
+    const listaOrdenada = Array.from(terminosDeLaColeccion.values())
+      .sort((a, b) => a.termino.localeCompare(b.termino, "es", { sensitivity: "base" }));
+
+    const coleccionActual = colecciones.find(c => c.id === coleccionActualId);
+    document.getElementById("diccionarioModalSubtitulo").textContent =
+      `Palabras e ideas propias usadas en "${coleccionActual ? coleccionActual.nombre : "esta colección"}", ordenadas alfabéticamente.`;
+    const nombreAutorColeccion = nombreCreador(coleccionActual ? coleccionActual.ownerId : null);
+
+    const lista = document.getElementById("diccionarioModalLista");
+    lista.innerHTML = "";
+    if (listaOrdenada.length === 0) {
+      lista.innerHTML = `<p style="font-size:0.8rem;color:var(--text-sec);">Todavía no hay términos en esta colección.</p>`;
+    } else {
+      listaOrdenada.forEach(ref => {
+        const item = document.createElement("div");
+        item.className = "bio-termino-fila";
+        item.innerHTML = `
+          <div class="bio-termino-texto">
+            <div class="palabra" style="color:var(--accent);">${escapeHtml(ref.termino)}</div>
+            <div class="def">${escapeHtml(ref.definicion)}</div>
+          </div>
+          <button type="button" class="bio-guardar-btn">Guardar</button>
+        `;
+        item.querySelector(".bio-guardar-btn").addEventListener("click", (e) => {
+          guardarEnHistorial(ref.termino, ref.definicion, nombreAutorColeccion, e.target);
+        });
+        lista.appendChild(item);
+      });
+    }
+    document.getElementById("diccionarioModal").style.display = "flex";
+  });
+
+  document.getElementById("cerrarDiccionarioBtn").addEventListener("click", () => {
+    document.getElementById("diccionarioModal").style.display = "none";
+  });
+
+  // ---------- Biografía y Diccionario de Referencias acumulado del autor ----------
+  document.getElementById("abrirBiografiaBtn").addEventListener("click", () => {
+    if (!uidPerfilObjetivo) return;
+    const autor = usuarios.find(u => u.id === uidPerfilObjetivo);
+    const nombreAutor = autor ? (autor.nombre || "Usuario") : "Usuario";
+
+    document.getElementById("biografiaModalTitulo").textContent = nombreAutor;
+    const cuerpo = document.getElementById("biografiaModalCuerpo");
+    cuerpo.innerHTML = "";
+
+    // Resumen / biografía escrita por el propio autor
+    const resumenTexto = autor && autor.resumen ? autor.resumen.trim() : "";
+    const bloqueResumen = document.createElement("div");
+    bloqueResumen.className = "bio-resumen";
+    bloqueResumen.textContent = resumenTexto || "Este autor todavía no ha escrito una biografía.";
+    cuerpo.appendChild(bloqueResumen);
+
+    // Árbol: galerías (alfabético) > colecciones (alfabético) > publicaciones (alfabético) > términos (alfabético)
+    const galeriasDelAutor = galerias
+      .filter(g => g.ownerId === uidPerfilObjetivo)
+      .sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" }));
+
+    const arbol = document.createElement("div");
+    arbol.className = "bio-arbol";
+
+    if (galeriasDelAutor.length === 0) {
+      arbol.innerHTML = `<div class="bio-vacio">Este autor todavía no tiene galerías publicadas.</div>`;
+    }
+
+    galeriasDelAutor.forEach(gal => {
+      const coleccionesDeEsaGaleria = colecciones
+        .filter(c => c.galeriaId === gal.id)
+        .sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" }));
+
+      const detGaleria = document.createElement("details");
+      detGaleria.className = "bio-galeria";
+      const sumGaleria = document.createElement("summary");
+      sumGaleria.textContent = gal.nombre || "Sin nombre";
+      detGaleria.appendChild(sumGaleria);
+
+      if (coleccionesDeEsaGaleria.length === 0) {
+        const vacio = document.createElement("div");
+        vacio.className = "bio-vacio";
+        vacio.textContent = "Sin colecciones todavía.";
+        detGaleria.appendChild(vacio);
+      }
+
+      coleccionesDeEsaGaleria.forEach(col => {
+        const publicacionesDeEsaColeccion = libros
+          .filter(l => l.coleccionId === col.id)
+          .sort((a, b) => (a.titulo || "").localeCompare(b.titulo || "", "es", { sensitivity: "base" }));
+
+        const detColeccion = document.createElement("details");
+        detColeccion.className = "bio-coleccion";
+        const sumColeccion = document.createElement("summary");
+        sumColeccion.textContent = col.nombre || "Sin nombre";
+        detColeccion.appendChild(sumColeccion);
+
+        if (publicacionesDeEsaColeccion.length === 0) {
+          const vacio = document.createElement("div");
+          vacio.className = "bio-vacio";
+          vacio.textContent = "Sin publicaciones todavía.";
+          detColeccion.appendChild(vacio);
+        }
+
+        publicacionesDeEsaColeccion.forEach(libro => {
+          const detPublicacion = document.createElement("details");
+          detPublicacion.className = "bio-publicacion";
+          const sumPublicacion = document.createElement("summary");
+          sumPublicacion.textContent = libro.titulo || "Sin título";
+          detPublicacion.appendChild(sumPublicacion);
+
+          const terminos = (Array.isArray(libro.terminosReferencia) ? libro.terminosReferencia : [])
+            .map(t => referencias.find(r => r.ownerId === uidPerfilObjetivo && r.termino.toLowerCase() === t.toLowerCase()))
+            .filter(Boolean)
+            .sort((a, b) => a.termino.localeCompare(b.termino, "es", { sensitivity: "base" }));
+
+          if (terminos.length === 0) {
+            const vacio = document.createElement("div");
+            vacio.className = "bio-vacio";
+            vacio.textContent = "Sin diccionario de referencias en esta publicación.";
+            detPublicacion.appendChild(vacio);
+          } else {
+            terminos.forEach(ref => {
+              const fila = document.createElement("div");
+              fila.className = "bio-termino-fila";
+              fila.innerHTML = `
+                <div class="bio-termino-texto">
+                  <div class="palabra">${escapeHtml(ref.termino)}</div>
+                  <div class="def">${escapeHtml(ref.definicion)}</div>
+                </div>
+                <button type="button" class="bio-guardar-btn">Guardar</button>
+              `;
+              fila.querySelector(".bio-guardar-btn").addEventListener("click", (e) => {
+                guardarEnHistorial(ref.termino, ref.definicion, nombreAutor, e.target);
+              });
+              detPublicacion.appendChild(fila);
+            });
+          }
+
+          detColeccion.appendChild(detPublicacion);
+        });
+
+        detGaleria.appendChild(detColeccion);
+      });
+
+      arbol.appendChild(detGaleria);
+    });
+
+    cuerpo.appendChild(arbol);
+    document.getElementById("biografiaModal").style.display = "flex";
+  });
+
+  document.getElementById("cerrarBiografiaBtn").addEventListener("click", () => {
+    document.getElementById("biografiaModal").style.display = "none";
+  });
 
   document.getElementById("backToHomeBtn").addEventListener("click", () => {
     vista = "colecciones";
@@ -3124,7 +4238,6 @@
     quitarFondo(vistaColeccionDetalleEl);
     vistaColeccionesEl.style.display = "block";
     aplicarFiltro();
-    renderCinturon();
     window.scrollTo(0, 0);
   });
 
@@ -3198,6 +4311,8 @@
   }
 
   function crearTarjetaLibro(libro) {
+    const p = progresoDeLibro(libro.id);
+    const revisado = !!(p && p.revisado);
     const card = document.createElement("div");
     card.className = "book-card";
     card.innerHTML = `
@@ -3205,7 +4320,7 @@
         <img src="${imagenDirecta(libro.portadaId)}" data-alt-src="${imagenAlternativa(libro.portadaId)}" data-tried-alt="0" alt="${escapeHtml(libro.titulo)}" loading="lazy" onerror="manejarErrorImagen(this)">
       </div>
       <div class="book-info">
-        <div class="book-title">${escapeHtml(libro.titulo)}</div>
+        <div class="book-title">${escapeHtml(libro.titulo)}${revisado ? ` <span style="color:var(--verde);font-size:0.7rem;font-weight:700;">✓ Revisado</span>` : ""}</div>
         <div class="book-summary">${escapeHtml(libro.resumen)}</div>
         <button class="read-btn">Ver publicación</button>
       </div>
@@ -3218,8 +4333,28 @@
 
   // ---------- Panel admin: lista de libros (siempre muestra todos) ----------
   // Un elemento es "mío" si lo creé yo, o si es contenido antiguo sin dueño asignado.
+  const UID_ADMIN_GENERAL = "b2NiOeuL0EdbrfSmjBBedc5sutt2"; // única cuenta que puede administrar contenido "sin dueño" (orbSY General)
+
+  // Devuelve el nombre a mostrar como firma del creador de una galería/colección/publicación
+  function nombreCreador(ownerId) {
+    if (!ownerId) return "orbSY General";
+    const u = usuarios.find(u => u.id === ownerId);
+    return u ? (u.nombre || "Usuario") : "Usuario";
+  }
+
   function esMio(item) {
-    return !item.ownerId || item.ownerId === uidActual;
+    if (!item.ownerId) return uidActual === UID_ADMIN_GENERAL;
+    return item.ownerId === uidActual;
+  }
+
+  // Una publicación es "de Noticias" si su colección pertenece a una galería marcada esNoticias
+  function esLibroDeNoticias(libro) {
+    const col = colecciones.find(c => c.id === libro.coleccionId);
+    if (!col) return false;
+    const gal = galerias.find(g => g.id === col.galeriaId);
+    // Elegible solo si su colección vive dentro de la galería marcada
+    // explícitamente como "Noticias en orbSY" (separada de orbSY General).
+    return !!(gal && gal.esNoticias);
   }
 
   function renderAdminListaLibros() {
@@ -3236,18 +4371,34 @@
         opciones[0] = `<option value="" selected>General (sin colección)</option>`;
       }
 
+      const miPerfilAdmin = usuarios.find(u => u.id === UID_ADMIN_GENERAL);
+      const yaEsDestacada = miPerfilAdmin && miPerfilAdmin.noticiaDestacadaId === libro.id;
+      const mostrarBotonDestacar = uidActual === UID_ADMIN_GENERAL && esLibroDeNoticias(libro);
+
       row.innerHTML = `
         <div class="admin-row-titulo">${escapeHtml(libro.titulo)}</div>
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
+          ${mostrarBotonDestacar ? `<button class="destacar-noticia-btn" style="${yaEsDestacada ? "background:var(--verde);color:#000;" : ""}">${yaEsDestacada ? "★ Destacada hoy" : "☆ Destacar en Noticias"}</button>` : ""}
           <button class="editar-btn">Editar</button>
+          <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar</button>
         </div>
       `;
       row.querySelector(".mover-select").addEventListener("change", async (e) => {
         await updateDoc(doc(db, "libros", libro.id), { coleccionId: e.target.value });
       });
+      if (mostrarBotonDestacar) {
+        row.querySelector(".destacar-noticia-btn").addEventListener("click", async () => {
+          try {
+            await setDoc(doc(db, "usuarios", UID_ADMIN_GENERAL), { noticiaDestacadaId: libro.id }, { merge: true });
+          } catch (e) {
+            alert("No se pudo destacar: " + e.message);
+          }
+        });
+      }
       row.querySelector(".editar-btn").addEventListener("click", () => cargarLibroParaEditar(libro));
+      row.querySelector(".transferir-btn").addEventListener("click", () => abrirModalTransferir("libro", libro.id, libro.titulo));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar "${libro.titulo}"?`)) {
           await deleteDoc(doc(db, "libros", libro.id));
@@ -3276,6 +4427,7 @@
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
           <button class="editar-btn">Editar</button>
+          <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar</button>
         </div>
       `;
@@ -3283,6 +4435,7 @@
         await updateDoc(doc(db, "colecciones", col.id), { galeriaId: e.target.value });
       });
       row.querySelector(".editar-btn").addEventListener("click", () => cargarColeccionParaEditar(col));
+      row.querySelector(".transferir-btn").addEventListener("click", () => abrirModalTransferir("coleccion", col.id, col.nombre));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar la colección "${col.nombre}"? Los escritos dentro no se borran, pasarán a verse en "General".`)) {
           await deleteDoc(doc(db, "colecciones", col.id));
@@ -3302,10 +4455,12 @@
         <div class="admin-row-titulo">${escapeHtml(gal.nombre)}</div>
         <div class="admin-row-controles">
           <button class="editar-btn">Editar</button>
+          <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar galería</button>
         </div>
       `;
       row.querySelector(".editar-btn").addEventListener("click", () => cargarGaleriaParaEditar(gal));
+      row.querySelector(".transferir-btn").addEventListener("click", () => abrirModalTransferir("galeria", gal.id, gal.nombre));
       row.querySelector(".delete-btn").addEventListener("click", async () => {
         if (confirm(`¿Eliminar la galería "${gal.nombre}"? Las colecciones dentro no se borran, pasarán a verse en "General".`)) {
           await deleteDoc(doc(db, "galerias", gal.id));
@@ -3383,7 +4538,6 @@
     herramientasDrawer.classList.add("abierto");
     herramientasOverlay.classList.add("abierto");
     document.getElementById("notasGuardadasVista").style.display = "none";
-    document.getElementById("asteroidesGuardadosVista").style.display = "none";
     document.getElementById("herramientasMenu").style.display = "block";
   }
   function cerrarHerramientas() {
@@ -3613,6 +4767,7 @@
   document.getElementById("abrirNotasGuardadasBtn").addEventListener("click", () => {
     herramientasMenu.style.display = "none";
     notasGuardadasVista.style.display = "flex";
+    activarTabNotas();
     renderNotasGuardadas();
   });
   document.getElementById("volverAHerramientasBtn").addEventListener("click", () => {
@@ -3620,54 +4775,326 @@
     herramientasMenu.style.display = "block";
   });
 
-  // ---------- Vista: asteroides guardados del Cinturón (desde Herramientas) ----------
-  const asteroidesGuardadosVista = document.getElementById("asteroidesGuardadosVista");
-  const asteroidesGuardadosLista = document.getElementById("asteroidesGuardadosLista");
-
-  document.getElementById("abrirAsteroidesGuardadosBtn").addEventListener("click", () => {
+  // ---------- Vista: Historial de Referencias (guardados personales) ----------
+  const historialVista = document.getElementById("historialVista");
+  document.getElementById("abrirHistorialBtn").addEventListener("click", () => {
     herramientasMenu.style.display = "none";
-    asteroidesGuardadosVista.style.display = "flex";
-    renderAsteroidesGuardados();
+    historialVista.style.display = "flex";
+    renderHistorialGuardado();
   });
-  document.getElementById("volverAHerramientasBtn2").addEventListener("click", () => {
-    asteroidesGuardadosVista.style.display = "none";
+  document.getElementById("volverAHerramientasDesdeHistorialBtn").addEventListener("click", () => {
+    historialVista.style.display = "none";
     herramientasMenu.style.display = "block";
   });
 
-  function renderAsteroidesGuardados() {
-    const lista = leerAsteroidesGuardados();
-    asteroidesGuardadosLista.innerHTML = "";
-
-    if (lista.length === 0) {
-      asteroidesGuardadosLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no has guardado ningún fragmento del Cinturón.</div>`;
+  function renderHistorialGuardado() {
+    const historialLista = document.getElementById("historialLista");
+    if (!historialLista) return;
+    if (!uidActual) {
+      historialLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Necesitas iniciar sesión (Admin) para ver tu historial guardado.</div>`;
       return;
     }
+    const mios = historial
+      .filter(h => h.ownerId === uidActual)
+      .sort((a, b) => a.termino.localeCompare(b.termino, "es", { sensitivity: "base" }));
 
-    lista.forEach((ast) => {
+    if (mios.length === 0) {
+      historialLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no has guardado nada. Cuando veas una palabra de otro autor que te interese, toca "Guardar" junto a su definición.</div>`;
+      return;
+    }
+    historialLista.innerHTML = "";
+    mios.forEach(h => {
       const item = document.createElement("div");
       item.className = "nota-guardada-item";
       item.innerHTML = `
-        <div class="nota-guardada-titulo">${escapeHtml(ast.autorNombre || "Alguien de Orbsy")}</div>
-        <div class="nota-guardada-preview">"${escapeHtml(ast.texto)}"</div>
+        <div class="nota-guardada-titulo">${escapeHtml(h.termino)}</div>
+        <div class="nota-guardada-preview">${escapeHtml(h.definicion)}</div>
+        <div style="font-size:0.7rem;color:var(--text-sec);font-style:italic;margin-top:2px;">De ${escapeHtml(h.autorNombre || "un autor")}</div>
         <div class="nota-guardada-controles">
-          <button class="abrir-nota">Ir al origen</button>
           <button class="eliminar">Quitar</button>
         </div>
       `;
-      item.querySelector(".abrir-nota").addEventListener("click", () => {
-        cerrarHerramientas();
-        irAlOrigenAsteroide(ast);
+      item.querySelector(".eliminar").addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "historial", h.id));
+        } catch (e) {
+          alert("No se pudo quitar: " + e.message);
+        }
       });
-      item.querySelector(".eliminar").addEventListener("click", () => {
-        let lista2 = leerAsteroidesGuardados();
-        lista2 = lista2.filter(a => a.id !== ast.id);
-        guardarAsteroidesGuardados(lista2);
-        renderAsteroidesGuardados();
-        renderCinturon();
-      });
-      asteroidesGuardadosLista.appendChild(item);
+      historialLista.appendChild(item);
     });
   }
+
+  // Guarda una palabra/definición de otro autor en tu Historial de Referencias personal
+  async function guardarEnHistorial(termino, definicion, autorNombre, btn) {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para guardar en tu historial.");
+      return;
+    }
+    const yaGuardado = historial.some(h => h.ownerId === uidActual && h.termino.toLowerCase() === termino.toLowerCase());
+    if (yaGuardado) {
+      if (btn) { btn.textContent = "Ya guardado"; btn.classList.add("guardado"); }
+      return;
+    }
+    try {
+      await addDoc(historialCol, { ownerId: uidActual, termino, definicion, autorNombre: autorNombre || "un autor", fecha: serverTimestamp() });
+      if (btn) { btn.textContent = "Guardado ✓"; btn.classList.add("guardado"); }
+    } catch (e) {
+      alert("No se pudo guardar: " + e.message);
+    }
+  }
+
+  // ---------- Seguir perfiles: lista personal, sin contador público ----------
+  function actualizarBotonSeguir() {
+    const btnSeguir = document.getElementById("seguirPerfilBtn");
+    if (!btnSeguir || btnSeguir.style.display === "none") return;
+    if (!uidActual || !uidPerfilObjetivo) return;
+    const yaSigue = seguidos.some(s => s.ownerId === uidActual && s.perfilSeguidoId === uidPerfilObjetivo);
+    btnSeguir.textContent = yaSigue ? "✓ Siguiendo" : "＋ Seguir";
+    btnSeguir.classList.toggle("guardado", yaSigue);
+  }
+
+  document.getElementById("seguirPerfilBtn").addEventListener("click", async () => {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para seguir perfiles.");
+      return;
+    }
+    const existente = seguidos.find(s => s.ownerId === uidActual && s.perfilSeguidoId === uidPerfilObjetivo);
+    try {
+      if (existente) {
+        await deleteDoc(doc(db, "seguidos", existente.id));
+      } else {
+        const perfil = usuarios.find(u => u.id === uidPerfilObjetivo);
+        await addDoc(seguidosCol, {
+          ownerId: uidActual,
+          perfilSeguidoId: uidPerfilObjetivo,
+          perfilSeguidoNombre: perfil ? (perfil.nombre || "Usuario") : "Usuario",
+          fecha: serverTimestamp()
+        });
+      }
+    } catch (e) {
+      alert("No se pudo actualizar: " + e.message);
+    }
+  });
+
+  function renderSeguidosGuardados() {
+    const seguidosLista = document.getElementById("seguidosLista");
+    if (!seguidosLista) return;
+    if (!uidActual) {
+      seguidosLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Necesitas iniciar sesión (Admin) para ver tu lista.</div>`;
+      return;
+    }
+    const mios = seguidos
+      .filter(s => s.ownerId === uidActual)
+      .sort((a, b) => (a.perfilSeguidoNombre || "").localeCompare(b.perfilSeguidoNombre || "", "es", { sensitivity: "base" }));
+
+    if (mios.length === 0) {
+      seguidosLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Todavía no seguís a nadie. Cuando visites el perfil de alguien, tocá "＋ Seguir" para agregarlo aquí.</div>`;
+      return;
+    }
+    seguidosLista.innerHTML = "";
+    mios.forEach(s => {
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">${escapeHtml(s.perfilSeguidoNombre || "Usuario")}</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-plantilla">Visitar</button>
+          <button class="eliminar">Dejar de seguir</button>
+        </div>
+      `;
+      item.querySelector(".abrir-plantilla").addEventListener("click", () => {
+        document.getElementById("cerrarHerramientasBtn").click();
+        seleccionarPerfil(s.perfilSeguidoId);
+      });
+      item.querySelector(".eliminar").addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "seguidos", s.id));
+        } catch (e) {
+          alert("No se pudo quitar: " + e.message);
+        }
+      });
+      seguidosLista.appendChild(item);
+    });
+  }
+
+  const seguidosVista = document.getElementById("seguidosVista");
+  document.getElementById("abrirSeguidosBtn").addEventListener("click", () => {
+    herramientasMenu.style.display = "none";
+    seguidosVista.style.display = "flex";
+    renderSeguidosGuardados();
+  });
+  document.getElementById("volverAHerramientasDesdeSeguidosBtn").addEventListener("click", () => {
+    seguidosVista.style.display = "none";
+    herramientasMenu.style.display = "block";
+  });
+
+  // ---------- Progreso de lectura: Comprendido / Congelar / Revisado ----------
+  // No es "me gusta" ni "guardar" — es una marca de comprensión real.
+  // "Comprendido": ya te llevaste el mensaje. "Congelar": lo dejás a
+  // propósito para volver más profundo después (aparece en tu lista de
+  // Congelados en Herramientas, como atajo de estudio).
+
+  function idProgreso(libroId) {
+    return `${uidActual}_${libroId}`;
+  }
+
+  function progresoDeLibro(libroId) {
+    if (!uidActual) return null;
+    return progreso.find(p => p.id === idProgreso(libroId)) || null;
+  }
+
+  async function marcarEstadoRecurso(libroId, tituloPublicacion, recursoIndex, estado) {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para marcar tu progreso.");
+      return;
+    }
+    const existente = progresoDeLibro(libroId);
+    const estadosActuales = existente && existente.estados ? { ...existente.estados } : {};
+    // Tocar el mismo estado otra vez lo desmarca (vuelve a "sin marcar")
+    if (estadosActuales[recursoIndex] === estado) {
+      delete estadosActuales[recursoIndex];
+    } else {
+      estadosActuales[recursoIndex] = estado;
+    }
+    try {
+      await setDoc(doc(db, "progreso", idProgreso(libroId)), {
+        ownerId: uidActual,
+        libroId,
+        libroTitulo: tituloPublicacion,
+        estados: estadosActuales,
+        revisado: existente ? !!existente.revisado : false,
+        fecha: serverTimestamp()
+      }, { merge: true });
+    } catch (e) {
+      alert("No se pudo guardar tu progreso: " + e.message);
+    }
+  }
+
+  async function alternarPublicacionRevisada(libroId, tituloPublicacion) {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para marcar tu progreso.");
+      return;
+    }
+    const existente = progresoDeLibro(libroId);
+    const nuevoValor = !(existente && existente.revisado);
+    try {
+      await setDoc(doc(db, "progreso", idProgreso(libroId)), {
+        ownerId: uidActual,
+        libroId,
+        libroTitulo: tituloPublicacion,
+        estados: existente && existente.estados ? existente.estados : {},
+        revisado: nuevoValor,
+        fecha: serverTimestamp()
+      }, { merge: true });
+    } catch (e) {
+      alert("No se pudo guardar tu progreso: " + e.message);
+    }
+  }
+
+  // Una colección está "revisada" cuando todas sus publicaciones lo están (y tiene al menos una)
+  function coleccionRevisada(coleccionId) {
+    const librosDeEsta = libros.filter(l => l.coleccionId === coleccionId);
+    if (librosDeEsta.length === 0) return false;
+    return librosDeEsta.every(l => {
+      const p = progresoDeLibro(l.id);
+      return !!(p && p.revisado);
+    });
+  }
+
+  // Una galería está "revisada" cuando todas sus colecciones lo están (y tiene al menos una)
+  function galeriaRevisada(galeriaId) {
+    const colsDeEsta = colecciones.filter(c => c.galeriaId === galeriaId);
+    if (colsDeEsta.length === 0) return false;
+    return colsDeEsta.every(c => coleccionRevisada(c.id));
+  }
+
+  // ---------- Lista de Congelados: atajo de estudio en Herramientas ----------
+  function renderCongeladosGuardados() {
+    const lista = document.getElementById("congeladosLista");
+    if (!lista) return;
+    if (!uidActual) {
+      lista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Necesitas iniciar sesión (Admin) para ver tu lista.</div>`;
+      return;
+    }
+    const propios = progreso.filter(p => p.ownerId === uidActual && p.estados);
+    const congelados = [];
+    propios.forEach(p => {
+      Object.entries(p.estados).forEach(([idx, estado]) => {
+        if (estado === "congelado") {
+          congelados.push({ libroId: p.libroId, libroTitulo: p.libroTitulo, recursoIndex: parseInt(idx, 10) });
+        }
+      });
+    });
+
+    if (congelados.length === 0) {
+      lista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">No tienes nada congelado todavía. Cuando marques "❄ Congelar" en un tema, aparece aquí como atajo para volver.</div>`;
+      return;
+    }
+    lista.innerHTML = "";
+    congelados.forEach(c => {
+      const libro = libros.find(l => l.id === c.libroId);
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">❄ ${escapeHtml(c.libroTitulo)}</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-plantilla">Retomar</button>
+        </div>
+      `;
+      item.querySelector(".abrir-plantilla").addEventListener("click", () => {
+        document.getElementById("cerrarHerramientasBtn").click();
+        if (libro) {
+          abrirRecurso(libro.id, libro.titulo, libro.recursos, c.recursoIndex);
+        } else {
+          alert("Esta publicación ya no está disponible.");
+        }
+      });
+      lista.appendChild(item);
+    });
+  }
+
+  const congeladosVista = document.getElementById("congeladosVista");
+  document.getElementById("abrirCongeladosBtn").addEventListener("click", () => {
+    herramientasMenu.style.display = "none";
+    congeladosVista.style.display = "flex";
+    renderCongeladosGuardados();
+  });
+  document.getElementById("volverAHerramientasDesdeCongeladosBtn").addEventListener("click", () => {
+    congeladosVista.style.display = "none";
+    herramientasMenu.style.display = "block";
+  });
+
+  // Refleja en los 3 botones del lector el estado guardado del recurso/publicación actual
+  function actualizarUIProgresoLector() {
+    const btnComprendido = document.getElementById("marcarComprendidoBtn");
+    const btnCongelar = document.getElementById("marcarCongelarBtn");
+    const btnRevisado = document.getElementById("marcarRevisadoBtn");
+    if (!btnComprendido || !libroIdActual) return;
+
+    const p = progresoDeLibro(libroIdActual);
+    const estadoActual = p && p.estados ? p.estados[indiceActual] : undefined;
+
+    btnComprendido.classList.toggle("activo", estadoActual === "comprendido");
+    btnCongelar.classList.toggle("activo", estadoActual === "congelado");
+
+    const estaRevisado = !!(p && p.revisado);
+    btnRevisado.classList.toggle("activo", estaRevisado);
+    btnRevisado.textContent = estaRevisado ? "✓ Publicación revisada" : "✓ Marcar publicación completa como revisada";
+  }
+
+  document.getElementById("marcarComprendidoBtn").addEventListener("click", () => {
+    if (!libroIdActual) return;
+    marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "comprendido");
+  });
+  document.getElementById("marcarCongelarBtn").addEventListener("click", () => {
+    if (!libroIdActual) return;
+    marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "congelado");
+  });
+  document.getElementById("marcarRevisadoBtn").addEventListener("click", () => {
+    if (!libroIdActual) return;
+    alternarPublicacionRevisada(libroIdActual, tituloPublicacionActual);
+  });
 
   function renderNotasGuardadas() {
     const todas = leerTodasLasNotas();
@@ -3727,6 +5154,378 @@
     return div.innerHTML;
   }
 
+  // ---------- orbSY notes: pestañas (Notas / Plantillas de Recursos) ----------
+  const tabNotasBtn = document.getElementById("tabNotasBtn");
+  const tabPlantillasBtn = document.getElementById("tabPlantillasBtn");
+  const plantillasVista = document.getElementById("plantillasVista");
+
+  function activarTabNotas() {
+    tabNotasBtn.style.background = "var(--accent)";
+    tabNotasBtn.style.border = "none";
+    tabNotasBtn.style.color = "#fff";
+    tabPlantillasBtn.style.background = "transparent";
+    tabPlantillasBtn.style.border = "1px solid var(--border)";
+    tabPlantillasBtn.style.color = "var(--text-sec)";
+    notasGuardadasLista.style.display = "block";
+    plantillasVista.style.display = "none";
+  }
+  function activarTabPlantillas() {
+    tabPlantillasBtn.style.background = "var(--accent)";
+    tabPlantillasBtn.style.border = "none";
+    tabPlantillasBtn.style.color = "#fff";
+    tabNotasBtn.style.background = "transparent";
+    tabNotasBtn.style.border = "1px solid var(--border)";
+    tabNotasBtn.style.color = "var(--text-sec)";
+    notasGuardadasLista.style.display = "none";
+    plantillasVista.style.display = "flex";
+    renderPlantillasGuardadas();
+  }
+  tabNotasBtn.addEventListener("click", activarTabNotas);
+  tabPlantillasBtn.addEventListener("click", activarTabPlantillas);
+
+  // ---------- Plantillas de Recursos: almacenamiento local ----------
+  const CLAVE_PLANTILLAS = "orbsy_plantillas_recursos";
+
+  function leerTodasLasPlantillas() {
+    try {
+      return JSON.parse(localStorage.getItem(CLAVE_PLANTILLAS)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function guardarTodasLasPlantillas(obj) {
+    try {
+      localStorage.setItem(CLAVE_PLANTILLAS, JSON.stringify(obj));
+    } catch (e) {
+      console.error("No se pudo guardar la plantilla localmente:", e);
+    }
+  }
+
+  // Copia el texto al portapapeles y da una señal visual de "copiado" en el botón
+  function copiarAlPortapapeles(valor, btn) {
+    if (!valor) return;
+    const marcarCopiado = () => {
+      if (!btn) return;
+      const textoOriginal = btn.textContent;
+      btn.textContent = "✓";
+      btn.classList.add("copiado");
+      setTimeout(() => { btn.textContent = textoOriginal; btn.classList.remove("copiado"); }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(valor).then(marcarCopiado).catch(() => {
+        alert("No se pudo copiar automáticamente. Copia el texto manualmente.");
+      });
+    } else {
+      // Respaldo para navegadores sin API de portapapeles
+      const temp = document.createElement("textarea");
+      temp.value = valor;
+      temp.style.position = "fixed";
+      temp.style.opacity = "0";
+      document.body.appendChild(temp);
+      temp.select();
+      try { document.execCommand("copy"); marcarCopiado(); } catch (e) { /* silencioso */ }
+      document.body.removeChild(temp);
+    }
+  }
+
+  // Copiar de campos estáticos (Nombre, Resumen, Portada, Fondo) por delegación de eventos
+  document.getElementById("plantillaEditorVista").addEventListener("click", (e) => {
+    const btn = e.target.closest(".copiar-campo-btn[data-target]");
+    if (!btn) return;
+    const campo = document.getElementById(btn.dataset.target);
+    if (campo) copiarAlPortapapeles(campo.value, btn);
+  });
+
+  // ---------- Selector de tipo de plantilla (Galería / Colección / Publicación) ----------
+  const plantillaTipoBotones = Array.from(document.querySelectorAll(".plantilla-tipo-btn"));
+  const plantillaNombreLabel = document.getElementById("plantillaNombreLabel");
+  const plantillaResumenLabel = document.getElementById("plantillaResumenLabel");
+  const plantillaFondoGrupo = document.getElementById("plantillaFondoGrupo");
+  const plantillaRecursosGrupo = document.getElementById("plantillaRecursosGrupo");
+  let plantillaTipoActivo = "publicacion";
+
+  const ETIQUETAS_POR_TIPO = {
+    galeria: { nombre: "Nombre de la galería", resumen: "Resumen (nota de planificación, opcional)" },
+    coleccion: { nombre: "Nombre de la colección", resumen: "Frase o resumen de bienvenida" },
+    publicacion: { nombre: "Título de la publicación", resumen: "Resumen" }
+  };
+
+  function seleccionarTipoPlantilla(tipo) {
+    plantillaTipoActivo = tipo;
+    plantillaTipoBotones.forEach(b => b.classList.toggle("activo", b.dataset.tipo === tipo));
+    plantillaNombreLabel.querySelector(".etiqueta-texto").textContent = ETIQUETAS_POR_TIPO[tipo].nombre;
+    plantillaResumenLabel.querySelector(".etiqueta-texto").textContent = ETIQUETAS_POR_TIPO[tipo].resumen;
+    plantillaFondoGrupo.style.display = (tipo === "galeria" || tipo === "coleccion") ? "block" : "none";
+    plantillaRecursosGrupo.style.display = (tipo === "publicacion") ? "block" : "none";
+
+    const COLOR_BORDE = { galeria: "var(--verde)", coleccion: "var(--accent)", publicacion: "var(--violeta)" };
+    document.getElementById("plantillaTarjeta").style.borderTopColor = COLOR_BORDE[tipo];
+  }
+  plantillaTipoBotones.forEach(b => b.addEventListener("click", () => seleccionarTipoPlantilla(b.dataset.tipo)));
+
+  // ---------- Constructor de recursos DENTRO de una plantilla (independiente del Taller) ----------
+  let plantillaRecursosBuilder = [];
+  const plantillaRecursosBuilderContainer = document.getElementById("plantillaRecursosBuilderContainer");
+
+  function renderPlantillaRecursosBuilder() {
+    plantillaRecursosBuilderContainer.innerHTML = "";
+    plantillaRecursosBuilder.forEach((r, i) => {
+      const row = document.createElement("div");
+      row.className = "recurso-row";
+      row.innerHTML = `
+        <select class="pr-tipo">
+          <option value="texto" ${r.tipo === "texto" ? "selected" : ""}>📄 Texto (PDF)</option>
+          <option value="audio" ${r.tipo === "audio" ? "selected" : ""}>🎧 Audio</option>
+          <option value="video" ${r.tipo === "video" ? "selected" : ""}>🎬 Video</option>
+          <option value="imagenes" ${r.tipo === "imagenes" ? "selected" : ""}>🖼️ Galería de imágenes</option>
+        </select>
+        <div class="plantilla-campo-copiable">
+          <input type="text" class="pr-etiqueta" placeholder="Etiqueta, ej: Introducción" value="${escapeAttr(r.etiqueta)}">
+          <button type="button" class="copiar-campo-btn pr-copiar-etiqueta">Copiar</button>
+        </div>
+        <div class="plantilla-campo-copiable">
+          <input type="text" class="pr-enlace" placeholder="Enlace de Google Drive" value="${escapeAttr(r.enlace)}">
+          <button type="button" class="copiar-campo-btn pr-copiar-enlace">Copiar</button>
+        </div>
+        <div class="recurso-controles">
+          <button type="button" class="recurso-quitar">✕ Quitar</button>
+        </div>
+      `;
+      row.querySelector(".pr-tipo").addEventListener("change", (e) => { plantillaRecursosBuilder[i].tipo = e.target.value; });
+      row.querySelector(".pr-etiqueta").addEventListener("input", (e) => { plantillaRecursosBuilder[i].etiqueta = e.target.value; });
+      row.querySelector(".pr-enlace").addEventListener("input", (e) => { plantillaRecursosBuilder[i].enlace = e.target.value; });
+      row.querySelector(".pr-copiar-etiqueta").addEventListener("click", (e) => copiarAlPortapapeles(plantillaRecursosBuilder[i].etiqueta, e.target));
+      row.querySelector(".pr-copiar-enlace").addEventListener("click", (e) => copiarAlPortapapeles(plantillaRecursosBuilder[i].enlace, e.target));
+      row.querySelector(".recurso-quitar").addEventListener("click", () => {
+        plantillaRecursosBuilder.splice(i, 1);
+        renderPlantillaRecursosBuilder();
+      });
+      plantillaRecursosBuilderContainer.appendChild(row);
+    });
+  }
+  document.getElementById("plantillaAgregarRecursoBtn").addEventListener("click", () => {
+    plantillaRecursosBuilder.push({ tipo: "texto", etiqueta: "", enlace: "" });
+    renderPlantillaRecursosBuilder();
+  });
+
+  // ---------- Constructor de preguntas DENTRO de una plantilla ----------
+  let plantillaPreguntasBuilder = [];
+  const plantillaPreguntasBuilderContainer = document.getElementById("plantillaPreguntasBuilderContainer");
+
+  function renderPlantillaPreguntasBuilder() {
+    plantillaPreguntasBuilderContainer.innerHTML = "";
+    plantillaPreguntasBuilder.forEach((texto, i) => {
+      const row = document.createElement("div");
+      row.className = "recurso-row";
+      row.innerHTML = `
+        <div class="plantilla-campo-copiable">
+          <textarea class="pp-texto" placeholder="Ej: ¿Dónde has visto esto en tu propia vida?" rows="2">${escapeAttr(texto)}</textarea>
+          <button type="button" class="copiar-campo-btn pp-copiar">Copiar</button>
+        </div>
+        <div class="recurso-controles">
+          <button type="button" class="pregunta-quitar">✕ Quitar</button>
+        </div>
+      `;
+      row.querySelector(".pp-texto").addEventListener("input", (e) => { plantillaPreguntasBuilder[i] = e.target.value; });
+      row.querySelector(".pp-copiar").addEventListener("click", (e) => copiarAlPortapapeles(plantillaPreguntasBuilder[i], e.target));
+      row.querySelector(".pregunta-quitar").addEventListener("click", () => {
+        plantillaPreguntasBuilder.splice(i, 1);
+        renderPlantillaPreguntasBuilder();
+      });
+      plantillaPreguntasBuilderContainer.appendChild(row);
+    });
+  }
+  document.getElementById("plantillaAgregarPreguntaBtn").addEventListener("click", () => {
+    plantillaPreguntasBuilder.push("");
+    renderPlantillaPreguntasBuilder();
+  });
+
+  // ---------- Editor de plantilla: abrir / guardar / eliminar ----------
+  const plantillaEditorVista = document.getElementById("plantillaEditorVista");
+  const plantillaNombreInput = document.getElementById("plantillaNombreInput");
+  const plantillaResumenInput = document.getElementById("plantillaResumenInput");
+  const plantillaPortadaInput = document.getElementById("plantillaPortadaInput");
+  const plantillaFondoInput = document.getElementById("plantillaFondoInput");
+  const eliminarPlantillaBtn = document.getElementById("eliminarPlantillaBtn");
+  let plantillaIdActiva = null;
+
+  function abrirEditorPlantilla(id) {
+    const todas = leerTodasLasPlantillas();
+    const plantilla = id ? todas[id] : null;
+    plantillaIdActiva = id || ("p_" + Date.now() + "_" + Math.floor(Math.random() * 10000));
+
+    seleccionarTipoPlantilla(plantilla ? plantilla.tipo : "publicacion");
+    plantillaNombreInput.value = plantilla ? (plantilla.nombre || "") : "";
+    plantillaResumenInput.value = plantilla ? (plantilla.resumen || "") : "";
+    plantillaPortadaInput.value = plantilla ? (plantilla.portada || "") : "";
+    plantillaFondoInput.value = plantilla ? (plantilla.fondo || "") : "";
+    plantillaRecursosBuilder = plantilla && Array.isArray(plantilla.recursos) ? plantilla.recursos.map(r => ({ ...r })) : [];
+    plantillaPreguntasBuilder = plantilla && Array.isArray(plantilla.preguntas) ? [...plantilla.preguntas] : [];
+    renderPlantillaRecursosBuilder();
+    renderPlantillaPreguntasBuilder();
+
+    eliminarPlantillaBtn.style.display = plantilla ? "block" : "none";
+    plantillasVista.style.display = "none";
+    plantillaEditorVista.style.display = "flex";
+  }
+
+  document.getElementById("nuevaPlantillaBtn").addEventListener("click", () => abrirEditorPlantilla(null));
+
+  document.getElementById("volverAPlantillasBtn").addEventListener("click", () => {
+    plantillaEditorVista.style.display = "none";
+    notasGuardadasVista.style.display = "flex";
+    activarTabPlantillas();
+  });
+
+  document.getElementById("guardarPlantillaBtn").addEventListener("click", () => {
+    const nombre = plantillaNombreInput.value.trim();
+    if (!nombre) {
+      alert("Ponle un nombre o título a la plantilla antes de guardarla.");
+      return;
+    }
+    const todas = leerTodasLasPlantillas();
+    todas[plantillaIdActiva] = {
+      tipo: plantillaTipoActivo,
+      nombre,
+      resumen: plantillaResumenInput.value.trim(),
+      portada: plantillaPortadaInput.value.trim(),
+      fondo: plantillaFondoInput.value.trim(),
+      recursos: plantillaTipoActivo === "publicacion" ? plantillaRecursosBuilder.filter(r => r.etiqueta || r.enlace) : [],
+      preguntas: plantillaTipoActivo === "publicacion" ? plantillaPreguntasBuilder.filter(p => p.trim() !== "") : [],
+      fecha: Date.now()
+    };
+    guardarTodasLasPlantillas(todas);
+    plantillaEditorVista.style.display = "none";
+    notasGuardadasVista.style.display = "flex";
+    activarTabPlantillas();
+  });
+
+  eliminarPlantillaBtn.addEventListener("click", () => {
+    if (!plantillaIdActiva) return;
+    if (confirm("¿Eliminar esta plantilla?")) {
+      const todas = leerTodasLasPlantillas();
+      delete todas[plantillaIdActiva];
+      guardarTodasLasPlantillas(todas);
+      plantillaEditorVista.style.display = "none";
+      notasGuardadasVista.style.display = "flex";
+      activarTabPlantillas();
+    }
+  });
+
+  const ETIQUETA_TIPO_BADGE = { galeria: "Galería", coleccion: "Colección", publicacion: "Publicación" };
+  const COLOR_BORDE_TIPO = { galeria: "#39ff8c", coleccion: "#22d3c4", publicacion: "#9b7cf6" };
+
+  function renderPlantillasGuardadas() {
+    const plantillasLista = document.getElementById("plantillasLista");
+    const todas = leerTodasLasPlantillas();
+    const entradas = Object.entries(todas).sort((a, b) => b[1].fecha - a[1].fecha);
+    plantillasLista.innerHTML = "";
+
+    if (entradas.length === 0) {
+      plantillasLista.innerHTML = `<div style="padding:26px 16px;text-align:center;color:var(--text-sec);font-size:0.82rem;"><div style="font-size:2rem;margin-bottom:8px;opacity:0.5;">📋</div>Aún no tienes plantillas. Créalas para preparar el contenido de una galería, colección o publicación antes de ir al Taller.</div>`;
+      return;
+    }
+
+    entradas.forEach(([id, plantilla]) => {
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.style.borderLeft = `3px solid ${COLOR_BORDE_TIPO[plantilla.tipo] || "var(--border)"}`;
+      const detalle = plantilla.tipo === "publicacion"
+        ? `${(plantilla.recursos || []).length} recurso(s) · ${(plantilla.preguntas || []).length} pregunta(s)`
+        : "Contenido de planificación";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo"><span style="color:${COLOR_BORDE_TIPO[plantilla.tipo] || "var(--text-sec)"};">[${ETIQUETA_TIPO_BADGE[plantilla.tipo] || plantilla.tipo}]</span> ${escapeHtml(plantilla.nombre)}</div>
+        <div class="nota-guardada-preview">${detalle}</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-plantilla">Editar</button>
+          <button class="eliminar">Eliminar</button>
+        </div>
+      `;
+      item.querySelector(".abrir-plantilla").addEventListener("click", () => abrirEditorPlantilla(id));
+      item.querySelector(".eliminar").addEventListener("click", () => {
+        if (confirm(`¿Eliminar la plantilla "${plantilla.nombre}"?`)) {
+          const todasActualizadas = leerTodasLasPlantillas();
+          delete todasActualizadas[id];
+          guardarTodasLasPlantillas(todasActualizadas);
+          renderPlantillasGuardadas();
+        }
+      });
+      plantillasLista.appendChild(item);
+    });
+  }
+
+  // ---------- Usar plantilla: importar al formulario correspondiente del Taller ----------
+  const importarPlantillaModal = document.getElementById("importarPlantillaModal");
+  const importarPlantillaLista = document.getElementById("importarPlantillaLista");
+
+  document.querySelectorAll(".usar-plantilla-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tipo = btn.dataset.tipo;
+      const todas = leerTodasLasPlantillas();
+      const entradas = Object.entries(todas)
+        .filter(([, p]) => p.tipo === tipo)
+        .sort((a, b) => b[1].fecha - a[1].fecha);
+      importarPlantillaLista.innerHTML = "";
+
+      if (entradas.length === 0) {
+        importarPlantillaLista.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes plantillas de tipo "${ETIQUETA_TIPO_BADGE[tipo]}". Créalas desde orbSY notes → Plantillas de Recursos.</div>`;
+      } else {
+        entradas.forEach(([id, plantilla]) => {
+          const fila = document.createElement("div");
+          fila.style.cssText = "border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;";
+          const detalle = tipo === "publicacion" ? `${(plantilla.recursos || []).length} recurso(s) · ${(plantilla.preguntas || []).length} pregunta(s)` : "Toca para usarla";
+          fila.innerHTML = `
+            <div style="font-weight:600;font-size:0.85rem;">${escapeHtml(plantilla.nombre)}</div>
+            <div style="font-size:0.72rem;color:var(--text-sec);margin-top:2px;">${detalle}</div>
+          `;
+          fila.addEventListener("click", () => {
+            importarPlantillaEnTaller(tipo, plantilla);
+            importarPlantillaModal.style.display = "none";
+          });
+          importarPlantillaLista.appendChild(fila);
+        });
+      }
+      importarPlantillaModal.style.display = "flex";
+    });
+  });
+
+  document.getElementById("importarPlantillaCancelar").addEventListener("click", () => {
+    importarPlantillaModal.style.display = "none";
+  });
+
+  function importarPlantillaEnTaller(tipo, plantilla) {
+    const MAPA_PESTANA = { galeria: "galerias", coleccion: "colecciones", publicacion: "publicaciones" };
+    irAPestanaTaller(MAPA_PESTANA[tipo]);
+    if (tipo === "galeria") {
+      document.getElementById("inputNombreGaleria").value = plantilla.nombre || "";
+      document.getElementById("inputImagenGaleria").value = plantilla.portada || "";
+      document.getElementById("inputFondoGaleria").value = plantilla.fondo || "";
+      document.getElementById("inputNombreGaleria").scrollIntoView({ behavior: "smooth", block: "center" });
+    } else if (tipo === "coleccion") {
+      document.getElementById("inputNombreColeccion").value = plantilla.nombre || "";
+      document.getElementById("inputFraseColeccion").value = plantilla.resumen || "";
+      document.getElementById("inputImagenColeccion").value = plantilla.portada || "";
+      document.getElementById("inputFondoColeccion").value = plantilla.fondo || "";
+      document.getElementById("inputNombreColeccion").scrollIntoView({ behavior: "smooth", block: "center" });
+    } else if (tipo === "publicacion") {
+      document.getElementById("inputTitulo").value = plantilla.nombre || "";
+      document.getElementById("inputResumen").value = plantilla.resumen || "";
+      document.getElementById("inputPortada").value = plantilla.portada || "";
+
+      const recursos = plantilla.recursos || [];
+      if (recursos.length > 0) {
+        recursosBuilder = recursos.map(r => ({ tipo: r.tipo || "texto", etiqueta: r.etiqueta || "", enlace: r.enlace || "", fuente: "drive" }));
+        renderRecursosBuilder();
+      }
+      const preguntas = plantilla.preguntas || [];
+      if (preguntas.length > 0) {
+        preguntasBuilder = [...preguntas];
+        renderPreguntasBuilder();
+      }
+      document.getElementById("inputTitulo").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
   // ---------- Modal: índice temático ----------
   const indiceModal = document.getElementById("indiceModal");
   const indiceTitulo = document.getElementById("indiceTitulo");
@@ -3739,15 +5538,23 @@
       alert("Esta publicación todavía no tiene contenido cargado.");
       return;
     }
+    reproducirIntroFlipbook("rafaga");
     preguntasReflexionActuales = Array.isArray(preguntasReflexion) ? preguntasReflexion.filter(p => p && p.trim()) : [];
     if (recursos.length === 1) {
       abrirRecurso(libroId, tituloPublicacion, recursos, 0);
       return;
     }
     // Varios recursos: mostrar el índice temático primero
+    const libroActual = libros.find(l => l.id === libroId);
     indiceTitulo.textContent = tituloPublicacion;
+    document.getElementById("firmaIndice").textContent = "De " + nombreCreador(libroActual ? libroActual.ownerId : null);
+    const progresoLibro = progresoDeLibro(libroId);
     indiceLista.innerHTML = "";
     recursos.forEach((r, i) => {
+      const estadoItem = progresoLibro && progresoLibro.estados ? progresoLibro.estados[i] : undefined;
+      const marca = estadoItem === "comprendido" ? `<span style="color:var(--verde);font-size:0.7rem;font-weight:700;">✓ Comprendido</span>`
+        : estadoItem === "congelado" ? `<span style="color:var(--violeta);font-size:0.7rem;font-weight:700;">❄ Congelado</span>`
+        : "";
       const item = document.createElement("div");
       item.className = "indice-item";
       item.innerHTML = `
@@ -3755,6 +5562,7 @@
         <div class="indice-info">
           <div class="indice-etiqueta">${escapeHtml(r.etiqueta)}</div>
           <div class="indice-tipo">${ETIQUETAS_TIPO[r.tipo] || r.tipo}</div>
+          ${marca}
         </div>
       `;
       item.addEventListener("click", () => {
@@ -3847,6 +5655,8 @@
     modalTitle.textContent = recursos.length > 1
       ? `${tituloPublicacion} — ${recurso.etiqueta}`
       : tituloPublicacion;
+    const libroDelRecurso = libros.find(l => l.id === libroId);
+    document.getElementById("firmaLectorBar").textContent = "De " + nombreCreador(libroDelRecurso ? libroDelRecurso.ownerId : null);
 
     reflexionToggleBtn.style.display = preguntasReflexionActuales.length > 0 ? "inline-block" : "none";
     reflexionToggleBtn.textContent = preguntasReflexionActuales.length > 1 ? `🪞 Reflexión (${preguntasReflexionActuales.length})` : "🪞 Reflexión";
@@ -3855,6 +5665,7 @@
       // Galería de imágenes: visor propio con anterior/siguiente y deslizar,
       // en vez del iframe de Drive.
       pdfFrame.style.display = "none";
+      pdfFrame.src = ""; // corta cualquier audio/video que siguiera sonando de fondo
       pdfLoading.style.display = "none";
       galeriaImagenesViewer.style.display = "flex";
       document.getElementById("audioPortadaWrap").style.display = "none";
@@ -3913,6 +5724,7 @@
       navBar.classList.remove("active");
       indiceToggleBtn.style.display = "none";
     }
+    actualizarUIProgresoLector();
   }
 
   // ---------- Visor de galería de imágenes ----------
@@ -3997,8 +5809,13 @@
   // ---------- Cortina deslizable: índice siempre accesible durante la lectura ----------
   function renderIndiceDrawer(recursos, indexActual) {
     indiceDrawerLista.innerHTML = "";
+    const progresoLibro = progresoDeLibro(libroIdActual);
     recursos.forEach((r, i) => {
       const esActual = i === indexActual;
+      const estadoItem = progresoLibro && progresoLibro.estados ? progresoLibro.estados[i] : undefined;
+      const marca = estadoItem === "comprendido" ? `<span style="color:var(--verde);font-size:0.68rem;font-weight:700;">✓ Comprendido</span>`
+        : estadoItem === "congelado" ? `<span style="color:var(--violeta);font-size:0.68rem;font-weight:700;">❄ Congelado</span>`
+        : "";
       const item = document.createElement("div");
       item.className = "indice-drawer-item";
       item.innerHTML = `
@@ -4006,6 +5823,7 @@
         <div class="indice-drawer-info">
           <div class="indice-drawer-etiqueta ${esActual ? "actual" : ""}">${escapeHtml(r.etiqueta)}${esActual ? " (estás aquí)" : ""}</div>
           <div class="indice-drawer-tipo">${ETIQUETAS_TIPO[r.tipo] || r.tipo}</div>
+          ${marca}
         </div>
       `;
       item.addEventListener("click", () => {
@@ -4068,6 +5886,127 @@
   }
 
   backBtn.addEventListener("click", cerrarLector);
+
+  // ---------- Animación de entrada tipo "flipbook" (5 cuadros) ----------
+  const introFlipbook = document.getElementById("introFlipbook");
+  const introFlipbookImg = document.getElementById("introFlipbookImg");
+  const FRAMES_INTRO = ["intro-1.png", "intro-2.png", "intro-3.png", "intro-4.png", "intro-5.png"];
+  let introEnCurso = false;
+
+  function reproducirIntroFlipbook(velocidad) {
+    if (introEnCurso) return;
+    introEnCurso = true;
+
+    // "larga": al cargar la página y al iniciar sesión de Admin (~3.6s, 5 cuadros)
+    // "rafaga": al entrar a un perfil, galería, colección o publicación (~0.55s, igual de rápida)
+    const porCuadro = velocidad === "larga" ? 560 : 70;
+    const sostener = velocidad === "larga" ? 400 : 60;
+    const desvanecer = velocidad === "larga" ? 450 : 180;
+
+    introFlipbook.classList.remove("ocultando");
+    introFlipbookImg.src = FRAMES_INTRO[0];
+    // Forzar reflow para reiniciar la transición de opacidad si ya estaba oculto
+    void introFlipbook.offsetWidth;
+    introFlipbook.classList.add("mostrar");
+
+    for (let i = 1; i < FRAMES_INTRO.length; i++) {
+      setTimeout(() => { introFlipbookImg.src = FRAMES_INTRO[i]; }, porCuadro * i);
+    }
+
+    const duracionCuadros = porCuadro * (FRAMES_INTRO.length - 1);
+    setTimeout(() => {
+      introFlipbook.classList.remove("mostrar");
+      introFlipbook.classList.add("ocultando");
+      setTimeout(() => {
+        introEnCurso = false;
+      }, desvanecer);
+    }, duracionCuadros + sostener);
+  }
+
+  // Se reproduce al cargar la página (pantalla de "Elige un perfil").
+  // Precargamos los 5 cuadros primero para que los cambios de imagen sean
+  // instantáneos y no dependan de la velocidad de la red en ese momento
+  // (si no, en conexiones lentas los cuadros pueden verse fuera de orden).
+  const precargaFramesIntro = Promise.all(
+    FRAMES_INTRO.map(src => new Promise(resolve => {
+      const img = new Image();
+      img.onload = resolve;
+      img.onerror = resolve;
+      img.src = src;
+    }))
+  );
+  const esperaMaximaPrecarga = new Promise(resolve => setTimeout(resolve, 1800));
+
+  Promise.race([precargaFramesIntro, esperaMaximaPrecarga]).then(() => {
+    reproducirIntroFlipbook("larga");
+  });
+
+  // ---------- Capas del Taller: Noticias en orbSY y Publicidad en orbSY ----------
+  // Aparecen cada vez que se entra al Taller estando logueado: al iniciar
+  // sesión, y al reabrir el panel Admin después de haber salido a publicar
+  // o leer contenido (así siempre se ve la Noticia/Publicidad más reciente,
+  // sin necesitar un botón de "actualizar" aparte). Un pequeño candado en
+  // memoria evita que se dupare si el panel se abre/cierra muy rápido.
+  let capasTallerEnCurso = false;
+
+  function mostrarCapasDelTallerSiCorresponde() {
+    if (capasTallerEnCurso) return;
+    capasTallerEnCurso = true;
+
+    const caja = document.getElementById("capaNoticiasCaja");
+    const imagen = document.getElementById("capaNoticiasImagen");
+    const icono = document.getElementById("capaNoticiasIcono");
+    const titulo = document.getElementById("capaNoticiasTitulo");
+    const subtitulo = document.getElementById("capaNoticiasSubtitulo");
+    const contenido = document.getElementById("capaNoticiasContenido");
+    const btnLeer = document.getElementById("leerNoticiaDestacadaBtn");
+    const miPerfilAdmin = usuarios.find(u => u.id === UID_ADMIN_GENERAL);
+    const libroDestacado = miPerfilAdmin && miPerfilAdmin.noticiaDestacadaId
+      ? libros.find(l => l.id === miPerfilAdmin.noticiaDestacadaId)
+      : null;
+
+    if (libroDestacado) {
+      caja.classList.add("con-imagen");
+      if (libroDestacado.portadaId) {
+        imagen.src = imagenDirecta(libroDestacado.portadaId);
+        imagen.style.display = "block";
+      } else {
+        imagen.style.display = "none";
+      }
+      icono.style.display = "none";
+      titulo.textContent = libroDestacado.titulo;
+      subtitulo.textContent = "Noticias en orbSY";
+      contenido.textContent = libroDestacado.resumen || "";
+      btnLeer.style.display = "block";
+      btnLeer.onclick = () => {
+        document.getElementById("capaNoticiasOrbSY").style.display = "none";
+        document.getElementById("capaPublicidadOrbSY").style.display = "none";
+        capasTallerEnCurso = false;
+        adminPanel.style.display = "none";
+        abrirPublicacion(libroDestacado.id, libroDestacado.titulo, libroDestacado.recursos, libroDestacado.preguntasReflexion || []);
+      };
+    } else {
+      caja.classList.remove("con-imagen");
+      imagen.style.display = "none";
+      icono.style.display = "block";
+      titulo.textContent = "Noticias en orbSY";
+      subtitulo.textContent = "Datos y novedades productivas — psicología, ciencia, arte, literatura.";
+      contenido.textContent = "Próximamente habrá noticias aquí.";
+      btnLeer.style.display = "none";
+    }
+
+    document.getElementById("capaNoticiasOrbSY").style.display = "flex";
+  }
+
+  document.getElementById("cerrarCapaNoticiasBtn").addEventListener("click", () => {
+    document.getElementById("capaNoticiasOrbSY").style.display = "none";
+    document.getElementById("capaPublicidadOrbSY").style.display = "flex";
+  });
+
+  document.getElementById("cerrarCapaPublicidadBtn").addEventListener("click", () => {
+    document.getElementById("capaPublicidadOrbSY").style.display = "none";
+    capasTallerEnCurso = false;
+  });
 </script>
 
 </body>
