@@ -426,7 +426,6 @@
     padding:14px 12px;
     margin-bottom:24px;
   }
-  #elCinturon.vacio{ display:none; }
   #cinturonLista{
     display:flex;
     gap:12px;
@@ -438,6 +437,7 @@
   .asteroide-card{
     flex:1 0 260px;
     max-width:340px;
+    min-height:120px;
     scroll-snap-align:start;
     background:#0b0b0e;
     border-radius:12px;
@@ -490,6 +490,20 @@
     padding:2px 6px;
   }
   .asteroide-guardar-btn.guardado{ color:var(--violeta); }
+
+  .asteroide-card-vacia{
+    align-items:center;
+    justify-content:center;
+    background:#141418;
+    border:1px dashed #35353d;
+  }
+  .asteroide-texto-vacio{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    color:#6f6f78;
+    text-align:center;
+    margin:0;
+  }
 
   /* PANTALLA: GALERÍAS (nivel superior, diseño propio) */
   #vistaGalerias{
@@ -1955,6 +1969,9 @@
   let libros = [];        // [{id, titulo, resumen, portadaId, coleccionId, recursos, fecha}]
   let colecciones = [];   // [{id, nombre, imagenId, frase, clave, galeriaId, fecha}]
   let galerias = [];      // [{id, nombre, imagenId, fecha}]
+  const parametrosUrl = new URLSearchParams(location.search);
+  let uidPerfilObjetivo = parametrosUrl.get("u");
+
   let vista = uidPerfilObjetivo ? "galerias" : "perfiles"; // "perfiles" | "galerias" | "colecciones" | "coleccion"
   let galeriaActualId = null;
   let coleccionActualId = null;
@@ -2008,10 +2025,10 @@
   // estar autenticado para poder publicar o borrar libros.
   let isAdmin = false;
   let uidActual = null;
-
-  // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
-  const parametrosUrl = new URLSearchParams(location.search);
-  let uidPerfilObjetivo = parametrosUrl.get("u");
+  let usuarios = [];
+  let libroSnapshotListo = false;
+  let coleccionSnapshotListo = false;
+  let galeriaSnapshotListo = false;
 
   const COLORES_GALAXIA = { verde: "#39ff8c", turquesa: "#22d3c4", violeta: "#9b7cf6", gris: "#c7c7cf" };
   const ID_PERFIL_GENERAL = "__perfil_general__"; // agrupa contenido sin dueño asignado
@@ -2665,10 +2682,6 @@
     renderCinturon();
   });
 
-  let libroSnapshotListo = false;
-  let coleccionSnapshotListo = false;
-  let galeriaSnapshotListo = false;
-
   // Convierte un nombre de galería en el mismo estilo de letras espaciadas
   // que ya usabas para "GALERÍA DEL ORBSENTISTA", para cualquier galería.
   function generarTituloEspaciado(nombre) {
@@ -2729,7 +2742,6 @@
   });
 
   // ---------- Perfiles (galaxias): selector tipo Netflix ----------
-  let usuarios = [];
   onSnapshot(usuariosCol, (snapshot) => {
     usuarios = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     renderPerfiles();
@@ -2770,22 +2782,29 @@
   }
 
   function renderCinturon() {
+    elCinturon.classList.remove("vacio");
+    const cantidad = cuantosCaben();
+    cinturonLista.innerHTML = "";
+
     if (asteroides.length === 0) {
-      elCinturon.classList.add("vacio");
-      cinturonLista.innerHTML = "";
+      // Sin ningún fragmento publicado todavía: mostramos casillas vacías
+      for (let i = 0; i < cantidad; i++) {
+        const card = document.createElement("div");
+        card.className = "asteroide-card asteroide-card-vacia";
+        card.innerHTML = `<div class="asteroide-texto-vacio">Aún no hay fragmentos publicados aquí.</div>`;
+        cinturonLista.appendChild(card);
+      }
       return;
     }
-    elCinturon.classList.remove("vacio");
 
-    const cantidad = Math.min(cuantosCaben(), asteroides.length);
+    const cantidadReal = Math.min(cantidad, asteroides.length);
     let disponibles = asteroides.filter(a => !ultimoGrupoCinturon.includes(a.id));
-    if (disponibles.length < cantidad) disponibles = asteroides; // ya no hay suficientes nuevos, repetimos
+    if (disponibles.length < cantidadReal) disponibles = asteroides; // ya no hay suficientes nuevos, repetimos
 
-    const grupo = [...disponibles].sort(() => Math.random() - 0.5).slice(0, cantidad);
+    const grupo = [...disponibles].sort(() => Math.random() - 0.5).slice(0, cantidadReal);
     ultimoGrupoCinturon = grupo.map(a => a.id);
 
     const guardados = leerAsteroidesGuardados().map(a => a.id);
-    cinturonLista.innerHTML = "";
     grupo.forEach(ast => {
       const card = document.createElement("div");
       card.className = "asteroide-card";
@@ -2806,6 +2825,14 @@
       });
       cinturonLista.appendChild(card);
     });
+
+    // Si faltan casillas para llenar el espacio (pocos fragmentos existentes), se completan vacías
+    for (let i = grupo.length; i < cantidad; i++) {
+      const card = document.createElement("div");
+      card.className = "asteroide-card asteroide-card-vacia";
+      card.innerHTML = `<div class="asteroide-texto-vacio">Aún no hay más fragmentos por aquí.</div>`;
+      cinturonLista.appendChild(card);
+    }
   }
 
   function irAlOrigenAsteroide(ast) {
