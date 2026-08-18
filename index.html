@@ -1358,16 +1358,11 @@
     cursor:pointer;
   }
   .indice-reaccion-btn:active{ opacity:0.8; }
-  .indice-reaccion-btn.activa-da{
-    opacity:1;
-    background:var(--verde);
-    border-color:var(--verde);
-    color:#0e0e12;
-  }
+  .indice-reaccion-btn.activa-da,
   .indice-reaccion-btn.activa-ds{
     opacity:1;
-    background:#f87171;
-    border-color:#f87171;
+    background:var(--turquesa);
+    border-color:var(--turquesa);
     color:#0e0e12;
   }
   .indice-reaccion-conteo{
@@ -1377,14 +1372,26 @@
   }
 
   /* FRANJA DE FRAGMENTOS: banda blanca con casillas negras, promociona contenido */
-  .franja-fragmentos{
+  .franja-fragmentos-wrap{
+    position:sticky;
+    top:0;
+    z-index:40;
     background:#f4f4f6;
-    border-radius:14px;
-    padding:14px;
-    margin-bottom:22px;
+    padding:14px clamp(10px,3vw,24px);
+  }
+  .franja-fragmentos-wrap.oculta{ display:none; }
+  .franja-fragmentos{
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns:repeat(3, 1fr);
     gap:12px;
+    max-width:1400px;
+    margin:0 auto;
+  }
+  @media (max-width:1024px){
+    .franja-fragmentos{ grid-template-columns:repeat(2, 1fr); }
+  }
+  @media (max-width:640px){
+    .franja-fragmentos{ grid-template-columns:repeat(1, 1fr); }
   }
   .franja-casilla{
     background:#0c0c10;
@@ -2396,7 +2403,9 @@
     </div>
   </div>
 
-  <div id="franjaFragmentos" class="franja-fragmentos"></div>
+  <div id="franjaFragmentosWrap" class="franja-fragmentos-wrap oculta">
+    <div id="franjaFragmentos" class="franja-fragmentos"></div>
+  </div>
 
   <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
   <div id="vistaPerfiles">
@@ -4141,22 +4150,69 @@
     }
   }
 
+  // Cantidad de casillas visibles según el ancho de pantalla: 3 en pc, 2 en tablet, 1 en celular
+  function numCasillasFranja() {
+    const ancho = window.innerWidth;
+    if (ancho <= 640) return 1;
+    if (ancho <= 1024) return 2;
+    return 3;
+  }
+
+  // Mueve la franja al lugar correcto de la página actualmente visible:
+  // debajo de la cabecera (logo/título/esfera) en Perfiles, y arriba del
+  // contenido en cualquier otra página. Nunca dentro del lector de una
+  // publicación (el propio #pdfModal, a pantalla completa, ya la tapa).
+  function posicionarFranjaFragmentos() {
+    const wrap = document.getElementById("franjaFragmentosWrap");
+    if (!wrap) return;
+    const vPerfiles = document.getElementById("vistaPerfiles");
+    const vGalerias = document.getElementById("vistaGalerias");
+    const vColecciones = document.getElementById("vistaColecciones");
+    const vColeccionDetalle = document.getElementById("vistaColeccionDetalle");
+    let destino = null, anclaDespuesDe = null;
+    if (vPerfiles && vPerfiles.style.display !== "none") {
+      destino = vPerfiles;
+      anclaDespuesDe = vPerfiles.querySelector(".fila-superior-perfiles");
+    } else if (vColeccionDetalle && vColeccionDetalle.style.display !== "none") {
+      destino = vColeccionDetalle;
+    } else if (vColecciones && vColecciones.style.display !== "none") {
+      destino = vColecciones;
+    } else if (vGalerias && vGalerias.style.display !== "none") {
+      destino = vGalerias;
+    }
+    if (!destino) { wrap.classList.add("oculta"); return; }
+    wrap.classList.remove("oculta");
+    if (anclaDespuesDe) {
+      if (anclaDespuesDe.nextElementSibling !== wrap) anclaDespuesDe.insertAdjacentElement("afterend", wrap);
+    } else if (destino.firstElementChild !== wrap) {
+      destino.insertBefore(wrap, destino.firstElementChild);
+    }
+  }
+  let _reposicionarFranjaTimeout = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(_reposicionarFranjaTimeout);
+    _reposicionarFranjaTimeout = setTimeout(() => { renderFranjaFragmentos(); }, 200);
+  });
+
   function renderFranjaFragmentos() {
     const franja = document.getElementById("franjaFragmentos");
     if (!franja) return;
+    posicionarFranjaFragmentos();
     const disponibles = obtenerFragmentosDisponibles();
+    const cupos = numCasillasFranja();
     franja.innerHTML = "";
     if (disponibles.length === 0) {
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < cupos; i++) {
         const casilla = document.createElement("div");
         casilla.className = "franja-casilla";
-        casilla.innerHTML = `<div class="franja-texto"><span class="franja-vacia">Aún nadie ha subido un fragmento aquí.</span></div>`;
+        casilla.innerHTML = `<div class="franja-texto"><span class="franja-vacia">Sin fragmentos publicados</span></div>`;
         franja.appendChild(casilla);
       }
       return;
     }
-    // Orden aleatorio cada vez, para que nunca sea el mismo contenido estático
-    const barajado = [...disponibles].sort(() => Math.random() - 0.5);
+    // Orden aleatorio cada vez, para que nunca sea el mismo contenido estático,
+    // recortado al número de casillas que caben según el tamaño de pantalla.
+    const barajado = [...disponibles].sort(() => Math.random() - 0.5).slice(0, cupos);
     barajado.forEach(item => {
       const yaGuardado = fragmentoYaGuardado(item.tipo, item.refId);
       const casilla = document.createElement("div");
@@ -5957,8 +6013,8 @@
     const { da, ds } = contarReacciones(libroId, recursoIndex);
     if (esCreador) {
       zona.innerHTML = `
-        <span class="indice-reaccion-conteo" style="color:var(--verde);">DA ${da}</span>
-        <span class="indice-reaccion-conteo" style="color:#f87171;">DS ${ds}</span>
+        <span class="indice-reaccion-conteo" style="color:var(--turquesa);">DA ${da}</span>
+        <span class="indice-reaccion-conteo" style="color:var(--turquesa);">DS ${ds}</span>
       `;
       return;
     }
@@ -5993,11 +6049,8 @@
     }
     reproducirIntroFlipbook("rafaga");
     preguntasReflexionActuales = Array.isArray(preguntasReflexion) ? preguntasReflexion.filter(p => p && p.trim()) : [];
-    if (recursos.length === 1) {
-      abrirRecurso(libroId, tituloPublicacion, recursos, 0);
-      return;
-    }
-    // Varios recursos: mostrar el índice temático primero
+    // El índice temático siempre se muestra primero, incluso con un solo
+    // contenido — así el DA/DS y el estado de revisión están siempre visibles.
     const libroActual = libros.find(l => l.id === libroId);
     const esCreadorDeEsta = !!(libroActual && libroActual.ownerId === uidActual);
     indiceTitulo.textContent = tituloPublicacion;
