@@ -710,6 +710,76 @@
     color:var(--text-sec);
     margin-bottom:26px;
   }
+  /* ---------- EL CINTURÓN: banda de fragmentos entre el Taller y el contenido ---------- */
+  /* A propósito NO usa la paleta oscura del resto de orbSY: blanco/negro puro,
+     alto contraste, para que se lea como tránsito, no como otra sección más. */
+  #cinturonBanda{
+    background:#f4f4f2;
+    padding:18px 16px;
+    margin:0 0 26px;
+  }
+  #cinturonGrid{
+    max-width:1200px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+  @media (min-width:641px){
+    #cinturonGrid{ grid-template-columns:repeat(2, 1fr); }
+  }
+  @media (min-width:981px){
+    #cinturonGrid{ grid-template-columns:repeat(3, 1fr); }
+  }
+  .cinturon-tarjeta{
+    position:relative;
+    background:#0a0a0a;
+    color:#fff;
+    border-radius:10px;
+    padding:16px 40px 16px 16px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .cinturon-autor{
+    font-size:0.66rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:#9a9a9a;
+    margin-bottom:8px;
+  }
+  .cinturon-frase{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:0.95rem;
+    line-height:1.5;
+    color:#fff;
+    margin-bottom:14px;
+  }
+  .cinturon-origen{
+    background:transparent;
+    border:1px solid #444;
+    color:#fff;
+    padding:7px 12px;
+    border-radius:7px;
+    font-size:0.72rem;
+    font-family:'IBM Plex Mono', monospace;
+    cursor:pointer;
+  }
+  .cinturon-origen:active{ background:#1a1a1a; }
+  .cinturon-guardar{
+    position:absolute;
+    top:12px;
+    right:10px;
+    background:transparent;
+    border:none;
+    font-size:1.05rem;
+    line-height:1;
+    cursor:pointer;
+    padding:4px;
+    opacity:0.75;
+  }
+  .cinturon-guardar.guardado{ opacity:1; }
+  .cinturon-guardar:active{ opacity:1; }
+
   .galerias-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));
@@ -1878,6 +1948,13 @@
         <div style="font-size:0.72rem;color:var(--text-sec);">Temas que dejaste para volver más profundo</div>
       </div>
     </div>
+    <div class="herramienta-item" id="abrirCinturonGuardadosBtn">
+      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.15rem;">📍</div>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Guardados del Cinturón</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Fragmentos que guardaste al pasar</div>
+      </div>
+    </div>
     <div class="herramienta-item" style="opacity:0.45;cursor:default;">
       <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">☕</div>
       <div>
@@ -1988,6 +2065,14 @@
     </div>
     <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Temas que marcaste "❄ Congelar" para retomar más adelante. Tocar "Retomar" te lleva directo ahí.</p>
     <div class="notas-guardadas-lista" id="congeladosLista"></div>
+  </div>
+
+  <div id="cinturonGuardadosVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasDesdeCinturonBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Fragmentos del Cinturón que guardaste en este dispositivo. Guardado local, no en la nube.</p>
+    <div class="notas-guardadas-lista" id="cinturonGuardadosLista"></div>
   </div>
 </div>
 
@@ -2210,6 +2295,11 @@
         <button type="button" id="agregarTerminoBtn">+ Agregar término</button>
       </div>
 
+      <label style="margin-top:16px;">☄️ Texto de propagación (opcional)</label>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Si lo llenas, esta publicación aparece como fragmento en el Cinturón, invitando a leerla. Si lo dejas vacío, no aparece ahí.</p>
+      <textarea id="inputPropagacion" maxlength="200" placeholder="Una frase que dé ganas de entrar a leer/ver/escuchar esto..." rows="3"></textarea>
+      <div id="contadorPropagacion" style="text-align:right;font-size:0.7rem;color:var(--text-sec);margin-top:-6px;margin-bottom:8px;">0/200</div>
+
       <div style="display:flex;gap:8px;margin-top:16px;">
         <button id="publishBtn" style="flex:1;">Publicar</button>
         <button id="cancelarEdicionLibroBtn" style="display:none;flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:0 14px;border-radius:9px;">Cancelar</button>
@@ -2252,6 +2342,11 @@
       </div>
       </div>
     </div>
+  </div>
+
+  <!-- EL CINTURÓN: banda de fragmentos, fija entre el Taller y el contenido, en toda la app -->
+  <div id="cinturonBanda" style="display:none;">
+    <div id="cinturonGrid"></div>
   </div>
 
   <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
@@ -2526,6 +2621,7 @@
   const seguidosCol = collection(db, "seguidos");
   const progresoCol = collection(db, "progreso");
   const solicitudesCol = collection(db, "solicitudesTransferencia");
+  const asteroidesCol = collection(db, "asteroides");
 
   // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
   // (Declarado aquí arriba porque "vista" lo necesita para inicializarse)
@@ -2540,6 +2636,7 @@
   let historial = [];     // [{id, ownerId, termino, definicion, autorNombre, fecha}] — Historial de Referencias (guardados personales)
   let seguidos = [];      // [{id, ownerId, perfilSeguidoId, perfilSeguidoNombre, fecha}] — Seguir perfiles (lista personal)
   let progreso = [];      // [{id, ownerId, libroId, libroTitulo, estados:{idx:"comprendido"|"congelado"}, revisado, fecha}] — Progreso de lectura
+  let asteroides = [];    // [{id, ownerId, autorNombre, texto, libroId, libroTitulo, fecha}] — El Cinturón (fragmentos de propagación)
   let vista = uidPerfilObjetivo ? "galerias" : "perfiles"; // "perfiles" | "galerias" | "colecciones" | "coleccion"
   let galeriaActualId = null;
   let coleccionActualId = null;
@@ -3002,6 +3099,9 @@
     document.getElementById("inputResumen").value = libro.resumen || "";
     document.getElementById("inputPortada").value = libro.portadaId ? `https://drive.google.com/file/d/${libro.portadaId}/view` : "";
     document.getElementById("inputColeccionAsignada").value = libro.coleccionId || "";
+    const propagacionExistente = asteroides.find(a => a.libroId === libro.id);
+    document.getElementById("inputPropagacion").value = propagacionExistente ? propagacionExistente.texto : "";
+    document.getElementById("contadorPropagacion").textContent = `${document.getElementById("inputPropagacion").value.length}/200`;
 
     const recursosOriginales = recursosDeLibro(libro);
     recursosBuilder = recursosOriginales.map(r => {
@@ -3053,6 +3153,8 @@
     document.getElementById("inputTitulo").value = "";
     document.getElementById("inputResumen").value = "";
     document.getElementById("inputPortada").value = "";
+    document.getElementById("inputPropagacion").value = "";
+    document.getElementById("contadorPropagacion").textContent = "0/200";
     recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
     renderRecursosBuilder();
     preguntasBuilder = [];
@@ -3092,6 +3194,7 @@
 
     const portadaId = extraerIdDrive(portadaUrl);
     const preguntasReflexion = preguntasBuilder.map(p => p.trim()).filter(p => p !== "");
+    const textoPropagacion = document.getElementById("inputPropagacion").value.trim().slice(0, 200);
     const terminosValidos = inputAgregarDiccionario.checked
       ? diccionarioBuilder.map(par => ({ termino: par.termino.trim(), definicion: par.definicion.trim() })).filter(par => par.termino !== "" && par.definicion !== "")
       : [];
@@ -3135,13 +3238,17 @@
       if (libroEnEdicionId) {
         await updateDoc(doc(db, "libros", libroEnEdicionId), { ...datosLibro, ownerId: uidActual });
         await sincronizarDiccionario(terminosValidos);
+        await sincronizarAsteroide(libroEnEdicionId, titulo, textoPropagacion);
         cancelarEdicionLibro();
       } else {
-        await addDoc(librosCol, { ...datosLibro, ownerId: uidActual, fecha: serverTimestamp() });
+        const nuevoLibroRef = await addDoc(librosCol, { ...datosLibro, ownerId: uidActual, fecha: serverTimestamp() });
         await sincronizarDiccionario(terminosValidos);
+        await sincronizarAsteroide(nuevoLibroRef.id, titulo, textoPropagacion);
         document.getElementById("inputTitulo").value = "";
         document.getElementById("inputResumen").value = "";
         document.getElementById("inputPortada").value = "";
+        document.getElementById("inputPropagacion").value = "";
+        document.getElementById("contadorPropagacion").textContent = "0/200";
         recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
         renderRecursosBuilder();
         preguntasBuilder = [];
@@ -3177,6 +3284,30 @@
       }
     }
   }
+
+  // Crea, actualiza o borra el asteroide (fragmento del Cinturón) ligado a este libro,
+  // según si el "Texto de propagación" quedó lleno o vacío.
+  async function sincronizarAsteroide(libroId, tituloLibro, texto) {
+    const existente = asteroides.find(a => a.libroId === libroId);
+    try {
+      if (!texto) {
+        if (existente) await deleteDoc(doc(db, "asteroides", existente.id));
+        return;
+      }
+      const datos = { ownerId: uidActual, autorNombre: nombreCreador(uidActual), texto, libroId, libroTitulo: tituloLibro };
+      if (existente) {
+        await updateDoc(doc(db, "asteroides", existente.id), datos);
+      } else {
+        await addDoc(asteroidesCol, { ...datos, fecha: serverTimestamp() });
+      }
+    } catch (e) {
+      console.error("No se pudo sincronizar el asteroide de esta publicación:", e);
+    }
+  }
+
+  document.getElementById("inputPropagacion").addEventListener("input", (e) => {
+    document.getElementById("contadorPropagacion").textContent = `${e.target.value.length}/200`;
+  });
 
   // ---------- Taller: colapsar/expandir el contenido de configuración ----------
   const tallerContenido = document.getElementById("tallerContenido");
@@ -3505,6 +3636,7 @@
     vistaGaleriasEl.style.display = "none";
     vistaPerfilesEl.style.display = "block";
     history.replaceState(null, "", location.pathname);
+    if (typeof resortearCinturon === "function") resortearCinturon();
   });
 
   let libroSnapshotListo = false;
@@ -3609,6 +3741,15 @@
     }
   }, (error) => {
     console.error("Error al leer el progreso de lectura:", error);
+  });
+
+  // El Cinturón: fragmentos de propagación. Cada vez que cambian, si la banda
+  // ya está visible, se resortea para que la próxima vista muestre algo fresco.
+  onSnapshot(asteroidesCol, (snapshot) => {
+    asteroides = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof resortearCinturon === "function") resortearCinturon();
+  }, (error) => {
+    console.error("Error al leer el Cinturón:", error);
   });
 
   // ---------- Perfiles (galaxias): selector tipo Netflix ----------
@@ -3948,6 +4089,7 @@
     aplicarFondo(vistaColeccionesEl, galeriaActual ? galeriaActual.fondoId : "");
     aplicarFiltro();
     window.scrollTo(0, 0);
+    if (typeof resortearCinturon === "function") resortearCinturon();
   }
 
   document.getElementById("backToGaleriasBtn").addEventListener("click", () => {
@@ -3962,6 +4104,7 @@
     quitarFondo(vistaColeccionDetalleEl);
     renderGalerias();
     window.scrollTo(0, 0);
+    if (typeof resortearCinturon === "function") resortearCinturon();
   });
 
   // ---------- Vista: colecciones dentro de la galería abierta (tipo Netflix) ----------
@@ -4062,6 +4205,7 @@
     aplicarFondo(vistaColeccionDetalleEl, fondoEfectivo);
 
     window.scrollTo(0, 0);
+    if (typeof resortearCinturon === "function") resortearCinturon();
   }
 
   // ---------- Diccionario de Referencias: lista filtrada por colección ----------
@@ -4239,6 +4383,7 @@
     vistaColeccionesEl.style.display = "block";
     aplicarFiltro();
     window.scrollTo(0, 0);
+    if (typeof resortearCinturon === "function") resortearCinturon();
   });
 
   // ---------- Buscador (colecciones y publicaciones) ----------
@@ -6007,6 +6152,144 @@
     document.getElementById("capaPublicidadOrbSY").style.display = "none";
     capasTallerEnCurso = false;
   });
+
+  // ---------- EL CINTURÓN: banda de fragmentos entre el Taller y el contenido ----------
+  // Fija en toda la app. Se resortea cada vez que cambias de pantalla (elegir
+  // perfil, entrar/salir de galería, entrar/salir de colección). Guardar un
+  // fragmento es local al dispositivo, igual que orbSY notes: no hay cuenta
+  // de "me gusta" ni nada que se vea en la nube.
+  const CLAVE_CINTURON_GUARDADOS = "orbsy_cinturon_guardados";
+  const CANTIDAD_MAX_CINTURON = 3;
+  let ultimoGrupoCinturonIds = [];
+
+  function leerGuardadosCinturon() {
+    try { return JSON.parse(localStorage.getItem(CLAVE_CINTURON_GUARDADOS)) || []; }
+    catch (e) { return []; }
+  }
+  function guardarGuardadosCinturon(arr) {
+    try { localStorage.setItem(CLAVE_CINTURON_GUARDADOS, JSON.stringify(arr)); }
+    catch (e) { console.error("No se pudo guardar el fragmento localmente:", e); }
+  }
+
+  // Elige N asteroides al azar, evitando repetir exactamente el mismo grupo
+  // de la vez anterior mientras haya suficientes fragmentos distintos.
+  function elegirAsteroidesAleatorios(pool, cantidad) {
+    if (pool.length <= cantidad) return [...pool];
+    let elegidos;
+    let intentos = 0;
+    do {
+      elegidos = [...pool].sort(() => Math.random() - 0.5).slice(0, cantidad);
+      intentos++;
+    } while (
+      intentos < 6 &&
+      elegidos.map(a => a.id).sort().join(",") === ultimoGrupoCinturonIds.slice().sort().join(",")
+    );
+    return elegidos;
+  }
+
+  function irAlOrigenAsteroide(a) {
+    const libro = libros.find(l => l.id === a.libroId);
+    if (!libro) {
+      alert("Esta publicación ya no está disponible.");
+      return;
+    }
+    abrirPublicacion(libro.id, libro.titulo, recursosDeLibro(libro), libro.preguntasReflexion || (libro.preguntaReflexion ? [libro.preguntaReflexion] : []));
+  }
+
+  function alternarGuardadoCinturon(a, btn) {
+    const guardados = leerGuardadosCinturon();
+    const idx = guardados.findIndex(g => g.id === a.id);
+    if (idx >= 0) {
+      guardados.splice(idx, 1);
+      btn.textContent = "📍";
+      btn.classList.remove("guardado");
+    } else {
+      guardados.push({ id: a.id, autorNombre: a.autorNombre, texto: a.texto, libroId: a.libroId, libroTitulo: a.libroTitulo });
+      btn.textContent = "📌";
+      btn.classList.add("guardado");
+    }
+    guardarGuardadosCinturon(guardados);
+  }
+
+  function crearTarjetaAsteroide(a) {
+    const yaGuardado = leerGuardadosCinturon().some(g => g.id === a.id);
+    const tile = document.createElement("div");
+    tile.className = "cinturon-tarjeta";
+    tile.innerHTML = `
+      <button type="button" class="cinturon-guardar ${yaGuardado ? "guardado" : ""}" title="Guardar fragmento">${yaGuardado ? "📌" : "📍"}</button>
+      <div class="cinturon-autor">${escapeHtml(a.autorNombre || "Alguien")}</div>
+      <div class="cinturon-frase">"${escapeHtml(a.texto)}"</div>
+      <button type="button" class="cinturon-origen">Ir al origen →</button>
+    `;
+    tile.querySelector(".cinturon-origen").addEventListener("click", () => irAlOrigenAsteroide(a));
+    tile.querySelector(".cinturon-guardar").addEventListener("click", (e) => alternarGuardadoCinturon(a, e.currentTarget));
+    return tile;
+  }
+
+  // Vuelve a sortear las tarjetas visibles. Se llama al cargar y en cada
+  // cambio de pantalla (elegir perfil, entrar/salir de galería o colección).
+  function resortearCinturon() {
+    const banda = document.getElementById("cinturonBanda");
+    const grid = document.getElementById("cinturonGrid");
+    if (!banda || !grid) return;
+    if (!asteroides || asteroides.length === 0) {
+      banda.style.display = "none";
+      return;
+    }
+    banda.style.display = "block";
+    const elegidos = elegirAsteroidesAleatorios(asteroides, CANTIDAD_MAX_CINTURON);
+    ultimoGrupoCinturonIds = elegidos.map(a => a.id);
+    grid.innerHTML = "";
+    elegidos.forEach(a => grid.appendChild(crearTarjetaAsteroide(a)));
+  }
+
+  // ---------- Guardados del Cinturón (vista en Herramientas) ----------
+  function renderCinturonGuardadosVista() {
+    const lista = document.getElementById("cinturonGuardadosLista");
+    if (!lista) return;
+    const guardados = leerGuardadosCinturon();
+    if (guardados.length === 0) {
+      lista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">No has guardado ningún fragmento todavía. Tócalo (📍) en la banda del Cinturón, en cualquier pantalla.</div>`;
+      return;
+    }
+    lista.innerHTML = "";
+    guardados.forEach(g => {
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">${escapeHtml(g.autorNombre || "Alguien")}</div>
+        <div class="nota-guardada-preview">"${escapeHtml(g.texto)}"</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-plantilla">Ir al origen</button>
+          <button class="eliminar">Quitar</button>
+        </div>
+      `;
+      item.querySelector(".abrir-plantilla").addEventListener("click", () => {
+        document.getElementById("cerrarHerramientasBtn").click();
+        irAlOrigenAsteroide(g);
+      });
+      item.querySelector(".eliminar").addEventListener("click", () => {
+        guardarGuardadosCinturon(leerGuardadosCinturon().filter(x => x.id !== g.id));
+        renderCinturonGuardadosVista();
+        resortearCinturon();
+      });
+      lista.appendChild(item);
+    });
+  }
+
+  const cinturonGuardadosVista = document.getElementById("cinturonGuardadosVista");
+  document.getElementById("abrirCinturonGuardadosBtn").addEventListener("click", () => {
+    herramientasMenu.style.display = "none";
+    cinturonGuardadosVista.style.display = "flex";
+    renderCinturonGuardadosVista();
+  });
+  document.getElementById("volverAHerramientasDesdeCinturonBtn").addEventListener("click", () => {
+    cinturonGuardadosVista.style.display = "none";
+    herramientasMenu.style.display = "block";
+  });
+
+  // Primer sorteo al cargar la página (por si los asteroides ya estaban en caché)
+  resortearCinturon();
 </script>
 
 </body>
