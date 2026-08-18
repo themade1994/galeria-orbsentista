@@ -1414,17 +1414,35 @@
     display:flex;
     align-items:center;
   }
-  .franja-boton{
+  .franja-pie{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .franja-guardar-btn{
     background:transparent;
-    border:1px solid rgba(255,255,255,0.35);
-    color:#fff;
-    padding:7px 16px;
+    border:1px solid rgba(255,255,255,0.25);
+    color:rgba(255,255,255,0.75);
+    padding:6px 10px;
     border-radius:8px;
-    font-size:0.72rem;
+    font-size:0.66rem;
     font-weight:600;
     cursor:pointer;
   }
-  .franja-boton:active{ background:rgba(255,255,255,0.12); }
+  .franja-guardar-btn:active{ background:rgba(255,255,255,0.12); }
+  .franja-ir-btn{
+    background:var(--accent);
+    border:1px solid var(--accent);
+    color:#0e0e12;
+    padding:6px 16px;
+    border-radius:8px;
+    font-size:0.72rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .franja-ir-btn:active{ background:var(--accent-hover); }
   .franja-vacia{
     color:rgba(255,255,255,0.4);
     font-size:0.78rem;
@@ -1965,6 +1983,13 @@
         <div style="font-size:0.72rem;color:var(--text-sec);">Tu lista personal, nadie más la ve</div>
       </div>
     </div>
+    <div class="herramienta-item" id="abrirFragmentosGuardadosBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-capsula-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Fragmentos guardados</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Fragmentos que guardaste para después</div>
+      </div>
+    </div>
     <div class="herramienta-item" id="abrirCongeladosBtn">
       <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-congelados-svg"/></svg>
       <div>
@@ -2074,6 +2099,14 @@
     </div>
     <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Tu lista personal. No aumenta el contador de nadie ni nadie ve a quién sigues.</p>
     <div class="notas-guardadas-lista" id="seguidosLista"></div>
+  </div>
+
+  <div id="fragmentosGuardadosVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasDesdeFragmentosBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Fragmentos de otros usuarios que guardaste para revisar su contenido más adelante.</p>
+    <div class="notas-guardadas-lista" id="fragmentosGuardadosLista"></div>
   </div>
 
   <div id="congeladosVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
@@ -2363,6 +2396,8 @@
     </div>
   </div>
 
+  <div id="franjaFragmentos" class="franja-fragmentos"></div>
+
   <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
   <div id="vistaPerfiles">
     <div class="fila-superior-perfiles">
@@ -2402,7 +2437,6 @@
     <button id="backToPerfilesBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;margin-bottom:14px;">← Perfiles</button>
     <button id="abrirBiografiaBtn" style="display:none;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:14px;margin-left:8px;">📖 Biografía y Diccionario de Referencias</button>
     <button id="seguirPerfilBtn" style="display:none;background:transparent;border:1px dashed #22d3c4;color:#22d3c4;padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:14px;margin-left:8px;">＋ Seguir</button>
-    <div id="franjaFragmentos" class="franja-fragmentos"></div>
 
     <div class="galerias-eyebrow">Tus galerías</div>
     <div id="loadingMsgGalerias" class="empty-msg">Cargando...</div>
@@ -2638,6 +2672,7 @@
   const progresoCol = collection(db, "progreso");
   const solicitudesCol = collection(db, "solicitudesTransferencia");
   const reaccionesCol = collection(db, "reacciones");
+  const fragmentosGuardadosCol = collection(db, "fragmentosGuardados");
 
   // Si el enlace trae ?u=UID, esta app muestra solo las galerías de ese perfil.
   // (Declarado aquí arriba porque "vista" lo necesita para inicializarse)
@@ -3655,6 +3690,7 @@
     vistaGaleriasEl.style.display = "none";
     vistaPerfilesEl.style.display = "block";
     history.replaceState(null, "", location.pathname);
+    renderFranjaFragmentos();
   });
 
   let libroSnapshotListo = false;
@@ -3761,6 +3797,16 @@
     console.error("Error al leer el progreso de lectura:", error);
   });
 
+  // Fragmentos guardados para después (lista personal, visible en orbSY Herramientas)
+  let fragmentosGuardados = [];
+  onSnapshot(fragmentosGuardadosCol, (snapshot) => {
+    fragmentosGuardados = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderFragmentosGuardados === "function") renderFragmentosGuardados();
+    if (typeof renderFranjaFragmentos === "function") renderFranjaFragmentos();
+  }, (error) => {
+    console.error("Error al leer los fragmentos guardados:", error);
+  });
+
   // De acuerdo / En desacuerdo por recurso del índice temático
   let reacciones = [];
   onSnapshot(reaccionesCol, (snapshot) => {
@@ -3788,6 +3834,7 @@
   });
 
   function renderPerfiles() {
+    renderFranjaFragmentos();
     loadingMsgPerfiles.style.display = "none";
     perfilesGrid.innerHTML = "";
     const orbsyGeneralFlanco = document.getElementById("orbsyGeneralFlanco");
@@ -3840,6 +3887,7 @@
     vistaGaleriasEl.style.display = "block";
     history.replaceState(null, "", `${location.pathname}?u=${uid}`);
     renderGalerias();
+    renderFranjaFragmentos();
     window.scrollTo(0, 0);
   }
 
@@ -4028,18 +4076,54 @@
   function obtenerFragmentosDisponibles() {
     const items = [];
     libros.forEach(l => {
-      if (l.fragmento && l.fragmento.trim()) items.push({ tipo: "libro", texto: l.fragmento.trim(), ownerId: l.ownerId, ref: l });
+      if (l.fragmento && l.fragmento.trim()) items.push({ tipo: "libro", refId: l.id, texto: l.fragmento.trim(), ownerId: l.ownerId, ref: l });
     });
     colecciones.forEach(c => {
-      if (c.fragmento && c.fragmento.trim()) items.push({ tipo: "coleccion", texto: c.fragmento.trim(), ownerId: c.ownerId, ref: c });
+      if (c.fragmento && c.fragmento.trim()) items.push({ tipo: "coleccion", refId: c.id, texto: c.fragmento.trim(), ownerId: c.ownerId, ref: c });
     });
     galerias.forEach(g => {
-      if (g.fragmento && g.fragmento.trim()) items.push({ tipo: "galeria", texto: g.fragmento.trim(), ownerId: g.ownerId, ref: g });
+      if (g.fragmento && g.fragmento.trim()) items.push({ tipo: "galeria", refId: g.id, texto: g.fragmento.trim(), ownerId: g.ownerId, ref: g });
     });
     return items;
   }
 
+  // ---------- Guardar fragmentos para después (lista personal en orbSY Herramientas) ----------
+  function idFragmentoGuardado(tipo, refId) {
+    return `${uidActual}_${tipo}_${refId}`;
+  }
+  function fragmentoYaGuardado(tipo, refId) {
+    if (!uidActual) return false;
+    return fragmentosGuardados.some(f => f.id === idFragmentoGuardado(tipo, refId));
+  }
+  async function alternarGuardarFragmento(item, btn) {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para guardar fragmentos.");
+      return;
+    }
+    const yaGuardado = fragmentoYaGuardado(item.tipo, item.refId);
+    try {
+      if (yaGuardado) {
+        await deleteDoc(doc(db, "fragmentosGuardados", idFragmentoGuardado(item.tipo, item.refId)));
+      } else {
+        await setDoc(doc(db, "fragmentosGuardados", idFragmentoGuardado(item.tipo, item.refId)), {
+          uid: uidActual,
+          tipo: item.tipo,
+          refId: item.refId,
+          texto: item.texto,
+          ownerId: item.ownerId || null,
+          fecha: serverTimestamp()
+        });
+      }
+      if (btn) btn.textContent = yaGuardado ? "Guardar" : "Guardado ✓";
+    } catch (e) {
+      alert("No se pudo guardar el fragmento: " + e.message);
+    }
+  }
+
   function irAFragmentoContenido(item) {
+    // Primero "entra" al perfil dueño de ese contenido (la franja vive en la
+    // pantalla de Perfiles, antes de elegir uno), y luego navega al contenido.
+    seleccionarPerfil(item.ownerId || ID_PERFIL_GENERAL);
     if (item.tipo === "galeria") {
       abrirGaleria(item.ref.id, item.ref.nombre);
     } else if (item.tipo === "coleccion") {
@@ -4074,20 +4158,70 @@
     // Orden aleatorio cada vez, para que nunca sea el mismo contenido estático
     const barajado = [...disponibles].sort(() => Math.random() - 0.5);
     barajado.forEach(item => {
+      const yaGuardado = fragmentoYaGuardado(item.tipo, item.refId);
       const casilla = document.createElement("div");
       casilla.className = "franja-casilla";
       casilla.innerHTML = `
         <div class="franja-usuario">${escapeHtml(nombreCreador(item.ownerId))}</div>
         <div class="franja-texto">${escapeHtml(item.texto)}</div>
-        <button type="button" class="franja-boton">Ver contenido</button>
+        <div class="franja-pie">
+          <button type="button" class="franja-guardar-btn">${yaGuardado ? "Guardado ✓" : "Guardar"}</button>
+          <button type="button" class="franja-ir-btn">IR</button>
+        </div>
       `;
-      casilla.querySelector(".franja-boton").addEventListener("click", () => irAFragmentoContenido(item));
+      casilla.querySelector(".franja-ir-btn").addEventListener("click", () => irAFragmentoContenido(item));
+      casilla.querySelector(".franja-guardar-btn").addEventListener("click", (e) => alternarGuardarFragmento(item, e.target));
       franja.appendChild(casilla);
     });
   }
 
+  function renderFragmentosGuardados() {
+    const lista = document.getElementById("fragmentosGuardadosLista");
+    if (!lista) return;
+    if (!uidActual) {
+      lista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Necesitas iniciar sesión (Admin) para ver tus fragmentos guardados.</div>`;
+      return;
+    }
+    const mios = fragmentosGuardados
+      .filter(f => f.uid === uidActual)
+      .sort((a, b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0));
+
+    if (mios.length === 0) {
+      lista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no has guardado ningún fragmento. Tócalo desde la franja de fragmentos, junto a "IR".</div>`;
+      return;
+    }
+    lista.innerHTML = "";
+    mios.forEach(f => {
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">${escapeHtml(nombreCreador(f.ownerId))}</div>
+        <div class="nota-guardada-preview">${escapeHtml(f.texto)}</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-plantilla">Ir al contenido</button>
+          <button class="eliminar">Quitar</button>
+        </div>
+      `;
+      item.querySelector(".abrir-plantilla").addEventListener("click", () => {
+        document.getElementById("cerrarHerramientasBtn").click();
+        const refBusqueda = f.tipo === "libro" ? libros.find(l => l.id === f.refId)
+          : f.tipo === "coleccion" ? colecciones.find(c => c.id === f.refId)
+          : galerias.find(g => g.id === f.refId);
+        if (refBusqueda) irAFragmentoContenido({ tipo: f.tipo, refId: f.refId, texto: f.texto, ownerId: f.ownerId, ref: refBusqueda });
+        else alert("Ese contenido ya no está disponible.");
+      });
+      item.querySelector(".eliminar").addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "fragmentosGuardados", f.id));
+        } catch (e) {
+          alert("No se pudo quitar: " + e.message);
+        }
+      });
+      lista.appendChild(item);
+    });
+  }
+
   function renderGalerias() {
-    renderFranjaFragmentos();
     galeriasGrid.innerHTML = "";
     const galeriasAMostrar = galeriasVisibles();
 
@@ -4169,6 +4303,7 @@
     document.getElementById("firmaGaleriaHeader").textContent = "De " + nombreCreador(galeriaActual ? galeriaActual.ownerId : null);
     aplicarFondo(vistaColeccionesEl, galeriaActual ? galeriaActual.fondoId : "");
     aplicarFiltro();
+    renderFranjaFragmentos();
     window.scrollTo(0, 0);
   }
 
@@ -4183,6 +4318,7 @@
     quitarFondo(vistaColeccionesEl);
     quitarFondo(vistaColeccionDetalleEl);
     renderGalerias();
+    renderFranjaFragmentos();
     window.scrollTo(0, 0);
   });
 
@@ -4283,6 +4419,7 @@
       : (galeriaActual ? galeriaActual.fondoId : "");
     aplicarFondo(vistaColeccionDetalleEl, fondoEfectivo);
 
+    renderFranjaFragmentos();
     window.scrollTo(0, 0);
   }
 
@@ -4460,6 +4597,7 @@
     quitarFondo(vistaColeccionDetalleEl);
     vistaColeccionesEl.style.display = "block";
     aplicarFiltro();
+    renderFranjaFragmentos();
     window.scrollTo(0, 0);
   });
 
@@ -4760,6 +4898,7 @@
     herramientasDrawer.classList.add("abierto");
     herramientasOverlay.classList.add("abierto");
     document.getElementById("notasGuardadasVista").style.display = "none";
+    document.getElementById("fragmentosGuardadosVista").style.display = "none";
     document.getElementById("herramientasMenu").style.display = "block";
   }
   function cerrarHerramientas() {
@@ -5148,6 +5287,17 @@
   });
   document.getElementById("volverAHerramientasDesdeSeguidosBtn").addEventListener("click", () => {
     seguidosVista.style.display = "none";
+    herramientasMenu.style.display = "block";
+  });
+
+  const fragmentosGuardadosVista = document.getElementById("fragmentosGuardadosVista");
+  document.getElementById("abrirFragmentosGuardadosBtn").addEventListener("click", () => {
+    herramientasMenu.style.display = "none";
+    fragmentosGuardadosVista.style.display = "flex";
+    renderFragmentosGuardados();
+  });
+  document.getElementById("volverAHerramientasDesdeFragmentosBtn").addEventListener("click", () => {
+    fragmentosGuardadosVista.style.display = "none";
     herramientasMenu.style.display = "block";
   });
 
