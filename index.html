@@ -1467,9 +1467,14 @@
     align-items:center;
   }
   #navBar.active{ display:flex; }
+  #marcarComprendidoBtn, #marcarCongelarBtn, #marcarRevisadoBtn{
+    transition:background-color .15s ease, color .15s ease, border-color .15s ease, transform .12s ease;
+  }
   #marcarComprendidoBtn.activo{ background:var(--verde); color:#0e0e12; }
   #marcarCongelarBtn.activo{ background:var(--violeta); color:#0e0e12; }
   #marcarRevisadoBtn.activo{ background:var(--accent); border-color:var(--accent); color:#0e0e12; }
+  #marcarRevisadoBtn:disabled{ opacity:0.4; cursor:not-allowed; }
+  #marcarComprendidoBtn.pulso, #marcarCongelarBtn.pulso, #marcarRevisadoBtn.pulso{ transform:scale(0.93); }
   #navBar button{
     background:transparent;
     border:1px solid var(--border);
@@ -5372,6 +5377,28 @@
     return progreso.find(p => p.id === idProgreso(libroId)) || null;
   }
 
+  // Aplica un cambio de progreso localmente al instante (sin esperar la
+  // confirmación del servidor) para que el botón se sienta "seleccionado" ya.
+  function aplicarProgresoLocal(libroId, tituloPublicacion, cambios) {
+    const idP = idProgreso(libroId);
+    const existente = progresoDeLibro(libroId);
+    const idxLocal = progreso.findIndex(p => p.id === idP);
+    const actualizado = {
+      id: idP,
+      ownerId: uidActual,
+      libroId,
+      libroTitulo: tituloPublicacion,
+      estados: existente && existente.estados ? { ...existente.estados } : {},
+      revisado: existente ? !!existente.revisado : false,
+      ...cambios
+    };
+    if (idxLocal >= 0) progreso[idxLocal] = actualizado; else progreso.push(actualizado);
+    if (typeof actualizarUIProgresoLector === "function") actualizarUIProgresoLector();
+    if (typeof renderIndiceDrawer === "function" && libroId === libroIdActual && recursosActuales) {
+      renderIndiceDrawer(recursosActuales, indiceActual);
+    }
+  }
+
   async function marcarEstadoRecurso(libroId, tituloPublicacion, recursoIndex, estado) {
     if (!uidActual) {
       alert("Necesitas iniciar sesión (Admin) para marcar tu progreso.");
@@ -5385,6 +5412,7 @@
     } else {
       estadosActuales[recursoIndex] = estado;
     }
+    aplicarProgresoLocal(libroId, tituloPublicacion, { estados: estadosActuales });
     try {
       await setDoc(doc(db, "progreso", idProgreso(libroId)), {
         ownerId: uidActual,
@@ -5406,6 +5434,7 @@
     }
     const existente = progresoDeLibro(libroId);
     const nuevoValor = !(existente && existente.revisado);
+    aplicarProgresoLocal(libroId, tituloPublicacion, { revisado: nuevoValor });
     try {
       await setDoc(doc(db, "progreso", idProgreso(libroId)), {
         ownerId: uidActual,
@@ -5494,6 +5523,12 @@
   });
 
   // Refleja en los 3 botones del lector el estado guardado del recurso/publicación actual
+  function todosLosRecursosComprendidos(libroId, recursos) {
+    const p = progresoDeLibro(libroId);
+    if (!p || !p.estados || !recursos || recursos.length === 0) return false;
+    return recursos.every((r, i) => p.estados[i] === "comprendido");
+  }
+
   function actualizarUIProgresoLector() {
     const btnComprendido = document.getElementById("marcarComprendidoBtn");
     const btnCongelar = document.getElementById("marcarCongelarBtn");
@@ -5506,21 +5541,47 @@
     btnComprendido.classList.toggle("activo", estadoActual === "comprendido");
     btnCongelar.classList.toggle("activo", estadoActual === "congelado");
 
-    const estaRevisado = !!(p && p.revisado);
-    btnRevisado.classList.toggle("activo", estaRevisado);
-    btnRevisado.textContent = estaRevisado ? "✓ Publicación revisada" : "✓ Marcar publicación completa como revisada";
+    // "Marcar publicación completa como revisada" solo tiene sentido en el
+    // último contenido de la publicación, y solo se puede activar cuando ya
+    // se marcó "Comprendido" en todos los contenidos.
+    const esUltimoRecurso = recursosActuales.length > 0 && indiceActual === recursosActuales.length - 1;
+    btnRevisado.style.display = esUltimoRecurso ? "" : "none";
+    if (esUltimoRecurso) {
+      const estaRevisado = !!(p && p.revisado);
+      const todosComprendidos = todosLosRecursosComprendidos(libroIdActual, recursosActuales);
+      btnRevisado.disabled = !estaRevisado && !todosComprendidos;
+      btnRevisado.classList.toggle("activo", estaRevisado);
+      btnRevisado.textContent = estaRevisado
+        ? "✓ Publicación revisada"
+        : todosComprendidos
+          ? "✓ Marcar publicación completa como revisada"
+          : "Marca \"Comprendido\" en todos los contenidos para habilitar esto";
+    }
   }
 
-  document.getElementById("marcarComprendidoBtn").addEventListener("click", () => {
+  // Pequeño "pulso" visual al tocar un botón, para que se sienta la selección
+  // al instante, antes incluso de que confirme el servidor.
+  function pulsarBoton(btn) {
+    if (!btn) return;
+    btn.classList.remove("pulso");
+    void btn.offsetWidth; // fuerza reflow para poder repetir la animación
+    btn.classList.add("pulso");
+    setTimeout(() => btn.classList.remove("pulso"), 220);
+  }
+
+  document.getElementById("marcarComprendidoBtn").addEventListener("click", (e) => {
     if (!libroIdActual) return;
+    pulsarBoton(e.currentTarget);
     marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "comprendido");
   });
-  document.getElementById("marcarCongelarBtn").addEventListener("click", () => {
+  document.getElementById("marcarCongelarBtn").addEventListener("click", (e) => {
     if (!libroIdActual) return;
+    pulsarBoton(e.currentTarget);
     marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "congelado");
   });
-  document.getElementById("marcarRevisadoBtn").addEventListener("click", () => {
-    if (!libroIdActual) return;
+  document.getElementById("marcarRevisadoBtn").addEventListener("click", (e) => {
+    if (!libroIdActual || e.currentTarget.disabled) return;
+    pulsarBoton(e.currentTarget);
     alternarPublicacionRevisada(libroIdActual, tituloPublicacionActual);
   });
 
@@ -6031,14 +6092,15 @@
     });
   }
 
-  // Refresca en vivo los contadores/botones de la publicación que esté abierta ahora mismo
+  // Refresca en vivo los botones/contadores DA-DS del índice temático
+  // (el cajón lateral del lector) mientras esté abierto.
   function renderIndiceReacciones() {
-    if (!indiceAbiertoLibroId || !indiceModal.classList.contains("active")) return;
-    const libroActual = libros.find(l => l.id === indiceAbiertoLibroId);
+    if (!libroIdActual || !indiceDrawer.classList.contains("abierto")) return;
+    const libroActual = libros.find(l => l.id === libroIdActual);
     const esCreador = !!(libroActual && libroActual.ownerId === uidActual);
-    indiceLista.querySelectorAll(".indice-item[data-recurso-index]").forEach(fila => {
+    indiceDrawerLista.querySelectorAll(".indice-drawer-item[data-recurso-index]").forEach(fila => {
       const i = parseInt(fila.dataset.recursoIndex, 10);
-      renderReaccionEnFila(fila, indiceAbiertoLibroId, i, esCreador);
+      renderReaccionEnFila(fila, libroIdActual, i, esCreador);
     });
   }
 
@@ -6049,65 +6111,9 @@
     }
     reproducirIntroFlipbook("rafaga");
     preguntasReflexionActuales = Array.isArray(preguntasReflexion) ? preguntasReflexion.filter(p => p && p.trim()) : [];
-    // El índice temático siempre se muestra primero, incluso con un solo
-    // contenido — así el DA/DS y el estado de revisión están siempre visibles.
-    const libroActual = libros.find(l => l.id === libroId);
-    const esCreadorDeEsta = !!(libroActual && libroActual.ownerId === uidActual);
-    indiceTitulo.textContent = tituloPublicacion;
-    document.getElementById("firmaIndice").textContent = "De " + nombreCreador(libroActual ? libroActual.ownerId : null);
-    const progresoLibro = progresoDeLibro(libroId);
-    indiceLista.innerHTML = "";
-    indiceAbiertoLibroId = libroId;
-    indiceAbiertoRecursos = recursos;
-    recursos.forEach((r, i) => {
-      const estadoItem = progresoLibro && progresoLibro.estados ? progresoLibro.estados[i] : undefined;
-      const marca = estadoItem === "comprendido" ? `<span style="color:var(--verde);font-size:0.7rem;font-weight:700;">✓ Comprendido</span>`
-        : estadoItem === "congelado" ? `<span style="color:var(--violeta);font-size:0.7rem;font-weight:700;">❄ Congelado</span>`
-        : "";
-      const item = document.createElement("div");
-      item.className = "indice-item";
-      item.dataset.recursoIndex = String(i);
-      item.innerHTML = `
-        <div class="indice-numero">${i + 1}</div>
-        <div class="indice-info">
-          <div class="indice-etiqueta">${escapeHtml(r.etiqueta)}</div>
-          <div class="indice-tipo">${ETIQUETAS_TIPO[r.tipo] || r.tipo}</div>
-          ${marca}
-        </div>
-        <div class="indice-reaccion-zona" onclick="event.stopPropagation()"></div>
-      `;
-      item.addEventListener("click", () => {
-        cerrarIndice();
-        abrirRecurso(libroId, tituloPublicacion, recursos, i);
-      });
-      indiceLista.appendChild(item);
-      renderReaccionEnFila(item, libroId, i, esCreadorDeEsta);
-    });
-
-    if (preguntasReflexionActuales.length > 0) {
-      const separador = document.createElement("div");
-      separador.style.cssText = "padding:14px 10px 6px;font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--turquesa);border-top:1px solid var(--border);margin-top:8px;";
-      separador.textContent = "Cuestionario de reflexión";
-      indiceLista.appendChild(separador);
-      preguntasReflexionActuales.forEach((pregunta) => {
-        const item = document.createElement("div");
-        item.className = "indice-item";
-        item.innerHTML = `
-          <div class="indice-numero" style="background:var(--turquesa);">🪞</div>
-          <div class="indice-info">
-            <div class="indice-etiqueta">${escapeHtml(pregunta)}</div>
-            <div class="indice-tipo">Responder en orbSY notes</div>
-          </div>
-        `;
-        item.addEventListener("click", () => {
-          cerrarIndice();
-          responderPregunta(libroId, tituloPublicacion, pregunta);
-        });
-        indiceLista.appendChild(item);
-      });
-    }
-
-    indiceModal.classList.add("active");
+    // El índice temático real vive dentro del lector (botón "☰ Índice"), no
+    // como ventana flotante previa — entramos directo al primer contenido.
+    abrirRecurso(libroId, tituloPublicacion, recursos, 0);
   }
 
   let preguntasReflexionActuales = [];
@@ -6221,10 +6227,13 @@
     document.body.style.overflow = "hidden";
     cargarNotaDePublicacion(libroId, tituloPublicacion);
 
-    // Barra de Anterior / Siguiente, y botón de índice, solo si hay más de un recurso
+    // El botón de índice temático (con DA/DS) siempre está disponible, aunque
+    // la publicación tenga un solo contenido. La barra de Anterior/Siguiente
+    // solo tiene sentido cuando hay más de un recurso.
+    indiceToggleBtn.style.display = "inline-block";
+    renderIndiceDrawer(recursos, index);
     if (recursos.length > 1) {
       navBar.classList.add("active");
-      indiceToggleBtn.style.display = "inline-block";
       anteriorBtn.disabled = index === 0;
       siguienteBtn.disabled = index === recursos.length - 1;
       siguienteBtn.textContent = index < recursos.length - 1
@@ -6233,10 +6242,8 @@
       anteriorBtn.textContent = index > 0
         ? `← ${recursos[index - 1].etiqueta}`
         : "← Anterior";
-      renderIndiceDrawer(recursos, index);
     } else {
       navBar.classList.remove("active");
-      indiceToggleBtn.style.display = "none";
     }
     actualizarUIProgresoLector();
   }
@@ -6324,6 +6331,8 @@
   function renderIndiceDrawer(recursos, indexActual) {
     indiceDrawerLista.innerHTML = "";
     const progresoLibro = progresoDeLibro(libroIdActual);
+    const libroDeEsta = libros.find(l => l.id === libroIdActual);
+    const esCreadorDeEsta = !!(libroDeEsta && libroDeEsta.ownerId === uidActual);
     recursos.forEach((r, i) => {
       const esActual = i === indexActual;
       const estadoItem = progresoLibro && progresoLibro.estados ? progresoLibro.estados[i] : undefined;
@@ -6332,6 +6341,7 @@
         : "";
       const item = document.createElement("div");
       item.className = "indice-drawer-item";
+      item.dataset.recursoIndex = String(i);
       item.innerHTML = `
         <div class="indice-drawer-numero ${esActual ? "actual" : "disponible"}">${i + 1}</div>
         <div class="indice-drawer-info">
@@ -6339,12 +6349,14 @@
           <div class="indice-drawer-tipo">${ETIQUETAS_TIPO[r.tipo] || r.tipo}</div>
           ${marca}
         </div>
+        <div class="indice-reaccion-zona" onclick="event.stopPropagation()"></div>
       `;
       item.addEventListener("click", () => {
         cerrarDrawer();
         abrirRecurso(libroIdActual, tituloPublicacionActual, recursosActuales, i);
       });
       indiceDrawerLista.appendChild(item);
+      renderReaccionEnFila(item, libroIdActual, i, esCreadorDeEsta);
     });
 
     if (preguntasReflexionActuales.length > 0) {
