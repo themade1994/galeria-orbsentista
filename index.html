@@ -2289,8 +2289,8 @@
       </select>
       <label>Resumen / biografía (opcional)</label>
       <textarea id="perfilResumenInput" rows="3" placeholder="Tu categoría, estilo y dirección del trabajo. Aparece cuando alguien consulta tu biografía."></textarea>
-      <label>Género literario</label>
-      <input type="text" id="perfilGeneroInput" placeholder="Ej: Literario, ensayo, terror...">
+      <label>Categoría</label>
+      <input type="text" id="perfilGeneroInput" placeholder="Ej: Literario, fotografía, ilustración, docencia...">
       <label>Estilo</label>
       <input type="text" id="perfilEstiloInput" placeholder="Ej: Introspectivo, minimalista...">
       <label>Esencia (un epígrafe o frase que te represente)</label>
@@ -3977,7 +3977,7 @@
   function abrirPerfilDescripcion(u) {
     document.getElementById("perfilDescripcionNombre").textContent = u.nombre || "Perfil";
     const cuerpo = document.getElementById("perfilDescripcionCuerpo");
-    const campos = [["Género", u.genero], ["Estilo", u.estilo], ["Esencia", u.esencia]];
+    const campos = [["Categoría", u.genero], ["Estilo", u.estilo], ["Esencia", u.esencia]];
     const conContenido = campos.filter(([_, v]) => v && v.trim());
     cuerpo.innerHTML = conContenido.length > 0
       ? conContenido.map(([etiqueta, valor]) => `
