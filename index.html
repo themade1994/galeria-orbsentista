@@ -352,6 +352,30 @@
   .plantilla-tipo-btn[data-color="turquesa"].activo{ background:rgba(34,211,196,0.12) !important; border-color:var(--accent) !important; color:var(--accent) !important; }
   .plantilla-tipo-btn[data-color="violeta"].activo{ background:rgba(155,124,246,0.12) !important; border-color:var(--violeta) !important; color:var(--violeta) !important; }
 
+  /* Botón secundario "orbital": esquinas cortadas tipo asteroide/gema, con halo,
+     usado para acciones como Usar plantilla, Biografía, Diccionario, Seguir */
+  .boton-orbita{
+    position:relative;
+    width:100%;
+    background:linear-gradient(135deg, rgba(34,211,196,0.14), rgba(155,124,246,0.08));
+    border:1px solid var(--accent);
+    color:var(--accent);
+    padding:10px 16px;
+    font-size:0.8rem;
+    font-weight:700;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    clip-path:polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+    box-shadow:0 0 0 rgba(34,211,196,0);
+    transition:box-shadow .2s ease, transform .12s ease, background .2s ease;
+    margin-bottom:14px;
+  }
+  .boton-orbita:hover{ box-shadow:0 0 16px -3px var(--accent); }
+  .boton-orbita:active{ transform:scale(0.97); }
+  .boton-orbita.color-turquesa{ border-color:var(--turquesa); color:var(--turquesa); background:linear-gradient(135deg, rgba(34,211,196,0.16), rgba(57,255,140,0.06)); }
+  .boton-orbita.color-turquesa:hover{ box-shadow:0 0 16px -3px var(--turquesa); }
+  .boton-orbita.auto{ width:auto; display:inline-block; }
+
   .taller-pestana-btn{
     flex:1;
     background:transparent;
@@ -776,6 +800,27 @@
     pointer-events:none;
     box-shadow:0 0 14px -2px var(--color-galaxia, var(--verde));
   }
+  .perfil-descripcion-badge{
+    position:absolute;
+    bottom:-8px;
+    right:-4px;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--color-galaxia, var(--turquesa));
+    color:#0e0e12;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.8rem;
+    font-weight:900;
+    cursor:pointer;
+    border:2px solid var(--bg);
+    box-shadow:0 0 10px -2px var(--color-galaxia, var(--turquesa));
+    z-index:2;
+    transition:transform .12s ease;
+  }
+  .perfil-descripcion-badge:active{ transform:scale(0.88); }
 
   .galeria-tile-nombre{
     font-size:0.78rem;
@@ -1055,6 +1100,24 @@
     flex-shrink:0;
   }
   .editar-btn:active{ background:#0e2422; }
+
+  .destacar-noticia-btn{
+    background:rgba(57,255,140,0.08);
+    color:var(--verde);
+    border:1px solid var(--verde);
+    padding:7px 12px;
+    border-radius:999px;
+    font-size:0.72rem;
+    font-weight:700;
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:4px;
+    transition:background .2s ease, box-shadow .2s ease;
+  }
+  .destacar-noticia-btn:hover{ box-shadow:0 0 12px -3px var(--verde); }
+  .destacar-noticia-btn.destacada{ background:var(--verde); color:#0e0e12; box-shadow:0 0 14px -3px var(--verde); }
 
   .login-box{
     display:flex;
@@ -1371,15 +1434,50 @@
     font-family:'IBM Plex Mono',monospace;
   }
 
-  /* FRANJA DE FRAGMENTOS: banda blanca con casillas negras, promociona contenido */
+  /* FRANJA DE FRAGMENTOS: banda con acento de orbSY, casillas con color insignia distinto cada una */
   .franja-fragmentos-wrap{
     position:sticky;
     top:0;
     z-index:40;
-    background:#f4f4f6;
-    padding:14px clamp(10px,3vw,24px);
+    background:
+      radial-gradient(ellipse at 12% 15%, rgba(34,211,196,0.12), transparent 55%),
+      radial-gradient(ellipse at 88% 85%, rgba(155,124,246,0.12), transparent 55%),
+      var(--card);
+    border-bottom:1px solid var(--border);
+    padding:12px clamp(10px,3vw,24px) 16px;
+    margin-bottom:20px;
   }
   .franja-fragmentos-wrap.oculta{ display:none; }
+  .franja-fragmentos-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    max-width:1400px;
+    margin:0 auto 10px;
+  }
+  .franja-fragmentos-titulo{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.66rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--text-sec);
+  }
+  #franjaActualizarBtn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    font-size:0.82rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:transform .3s ease, color .2s ease, border-color .2s ease;
+  }
+  #franjaActualizarBtn:hover{ color:var(--accent); border-color:var(--accent); }
+  #franjaActualizarBtn.girando{ transform:rotate(360deg); }
   .franja-fragmentos{
     display:grid;
     grid-template-columns:repeat(3, 1fr);
@@ -1404,13 +1502,15 @@
     text-align:center;
     min-height:150px;
     gap:10px;
+    border:1px solid var(--color-casilla, var(--turquesa));
+    box-shadow:0 0 18px -8px var(--color-casilla, var(--turquesa));
   }
   .franja-usuario{
     font-family:'IBM Plex Mono',monospace;
     font-size:0.68rem;
     letter-spacing:0.06em;
     text-transform:uppercase;
-    color:var(--accent);
+    color:var(--color-casilla, var(--accent));
     align-self:flex-start;
   }
   .franja-texto{
@@ -1440,8 +1540,8 @@
   }
   .franja-guardar-btn:active{ background:rgba(255,255,255,0.12); }
   .franja-ir-btn{
-    background:var(--accent);
-    border:1px solid var(--accent);
+    background:var(--color-casilla, var(--accent));
+    border:1px solid var(--color-casilla, var(--accent));
     color:#0e0e12;
     padding:6px 16px;
     border-radius:8px;
@@ -1470,9 +1570,12 @@
   #marcarComprendidoBtn, #marcarCongelarBtn, #marcarRevisadoBtn{
     transition:background-color .15s ease, color .15s ease, border-color .15s ease, transform .12s ease;
   }
-  #marcarComprendidoBtn.activo{ background:var(--verde); color:#0e0e12; }
-  #marcarCongelarBtn.activo{ background:var(--violeta); color:#0e0e12; }
-  #marcarRevisadoBtn.activo{ background:var(--accent); border-color:var(--accent); color:#0e0e12; }
+  #marcarComprendidoBtn{ background:rgba(57,255,140,0.10); }
+  #marcarCongelarBtn{ background:rgba(155,124,246,0.10); }
+  #marcarRevisadoBtn{ background:rgba(34,211,196,0.08); }
+  #marcarComprendidoBtn.activo{ background:var(--verde); color:#0e0e12; box-shadow:0 0 14px -3px var(--verde); }
+  #marcarCongelarBtn.activo{ background:var(--violeta); color:#0e0e12; box-shadow:0 0 14px -3px var(--violeta); }
+  #marcarRevisadoBtn.activo{ background:var(--accent); border-color:var(--accent); color:#0e0e12; box-shadow:0 0 14px -3px var(--accent); }
   #marcarRevisadoBtn:disabled{ opacity:0.4; cursor:not-allowed; }
   #marcarComprendidoBtn.pulso, #marcarCongelarBtn.pulso, #marcarRevisadoBtn.pulso{ transform:scale(0.93); }
   #navBar button{
@@ -2186,6 +2289,12 @@
       </select>
       <label>Resumen / biografía (opcional)</label>
       <textarea id="perfilResumenInput" rows="3" placeholder="Tu categoría, estilo y dirección del trabajo. Aparece cuando alguien consulta tu biografía."></textarea>
+      <label>Género literario</label>
+      <input type="text" id="perfilGeneroInput" placeholder="Ej: Literario, ensayo, terror...">
+      <label>Estilo</label>
+      <input type="text" id="perfilEstiloInput" placeholder="Ej: Introspectivo, minimalista...">
+      <label>Esencia (un epígrafe o frase que te represente)</label>
+      <textarea id="perfilEsenciaInput" rows="2" placeholder="Una frase, cita o epígrafe que resuma tu esencia como creador..."></textarea>
       <button id="guardarPerfilBtn" style="margin-top:10px;">Guardar perfil</button>
     </div>
 
@@ -2233,7 +2342,7 @@
             <h2>Crear nueva galería</h2>
           </div>
         </div>
-      <button type="button" class="usar-plantilla-btn" data-tipo="galeria" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Usar plantilla</button>
+      <button type="button" class="usar-plantilla-btn boton-orbita" data-tipo="galeria">📋 Usar plantilla</button>
 
       <label>Nombre de la galería</label>
       <input type="text" id="inputNombreGaleria" placeholder="Ej: Orbsentismo, MICSES...">
@@ -2278,7 +2387,7 @@
             <h2>Crear nueva colección</h2>
           </div>
         </div>
-      <button type="button" class="usar-plantilla-btn" data-tipo="coleccion" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Usar plantilla</button>
+      <button type="button" class="usar-plantilla-btn boton-orbita" data-tipo="coleccion">📋 Usar plantilla</button>
 
       <label>Nombre de la colección</label>
       <input type="text" id="inputNombreColeccion" placeholder="Ej: Una noche con el nihilismo">
@@ -2325,7 +2434,7 @@
             <h2>Publicar nuevo libro</h2>
           </div>
         </div>
-      <button type="button" class="usar-plantilla-btn" data-tipo="publicacion" style="width:100%;margin-bottom:14px;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:10px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;">📋 Usar plantilla</button>
+      <button type="button" class="usar-plantilla-btn boton-orbita" data-tipo="publicacion">📋 Usar plantilla</button>
 
       <label>Título del libro</label>
       <input type="text" id="inputTitulo" placeholder="Ej: Meditaciones del Exadicto">
@@ -2409,6 +2518,10 @@
   </div>
 
   <div id="franjaFragmentosWrap" class="franja-fragmentos-wrap oculta">
+    <div class="franja-fragmentos-header">
+      <span class="franja-fragmentos-titulo">✦ Fragmentos del Cinturón</span>
+      <button type="button" id="franjaActualizarBtn" title="Ver otros fragmentos">↻</button>
+    </div>
     <div id="franjaFragmentos" class="franja-fragmentos"></div>
   </div>
 
@@ -2449,8 +2562,8 @@
   <!-- VISTA: GALERÍAS (nivel superior, pantalla de inicio) -->
   <div id="vistaGalerias" style="display:none;">
     <button id="backToPerfilesBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;margin-bottom:14px;">← Perfiles</button>
-    <button id="abrirBiografiaBtn" style="display:none;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:14px;margin-left:8px;">📖 Biografía y Diccionario de Referencias</button>
-    <button id="seguirPerfilBtn" style="display:none;background:transparent;border:1px dashed #22d3c4;color:#22d3c4;padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:14px;margin-left:8px;">＋ Seguir</button>
+    <button id="abrirBiografiaBtn" class="boton-orbita auto" style="display:none;margin-left:8px;">📖 Biografía y Diccionario de Referencias</button>
+    <button id="seguirPerfilBtn" class="boton-orbita color-turquesa auto" style="display:none;margin-left:8px;">＋ Seguir</button>
 
     <div class="galerias-eyebrow">Tus galerías</div>
     <div id="loadingMsgGalerias" class="empty-msg">Cargando...</div>
@@ -2477,7 +2590,7 @@
         <h2 id="coleccionDetalleTitulo"></h2>
         <p id="coleccionDetalleFrase"></p>
         <div id="firmaColeccionDetalle" style="font-style:italic;font-size:0.78rem;color:var(--text-sec);margin-top:-6px;margin-bottom:10px;"></div>
-        <button id="abrirDiccionarioBtn" style="display:none;background:transparent;border:1px dashed var(--accent);color:var(--accent);padding:7px 14px;border-radius:8px;font-size:0.75rem;cursor:pointer;margin-bottom:10px;">📖 Diccionario de Referencias</button>
+        <button id="abrirDiccionarioBtn" class="boton-orbita auto" style="display:none;">📖 Diccionario de Referencias</button>
       </div>
     </div>
     <div id="gridContainer" class="grid"></div>
@@ -2524,6 +2637,14 @@
 </div>
 
 <!-- MODAL: BIOGRAFÍA Y DICCIONARIO DE REFERENCIAS DEL AUTOR -->
+<div id="perfilDescripcionModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;padding:24px;position:relative;">
+    <button id="cerrarPerfilDescripcionBtn" style="position:absolute;top:12px;right:14px;background:transparent;border:none;color:var(--text-sec);font-size:1.2rem;cursor:pointer;">✕</button>
+    <h3 id="perfilDescripcionNombre" style="font-family:'Fraunces',serif;font-size:1.15rem;margin-bottom:16px;padding-right:24px;"></h3>
+    <div id="perfilDescripcionCuerpo" style="display:flex;flex-direction:column;gap:14px;"></div>
+  </div>
+</div>
+
 <div id="biografiaModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:460px;width:100%;padding:22px;max-height:82vh;display:flex;flex-direction:column;">
     <h3 id="biografiaModalTitulo" style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:10px;"></h3>
@@ -2961,6 +3082,9 @@
     document.getElementById("perfilImagenInput").value = miPerfil && miPerfil.imagenId ? `https://drive.google.com/file/d/${miPerfil.imagenId}/view` : "";
     document.getElementById("perfilColorInput").value = miPerfil ? (miPerfil.color || "verde") : "verde";
     document.getElementById("perfilResumenInput").value = miPerfil ? (miPerfil.resumen || "") : "";
+    document.getElementById("perfilGeneroInput").value = miPerfil ? (miPerfil.genero || "") : "";
+    document.getElementById("perfilEstiloInput").value = miPerfil ? (miPerfil.estilo || "") : "";
+    document.getElementById("perfilEsenciaInput").value = miPerfil ? (miPerfil.esencia || "") : "";
     const seccion = document.getElementById("configurarPerfilSection");
     seccion.style.display = "block";
     seccion.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2971,6 +3095,9 @@
     const imagenUrl = document.getElementById("perfilImagenInput").value.trim();
     const color = document.getElementById("perfilColorInput").value;
     const resumen = document.getElementById("perfilResumenInput").value.trim();
+    const genero = document.getElementById("perfilGeneroInput").value.trim();
+    const estilo = document.getElementById("perfilEstiloInput").value.trim();
+    const esencia = document.getElementById("perfilEsenciaInput").value.trim();
 
     if (!nombre || !imagenUrl) {
       alert("Ponle un nombre y una foto a tu perfil.");
@@ -2983,7 +3110,7 @@
     btn.disabled = true;
     btn.textContent = "Guardando...";
     try {
-      await setDoc(doc(db, "usuarios", uidActual), { nombre, imagenId, color, resumen }, { merge: true });
+      await setDoc(doc(db, "usuarios", uidActual), { nombre, imagenId, color, resumen, genero, estilo, esencia }, { merge: true });
       document.getElementById("configurarPerfilSection").style.display = "none";
     } catch (e) {
       alert("Error al guardar tu perfil: " + e.message);
@@ -3847,6 +3974,28 @@
     console.error("Error al leer los perfiles:", error);
   });
 
+  function abrirPerfilDescripcion(u) {
+    document.getElementById("perfilDescripcionNombre").textContent = u.nombre || "Perfil";
+    const cuerpo = document.getElementById("perfilDescripcionCuerpo");
+    const campos = [["Género", u.genero], ["Estilo", u.estilo], ["Esencia", u.esencia]];
+    const conContenido = campos.filter(([_, v]) => v && v.trim());
+    cuerpo.innerHTML = conContenido.length > 0
+      ? conContenido.map(([etiqueta, valor]) => `
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--turquesa);margin-bottom:4px;">${etiqueta}</div>
+            <div style="font-size:0.9rem;line-height:1.5;${etiqueta === "Esencia" ? "font-style:italic;font-family:'Fraunces',serif;" : ""}">${escapeHtml(valor)}</div>
+          </div>
+        `).join("")
+      : `<p style="color:var(--text-sec);font-size:0.85rem;">Este perfil todavía no agregó su descripción.</p>`;
+    document.getElementById("perfilDescripcionModal").style.display = "flex";
+  }
+  document.getElementById("cerrarPerfilDescripcionBtn").addEventListener("click", () => {
+    document.getElementById("perfilDescripcionModal").style.display = "none";
+  });
+  document.getElementById("perfilDescripcionModal").addEventListener("click", (e) => {
+    if (e.target.id === "perfilDescripcionModal") document.getElementById("perfilDescripcionModal").style.display = "none";
+  });
+
   function renderPerfiles() {
     renderFranjaFragmentos();
     loadingMsgPerfiles.style.display = "none";
@@ -3868,10 +4017,15 @@
       tile.innerHTML = `
         <div class="perfil-tile-img" style="--color-galaxia:${colorHex};">
           <img src="${imagenDirecta(u.imagenId)}" data-alt-src="${imagenAlternativa(u.imagenId)}" data-tried-alt="0" alt="${escapeHtml(u.nombre || "Perfil")}" loading="lazy" onerror="manejarErrorImagen(this)">
+          <div class="perfil-descripcion-badge" title="Ver descripción del perfil">i</div>
         </div>
         <div class="galeria-tile-nombre">${escapeHtml(u.nombre || "Sin nombre")}</div>
       `;
       tile.addEventListener("click", () => seleccionarPerfil(u.id));
+      tile.querySelector(".perfil-descripcion-badge").addEventListener("click", (e) => {
+        e.stopPropagation();
+        abrirPerfilDescripcion(u);
+      });
       perfilesGrid.appendChild(tile);
     });
 
@@ -4199,6 +4353,9 @@
     _reposicionarFranjaTimeout = setTimeout(() => { renderFranjaFragmentos(); }, 200);
   });
 
+  // Colores insignia de orbSY, uno distinto por casilla (se repiten en ciclo si hiciera falta)
+  const PALETA_FRANJA = ["#39ff8c", "#22d3c4", "#9b7cf6"];
+
   function renderFranjaFragmentos() {
     const franja = document.getElementById("franjaFragmentos");
     if (!franja) return;
@@ -4210,6 +4367,7 @@
       for (let i = 0; i < cupos; i++) {
         const casilla = document.createElement("div");
         casilla.className = "franja-casilla";
+        casilla.style.setProperty("--color-casilla", PALETA_FRANJA[i % PALETA_FRANJA.length]);
         casilla.innerHTML = `<div class="franja-texto"><span class="franja-vacia">Sin fragmentos publicados</span></div>`;
         franja.appendChild(casilla);
       }
@@ -4218,10 +4376,11 @@
     // Orden aleatorio cada vez, para que nunca sea el mismo contenido estático,
     // recortado al número de casillas que caben según el tamaño de pantalla.
     const barajado = [...disponibles].sort(() => Math.random() - 0.5).slice(0, cupos);
-    barajado.forEach(item => {
+    barajado.forEach((item, i) => {
       const yaGuardado = fragmentoYaGuardado(item.tipo, item.refId);
       const casilla = document.createElement("div");
       casilla.className = "franja-casilla";
+      casilla.style.setProperty("--color-casilla", PALETA_FRANJA[i % PALETA_FRANJA.length]);
       casilla.innerHTML = `
         <div class="franja-usuario">${escapeHtml(nombreCreador(item.ownerId))}</div>
         <div class="franja-texto">${escapeHtml(item.texto)}</div>
@@ -4233,6 +4392,16 @@
       casilla.querySelector(".franja-ir-btn").addEventListener("click", () => irAFragmentoContenido(item));
       casilla.querySelector(".franja-guardar-btn").addEventListener("click", (e) => alternarGuardarFragmento(item, e.target));
       franja.appendChild(casilla);
+    });
+  }
+
+  const franjaActualizarBtnEl = document.getElementById("franjaActualizarBtn");
+  if (franjaActualizarBtnEl) {
+    franjaActualizarBtnEl.addEventListener("click", () => {
+      franjaActualizarBtnEl.classList.remove("girando");
+      void franjaActualizarBtnEl.offsetWidth;
+      franjaActualizarBtnEl.classList.add("girando");
+      renderFranjaFragmentos();
     });
   }
 
@@ -4800,7 +4969,7 @@
         <div class="admin-row-titulo">${escapeHtml(libro.titulo)}</div>
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
-          ${mostrarBotonDestacar ? `<button class="destacar-noticia-btn" style="${yaEsDestacada ? "background:var(--verde);color:#000;" : ""}">${yaEsDestacada ? "★ Destacada hoy" : "☆ Destacar en Noticias"}</button>` : ""}
+          ${mostrarBotonDestacar ? `<button class="destacar-noticia-btn${yaEsDestacada ? " destacada" : ""}">${yaEsDestacada ? "★ Destacada hoy" : "☆ Destacar"}</button>` : ""}
           <button class="editar-btn">Editar</button>
           <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar</button>
