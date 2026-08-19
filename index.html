@@ -497,6 +497,35 @@
     filter:drop-shadow(0 0 6px rgba(0,0,0,0.5));
   }
 
+  /* Aviso fugaz (toast): confirma una acción como "Comprendido" o "Congelado" */
+  #avisoToast{
+    position:fixed;
+    left:50%;
+    bottom:clamp(80px, 16vh, 120px);
+    transform:translateX(-50%) translateY(12px);
+    background:#15151a;
+    border:1px solid var(--color-aviso, var(--verde));
+    color:var(--text);
+    padding:10px 20px;
+    border-radius:999px;
+    font-size:0.82rem;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    box-shadow:0 0 20px -4px var(--color-aviso, var(--verde));
+    z-index:10000;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .22s ease, transform .22s ease;
+    white-space:nowrap;
+    max-width:88vw;
+  }
+  #avisoToast.visible{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
   /* Animación de entrada tipo "flipbook": 3 cuadros que alternan */
   #introFlipbook{
     position:fixed; inset:0; z-index:9999;
@@ -1436,9 +1465,8 @@
 
   /* FRANJA DE FRAGMENTOS: banda con acento de orbSY, casillas con color insignia distinto cada una */
   .franja-fragmentos-wrap{
-    position:sticky;
-    top:0;
-    z-index:40;
+    position:static;
+    z-index:1;
     background:
       radial-gradient(ellipse at 12% 15%, rgba(34,211,196,0.12), transparent 55%),
       radial-gradient(ellipse at 88% 85%, rgba(155,124,246,0.12), transparent 55%),
@@ -1928,6 +1956,7 @@
 </div>
 
 <img id="insigniaOrbsy" src="orbsy-insignia.png" alt="" aria-hidden="true">
+<div id="avisoToast"></div>
 
 <div id="introFlipbook" aria-hidden="true">
   <img id="introFlipbookImg" src="intro-1.png" alt="">
@@ -5738,19 +5767,42 @@
     setTimeout(() => btn.classList.remove("pulso"), 220);
   }
 
+  // Aviso fugaz: confirma con texto + color que la acción sí ocurrió,
+  // más allá del cambio de color del botón.
+  function mostrarAvisoToast(mensaje, color) {
+    const toast = document.getElementById("avisoToast");
+    if (!toast) return;
+    toast.textContent = mensaje;
+    toast.style.setProperty("--color-aviso", color || "var(--verde)");
+    toast.classList.remove("visible");
+    void toast.offsetWidth;
+    toast.classList.add("visible");
+    clearTimeout(toast._ocultarTimeout);
+    toast._ocultarTimeout = setTimeout(() => toast.classList.remove("visible"), 1800);
+  }
+
   document.getElementById("marcarComprendidoBtn").addEventListener("click", (e) => {
     if (!libroIdActual) return;
     pulsarBoton(e.currentTarget);
+    const p = progresoDeLibro(libroIdActual);
+    const yaEstaba = !!(p && p.estados && p.estados[indiceActual] === "comprendido");
+    mostrarAvisoToast(yaEstaba ? "Comprendido retirado" : "✓ Marcado como comprendido", "#39ff8c");
     marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "comprendido");
   });
   document.getElementById("marcarCongelarBtn").addEventListener("click", (e) => {
     if (!libroIdActual) return;
     pulsarBoton(e.currentTarget);
+    const p = progresoDeLibro(libroIdActual);
+    const yaEstaba = !!(p && p.estados && p.estados[indiceActual] === "congelado");
+    mostrarAvisoToast(yaEstaba ? "Congelado retirado" : "❄ Contenido congelado", "#9b7cf6");
     marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "congelado");
   });
   document.getElementById("marcarRevisadoBtn").addEventListener("click", (e) => {
     if (!libroIdActual || e.currentTarget.disabled) return;
     pulsarBoton(e.currentTarget);
+    const p = progresoDeLibro(libroIdActual);
+    const yaEstaba = !!(p && p.revisado);
+    mostrarAvisoToast(yaEstaba ? "Ya no está marcada como revisada" : "✓ Publicación marcada como revisada", "#22d3c4");
     alternarPublicacionRevisada(libroIdActual, tituloPublicacionActual);
   });
 
