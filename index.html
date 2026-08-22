@@ -497,35 +497,6 @@
     filter:drop-shadow(0 0 6px rgba(0,0,0,0.5));
   }
 
-  /* Aviso fugaz (toast): confirma una acción como "Comprendido" o "Congelado" */
-  #avisoToast{
-    position:fixed;
-    left:50%;
-    bottom:clamp(80px, 16vh, 120px);
-    transform:translateX(-50%) translateY(12px);
-    background:#15151a;
-    border:1px solid var(--color-aviso, var(--verde));
-    color:var(--text);
-    padding:10px 20px;
-    border-radius:999px;
-    font-size:0.82rem;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    box-shadow:0 0 20px -4px var(--color-aviso, var(--verde));
-    z-index:10000;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .22s ease, transform .22s ease;
-    white-space:nowrap;
-    max-width:88vw;
-  }
-  #avisoToast.visible{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-  }
-
   /* Animación de entrada tipo "flipbook": 3 cuadros que alternan */
   #introFlipbook{
     position:fixed; inset:0; z-index:9999;
@@ -1392,6 +1363,69 @@
     overflow-y:auto;
     padding:8px 10px;
   }
+  /* EL ESQUELETO: nodos de la constelación */
+  .esqueleto-nodo{ cursor:pointer; }
+  .esqueleto-nodo:active{ opacity:0.75; }
+  .esqueleto-nodo-etiqueta{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:8px;
+    font-weight:700;
+    fill:#e8e8ec;
+    text-anchor:middle;
+    pointer-events:none;
+  }
+  .esqueleto-nodo-badge{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:7px;
+    fill:#8b8b96;
+    text-anchor:middle;
+    pointer-events:none;
+  }
+
+  .tema-row-esqueleto{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#0e0e13;
+    border-radius:8px;
+    padding:9px 10px;
+    margin-bottom:7px;
+    position:relative;
+  }
+  .tema-num-esqueleto{ font-family:'IBM Plex Mono', monospace; font-size:0.7rem; color:var(--turquesa); flex-shrink:0; }
+  .tema-nombre-esqueleto{ flex:1; font-size:0.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .tema-menu-btn-esqueleto{ background:none; border:none; color:var(--text-sec); font-size:1rem; cursor:pointer; padding:2px 6px; }
+
+  .tema-menu-flotante{
+    position:absolute;
+    right:8px;
+    top:36px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:6px;
+    width:190px;
+    z-index:10;
+    display:none;
+    flex-direction:column;
+  }
+  .tema-menu-flotante.abierto{ display:flex; }
+  .tema-menu-opcion{
+    padding:9px 10px;
+    font-size:0.8rem;
+    border-radius:7px;
+    cursor:pointer;
+    text-align:left;
+    background:none;
+    border:none;
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .tema-menu-opcion:active{ background:#22222a; }
+  .tema-menu-opcion.eliminar{ color:#f87171; }
+
   .indice-item{
     display:flex;
     align-items:center;
@@ -1465,8 +1499,9 @@
 
   /* FRANJA DE FRAGMENTOS: banda con acento de orbSY, casillas con color insignia distinto cada una */
   .franja-fragmentos-wrap{
-    position:static;
-    z-index:1;
+    position:sticky;
+    top:0;
+    z-index:40;
     background:
       radial-gradient(ellipse at 12% 15%, rgba(34,211,196,0.12), transparent 55%),
       radial-gradient(ellipse at 88% 85%, rgba(155,124,246,0.12), transparent 55%),
@@ -1956,7 +1991,6 @@
 </div>
 
 <img id="insigniaOrbsy" src="orbsy-insignia.png" alt="" aria-hidden="true">
-<div id="avisoToast"></div>
 
 <div id="introFlipbook" aria-hidden="true">
   <img id="introFlipbookImg" src="intro-1.png" alt="">
@@ -2060,6 +2094,24 @@
       <circle cx="100" cy="100" r="10" fill="#9b7cf6"/>
     </g>
 
+    <!-- Ícono de El Esqueleto: constelación con forma de figura pequeña, mismo lenguaje de puntos+líneas -->
+    <g id="icono-esqueleto-svg">
+      <g stroke="#5b5b64" stroke-width="4" fill="none">
+        <line x1="100" y1="52" x2="100" y2="90"/>
+        <line x1="100" y1="90" x2="65" y2="105"/>
+        <line x1="100" y1="90" x2="135" y2="105"/>
+        <line x1="100" y1="90" x2="100" y2="140"/>
+        <line x1="100" y1="140" x2="75" y2="150"/>
+        <line x1="100" y1="140" x2="125" y2="150"/>
+      </g>
+      <circle cx="100" cy="38" r="14" fill="#39ff8c"/>
+      <circle cx="100" cy="90" r="8" fill="#22d3c4"/>
+      <circle cx="65" cy="105" r="6" fill="#22d3c4"/>
+      <circle cx="135" cy="105" r="6" fill="#22d3c4"/>
+      <circle cx="75" cy="150" r="6" fill="#9b7cf6"/>
+      <circle cx="125" cy="150" r="6" fill="#9b7cf6"/>
+    </g>
+
     <!-- Candado propio: anillo abierto + cuerpo, mismo lenguaje del logo -->
     <g id="icono-candado-svg">
       <path d="M 75 95 L 75 75 A 25 25 0 0 1 125 75 L 125 90" fill="none" stroke="var(--text-sec)" stroke-width="9" stroke-linecap="round"/>
@@ -2139,6 +2191,13 @@
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Congelados</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Temas que dejaste para volver más profundo</div>
+      </div>
+    </div>
+    <div class="herramienta-item" id="abrirEsqueletosBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-esqueleto-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">El Esqueleto</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Organiza tus ideas antes de publicar</div>
       </div>
     </div>
     <div class="herramienta-item" style="opacity:0.45;cursor:default;">
@@ -2259,6 +2318,32 @@
     </div>
     <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Temas que marcaste "❄ Congelar" para retomar más adelante. Tocar "Retomar" te lleva directo ahí.</p>
     <div class="notas-guardadas-lista" id="congeladosLista"></div>
+  </div>
+
+  <div id="esqueletosVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;display:flex;gap:8px;align-items:center;">
+      <button id="volverAHerramientasDesdeEsqueletosBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+      <button id="crearEsqueletoBtn" style="margin-left:auto;background:transparent;border:1px solid var(--turquesa);color:var(--turquesa);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">+ Crear</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Organiza las ideas de un proyecto antes de publicarlo, en forma de pirámide o de figura humana.</p>
+    <div id="crearEsqueletoForm" style="display:none;padding:0 14px 14px;">
+      <input type="text" id="inputNombreEsqueleto" placeholder="Nombre del esqueleto (ej: MICSES)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;margin-bottom:8px;">
+      <select id="inputTipoEsqueleto" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;margin-bottom:8px;">
+        <option value="piramidal">Pirámide</option>
+        <option value="anatomico">Figura humana</option>
+      </select>
+      <div id="nivelesPiramideWrap" style="margin-bottom:8px;">
+        <label style="font-size:0.75rem;color:var(--text-sec);">Niveles de la pirámide (3 a 6)</label>
+        <select id="inputNivelesEsqueleto" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;">
+          <option value="3">3</option>
+          <option value="4" selected>4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+      <button id="guardarNuevoEsqueletoBtn" style="width:100%;background:var(--turquesa);border:none;color:#0b0b0e;padding:10px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;">Crear esqueleto</button>
+    </div>
+    <div class="notas-guardadas-lista" id="esqueletosLista"></div>
   </div>
 </div>
 
@@ -2701,6 +2786,48 @@
     </div>
     <div id="firmaIndice" style="text-align:center;font-style:italic;font-size:0.76rem;color:var(--text-sec);padding:0 14px 10px;margin-top:-8px;"></div>
     <div class="indice-lista" id="indiceLista"></div>
+  </div>
+</div>
+
+<!-- MODAL: EL ESQUELETO (constelación piramidal o anatómica) -->
+<div id="esqueletoModal" style="display:none;position:fixed;inset:0;background:#0e0e12;z-index:9500;flex-direction:column;">
+  <div class="modal-bar">
+    <button id="cerrarEsqueletoBtn">← Volver</button>
+    <div id="esqueletoModalTitulo"></div>
+    <button id="verAparienciaEsqueletoBtn" style="background:transparent;border:1px solid var(--turquesa);color:var(--turquesa);padding:8px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;">Ver apariencia</button>
+  </div>
+  <div style="flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:24px 12px;">
+    <svg id="esqueletoSvg" viewBox="0 0 260 340" style="width:min(90vw, 320px);height:auto;"></svg>
+  </div>
+</div>
+
+<!-- PANEL: CASILLA DEL ESQUELETO (temas dentro de un nodo) -->
+<div id="casillaOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9600;"></div>
+<div id="casillaPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;height:100%;width:min(92vw, 380px);background:#000;border-left:1px solid var(--border);z-index:9601;">
+  <div class="notas-header">
+    <div>
+      <input type="text" id="casillaNombreInput" style="background:transparent;border:none;color:var(--text);font-family:'Fraunces',serif;font-weight:600;font-size:0.95rem;width:100%;">
+      <div class="ref-publicacion" id="casillaRefEsqueleto"></div>
+    </div>
+    <button class="indice-cerrar" id="cerrarCasillaBtn">✕</button>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:12px;" id="casillaTemasLista"></div>
+  <div style="padding:12px;border-top:1px solid var(--border);">
+    <button id="agregarTemaCasillaBtn" style="width:100%;background:transparent;border:1px dashed var(--border);color:var(--text-sec);padding:10px;border-radius:9px;font-size:0.82rem;cursor:pointer;">+ Agregar tema</button>
+  </div>
+</div>
+
+<!-- MODAL: VER APARIENCIA (exportar esqueleto a texto) -->
+<div id="aparienciaModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9700;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;">
+    <div class="indice-header">
+      <h3>Vista de lectura</h3>
+      <button class="indice-cerrar" id="cerrarAparienciaBtn">✕</button>
+    </div>
+    <div id="aparienciaContenido" style="padding:14px 18px;overflow-y:auto;font-size:0.85rem;line-height:1.6;"></div>
+    <div style="padding:12px 18px;border-top:1px solid var(--border);">
+      <button id="exportarAparienciaBtn" style="width:100%;background:var(--turquesa);border:none;color:#0b0b0e;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;">Exportar a texto</button>
+    </div>
   </div>
 </div>
 
@@ -5158,6 +5285,7 @@
     herramientasOverlay.classList.add("abierto");
     document.getElementById("notasGuardadasVista").style.display = "none";
     document.getElementById("fragmentosGuardadosVista").style.display = "none";
+    document.getElementById("esqueletosVista").style.display = "none";
     document.getElementById("herramientasMenu").style.display = "block";
   }
   function cerrarHerramientas() {
@@ -5720,6 +5848,403 @@
     herramientasMenu.style.display = "block";
   });
 
+  // ================= EL ESQUELETO =================
+  const esqueletosCol = collection(db, "esqueletos");
+  let esqueletos = [];
+  let esqueletoActual = null;
+  let casillaActualKey = null;
+
+  onSnapshot(esqueletosCol, (snapshot) => {
+    esqueletos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  }, (error) => console.error("Error al leer esqueletos:", error));
+
+  function estructuraVacia(tipo, niveles) {
+    const casillas = {};
+    if (tipo === "piramidal") {
+      const n = niveles || 4;
+      for (let nivel = 1; nivel <= n; nivel++) {
+        for (let i = 0; i < nivel; i++) {
+          casillas[`n${nivel}_${i}`] = { nombre: `Nivel ${nivel}`, temas: [] };
+        }
+      }
+    } else {
+      ["cabeza", "cuello", "torso", "brazos", "manos", "piernas", "pies"].forEach(k => {
+        casillas[k] = { nombre: k.charAt(0).toUpperCase() + k.slice(1), temas: [] };
+      });
+    }
+    return casillas;
+  }
+
+  const esqueletosVista = document.getElementById("esqueletosVista");
+  const crearEsqueletoForm = document.getElementById("crearEsqueletoForm");
+  const inputTipoEsqueleto = document.getElementById("inputTipoEsqueleto");
+  document.getElementById("nivelesPiramideWrap").style.display = "block";
+  inputTipoEsqueleto.addEventListener("change", () => {
+    document.getElementById("nivelesPiramideWrap").style.display = inputTipoEsqueleto.value === "piramidal" ? "block" : "none";
+  });
+
+  document.getElementById("abrirEsqueletosBtn").addEventListener("click", () => {
+    herramientasMenu.style.display = "none";
+    esqueletosVista.style.display = "flex";
+    crearEsqueletoForm.style.display = "none";
+    renderListaEsqueletos();
+  });
+  document.getElementById("volverAHerramientasDesdeEsqueletosBtn").addEventListener("click", () => {
+    esqueletosVista.style.display = "none";
+    herramientasMenu.style.display = "block";
+  });
+  document.getElementById("crearEsqueletoBtn").addEventListener("click", () => {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para crear un esqueleto.");
+      return;
+    }
+    crearEsqueletoForm.style.display = crearEsqueletoForm.style.display === "none" ? "block" : "none";
+  });
+
+  document.getElementById("guardarNuevoEsqueletoBtn").addEventListener("click", async () => {
+    const nombre = document.getElementById("inputNombreEsqueleto").value.trim();
+    const tipo = inputTipoEsqueleto.value;
+    const niveles = parseInt(document.getElementById("inputNivelesEsqueleto").value, 10);
+    if (!nombre) {
+      alert("Ponle un nombre a tu esqueleto.");
+      return;
+    }
+    try {
+      await addDoc(esqueletosCol, {
+        ownerId: uidActual,
+        nombre,
+        tipo,
+        niveles: tipo === "piramidal" ? niveles : null,
+        casillas: estructuraVacia(tipo, niveles),
+        fecha: serverTimestamp()
+      });
+      document.getElementById("inputNombreEsqueleto").value = "";
+      crearEsqueletoForm.style.display = "none";
+    } catch (e) {
+      alert("No se pudo crear el esqueleto: " + e.message);
+    }
+  });
+
+  function renderListaEsqueletos() {
+    const lista = document.getElementById("esqueletosLista");
+    if (!uidActual) {
+      lista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Necesitas iniciar sesión (Admin) para ver y crear tus esqueletos.</div>`;
+      return;
+    }
+    const propios = esqueletos.filter(e => e.ownerId === uidActual);
+    if (propios.length === 0) {
+      lista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Aún no tienes ningún esqueleto. Crea uno con el botón "+ Crear" de arriba.</div>`;
+      return;
+    }
+    lista.innerHTML = "";
+    propios.forEach(esq => {
+      const totalTemas = Object.values(esq.casillas || {}).reduce((acc, c) => acc + (c.temas ? c.temas.length : 0), 0);
+      const item = document.createElement("div");
+      item.className = "nota-guardada-item";
+      item.innerHTML = `
+        <div class="nota-guardada-titulo">${escapeHtml(esq.nombre)}</div>
+        <div class="nota-guardada-preview">${esq.tipo === "piramidal" ? "Pirámide" : "Figura humana"} · ${totalTemas} tema${totalTemas === 1 ? "" : "s"}</div>
+        <div class="nota-guardada-controles">
+          <button class="abrir-plantilla">Abrir</button>
+          <button class="renombrar">Cambiar título</button>
+          <button class="eliminar">Eliminar</button>
+        </div>
+      `;
+      item.querySelector(".abrir-plantilla").addEventListener("click", () => {
+        cerrarHerramientas();
+        abrirEsqueletoModal(esq);
+      });
+      item.querySelector(".renombrar").addEventListener("click", async () => {
+        const nuevoNombre = prompt("Nuevo título del esqueleto:", esq.nombre);
+        if (nuevoNombre && nuevoNombre.trim()) {
+          await updateDoc(doc(db, "esqueletos", esq.id), { nombre: nuevoNombre.trim() });
+        }
+      });
+      item.querySelector(".eliminar").addEventListener("click", async () => {
+        if (confirm(`¿Eliminar el esqueleto "${esq.nombre}"? Esto no se puede deshacer.`)) {
+          await deleteDoc(doc(db, "esqueletos", esq.id));
+          renderListaEsqueletos();
+        }
+      });
+      lista.appendChild(item);
+    });
+  }
+
+  // ---------- Modal: constelación (piramidal o anatómica) ----------
+  const esqueletoModal = document.getElementById("esqueletoModal");
+  const esqueletoSvg = document.getElementById("esqueletoSvg");
+
+  function abrirEsqueletoModal(esq) {
+    esqueletoActual = esq;
+    document.getElementById("esqueletoModalTitulo").textContent = esq.nombre;
+    renderConstelacion(esq);
+    esqueletoModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+  document.getElementById("cerrarEsqueletoBtn").addEventListener("click", () => {
+    esqueletoModal.style.display = "none";
+    document.body.style.overflow = "";
+    esqueletoActual = null;
+  });
+
+  function renderConstelacion(esq) {
+    esqueletoSvg.innerHTML = "";
+    if (esq.tipo === "piramidal") {
+      esqueletoSvg.setAttribute("viewBox", "0 0 260 " + (60 + (esq.niveles || 4) * 55));
+      renderNodosPiramide(esq);
+    } else {
+      esqueletoSvg.setAttribute("viewBox", "0 0 200 340");
+      renderNodosAnatomico(esq);
+    }
+  }
+
+  function svgEl(tag, attrs) {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    return el;
+  }
+
+  function agregarNodo(x, y, r, color, key, esq, nombreCorto) {
+    const casilla = esq.casillas[key] || { nombre: nombreCorto, temas: [] };
+    const g = svgEl("g", { class: "esqueleto-nodo" });
+    g.appendChild(svgEl("circle", { cx: x, cy: y, r, fill: color }));
+    const label = svgEl("text", { class: "esqueleto-nodo-etiqueta", x, y: y - r - 6 });
+    label.textContent = casilla.nombre || nombreCorto;
+    g.appendChild(label);
+    if (casilla.temas && casilla.temas.length > 0) {
+      const badge = svgEl("text", { class: "esqueleto-nodo-badge", x, y: y + r + 12 });
+      badge.textContent = `${casilla.temas.length} tema${casilla.temas.length === 1 ? "" : "s"}`;
+      g.appendChild(badge);
+    }
+    g.addEventListener("click", () => abrirCasilla(key, esq));
+    esqueletoSvg.appendChild(g);
+    return { x, y };
+  }
+
+  function lineaSvg(x1, y1, x2, y2) {
+    esqueletoSvg.appendChild(svgEl("line", { x1, y1, x2, y2, stroke: "#3a3a44", "stroke-width": 1.3 }));
+  }
+
+  function renderNodosPiramide(esq) {
+    const niveles = esq.niveles || 4;
+    const colores = ["#9b7cf6", "#22d3c4", "#39ff8c", "#c7c7cf", "#8b8b96", "#5b4b8a"];
+    const puntosPorNivel = [];
+    for (let nivel = 1; nivel <= niveles; nivel++) {
+      const y = 34 + (nivel - 1) * 55;
+      const puntos = [];
+      for (let i = 0; i < nivel; i++) {
+        const espacio = 220 / (nivel + 1);
+        const x = 20 + espacio * (i + 1);
+        puntos.push(agregarNodo(x, y, Math.max(6, 11 - nivel), colores[(nivel - 1) % colores.length], `n${nivel}_${i}`, esq, `Nivel ${nivel}`));
+      }
+      puntosPorNivel.push(puntos);
+    }
+    for (let nivel = 0; nivel < puntosPorNivel.length - 1; nivel++) {
+      puntosPorNivel[nivel].forEach(p1 => {
+        puntosPorNivel[nivel + 1].forEach(p2 => {
+          if (Math.abs(p1.x - p2.x) < 140) lineaSvg(p1.x, p1.y, p2.x, p2.y);
+        });
+      });
+    }
+    // Las líneas se dibujaron encima de los nodos; reordenamos para que los nodos queden visibles
+    Array.from(esqueletoSvg.querySelectorAll(".esqueleto-nodo")).forEach(n => esqueletoSvg.appendChild(n));
+  }
+
+  function renderNodosAnatomico(esq) {
+    lineaSvg(100, 54, 100, 95);
+    lineaSvg(100, 95, 55, 95); lineaSvg(100, 95, 145, 95);
+    lineaSvg(55, 95, 30, 175); lineaSvg(145, 95, 170, 175);
+    lineaSvg(100, 95, 100, 165);
+    lineaSvg(100, 165, 72, 175); lineaSvg(100, 165, 128, 175);
+    lineaSvg(72, 175, 65, 300); lineaSvg(128, 175, 135, 300);
+
+    agregarNodo(100, 34, 17, "#9b7cf6", "cabeza", esq, "Cabeza");
+    agregarNodo(100, 68, 8, "#5b4b8a", "cuello", esq, "Cuello");
+    agregarNodo(100, 95, 11, "#22d3c4", "torso", esq, "Torso");
+    agregarNodo(30, 175, 9, "#39ff8c", "brazos", esq, "Brazos");
+    agregarNodo(170, 175, 9, "#39ff8c", "brazos", esq, "Brazos");
+    agregarNodo(65, 300, 9, "#c7c7cf", "piernas", esq, "Piernas");
+    agregarNodo(135, 300, 9, "#c7c7cf", "piernas", esq, "Piernas");
+    // Manos y pies, como casillas propias colgando de brazos/piernas
+    agregarNodo(20, 200, 7, "#8b8b96", "manos", esq, "Manos");
+    agregarNodo(180, 200, 7, "#8b8b96", "manos", esq, "Manos");
+    agregarNodo(60, 325, 7, "#3a3a44", "pies", esq, "Pies");
+    agregarNodo(140, 325, 7, "#3a3a44", "pies", esq, "Pies");
+    Array.from(esqueletoSvg.querySelectorAll(".esqueleto-nodo")).forEach(n => esqueletoSvg.appendChild(n));
+  }
+
+  // ---------- Panel: casilla (temas dentro de un nodo) ----------
+  const casillaPanel = document.getElementById("casillaPanel");
+  const casillaOverlay = document.getElementById("casillaOverlay");
+  const casillaNombreInput = document.getElementById("casillaNombreInput");
+
+  function abrirCasilla(key, esq) {
+    casillaActualKey = key;
+    const casilla = esq.casillas[key] || { nombre: "", temas: [] };
+    casillaNombreInput.value = casilla.nombre || "";
+    document.getElementById("casillaRefEsqueleto").textContent = esq.nombre;
+    renderTemasCasilla(esq, key);
+    casillaPanel.style.display = "flex";
+    casillaOverlay.style.display = "block";
+  }
+  function cerrarCasilla() {
+    casillaPanel.style.display = "none";
+    casillaOverlay.style.display = "none";
+    if (esqueletoActual) renderConstelacion(esqueletoActual);
+  }
+  document.getElementById("cerrarCasillaBtn").addEventListener("click", cerrarCasilla);
+  casillaOverlay.addEventListener("click", cerrarCasilla);
+
+  casillaNombreInput.addEventListener("change", async () => {
+    if (!esqueletoActual || !casillaActualKey) return;
+    const casillas = { ...esqueletoActual.casillas };
+    casillas[casillaActualKey] = { ...casillas[casillaActualKey], nombre: casillaNombreInput.value.trim() };
+    await guardarCasillas(casillas);
+  });
+
+  async function guardarCasillas(casillas) {
+    esqueletoActual.casillas = casillas;
+    await updateDoc(doc(db, "esqueletos", esqueletoActual.id), { casillas });
+  }
+
+  function renderTemasCasilla(esq, key) {
+    const cont = document.getElementById("casillaTemasLista");
+    cont.innerHTML = "";
+    const casilla = esq.casillas[key] || { temas: [] };
+    (casilla.temas || []).forEach((tema, i) => {
+      const row = document.createElement("div");
+      row.className = "tema-row-esqueleto";
+      row.innerHTML = `
+        <span class="tema-num-esqueleto">${i + 1}</span>
+        <span class="tema-nombre-esqueleto">${escapeHtml(tema.etiqueta)}</span>
+        <button class="tema-menu-btn-esqueleto">⋮</button>
+        <div class="tema-menu-flotante">
+          <button class="tema-menu-opcion op-renombrar">✏️ Cambiar título</button>
+          <button class="tema-menu-opcion op-mover-casilla">📍 Mover a otra casilla</button>
+          <button class="tema-menu-opcion op-mover-jerarquia">↕️ Mover de jerarquía</button>
+          <button class="tema-menu-opcion eliminar op-eliminar">🗑 Eliminar tema</button>
+        </div>
+      `;
+      const menuFlotante = row.querySelector(".tema-menu-flotante");
+      row.querySelector(".tema-menu-btn-esqueleto").addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.querySelectorAll(".tema-menu-flotante.abierto").forEach(m => { if (m !== menuFlotante) m.classList.remove("abierto"); });
+        menuFlotante.classList.toggle("abierto");
+      });
+
+      row.querySelector(".op-renombrar").addEventListener("click", async () => {
+        const nuevo = prompt("Nuevo título del tema:", tema.etiqueta);
+        if (nuevo && nuevo.trim()) {
+          const casillas = { ...esqueletoActual.casillas };
+          casillas[key].temas[i] = { ...tema, etiqueta: nuevo.trim() };
+          await guardarCasillas(casillas);
+          renderTemasCasilla(esqueletoActual, key);
+        }
+      });
+
+      row.querySelector(".op-mover-casilla").addEventListener("click", async () => {
+        const claves = Object.keys(esqueletoActual.casillas).filter(k => k !== key);
+        const nombres = claves.map(k => `${k}: ${esqueletoActual.casillas[k].nombre}`).join("\n");
+        const destino = prompt(`¿A qué casilla quieres mover este tema?\nEscribe la clave exacta:\n\n${nombres}`);
+        if (destino && esqueletoActual.casillas[destino]) {
+          const casillas = { ...esqueletoActual.casillas };
+          casillas[key].temas.splice(i, 1);
+          casillas[destino].temas = [...(casillas[destino].temas || []), tema];
+          await guardarCasillas(casillas);
+          renderTemasCasilla(esqueletoActual, key);
+        } else if (destino) {
+          alert("No encontré esa casilla.");
+        }
+      });
+
+      row.querySelector(".op-mover-jerarquia").addEventListener("click", async () => {
+        const total = casilla.temas.length;
+        const nuevaPos = prompt(`¿En qué posición quieres este tema? (1 a ${total})`, String(i + 1));
+        const idx = parseInt(nuevaPos, 10) - 1;
+        if (!isNaN(idx) && idx >= 0 && idx < total) {
+          const casillas = { ...esqueletoActual.casillas };
+          const arr = [...casillas[key].temas];
+          const [item] = arr.splice(i, 1);
+          arr.splice(idx, 0, item);
+          casillas[key].temas = arr;
+          await guardarCasillas(casillas);
+          renderTemasCasilla(esqueletoActual, key);
+        }
+      });
+
+      row.querySelector(".op-eliminar").addEventListener("click", async () => {
+        if (confirm(`¿Eliminar "${tema.etiqueta}"?`)) {
+          const casillas = { ...esqueletoActual.casillas };
+          casillas[key].temas.splice(i, 1);
+          await guardarCasillas(casillas);
+          renderTemasCasilla(esqueletoActual, key);
+        }
+      });
+
+      cont.appendChild(row);
+    });
+  }
+
+  document.getElementById("agregarTemaCasillaBtn").addEventListener("click", async () => {
+    const etiqueta = prompt("Título del tema:");
+    if (!etiqueta || !etiqueta.trim()) return;
+    const enlace = prompt("Enlace de Google Drive (opcional):") || "";
+    const casillas = { ...esqueletoActual.casillas };
+    casillas[casillaActualKey].temas = [...(casillas[casillaActualKey].temas || []), {
+      etiqueta: etiqueta.trim(),
+      driveId: enlace.trim() ? extraerIdDrive(enlace.trim()) : ""
+    }];
+    await guardarCasillas(casillas);
+    renderTemasCasilla(esqueletoActual, casillaActualKey);
+  });
+
+  // ---------- Ver apariencia: lista lineal + exportar a texto ----------
+  const aparienciaModal = document.getElementById("aparienciaModal");
+  document.getElementById("verAparienciaEsqueletoBtn").addEventListener("click", () => {
+    if (!esqueletoActual) return;
+    const cont = document.getElementById("aparienciaContenido");
+    cont.innerHTML = "";
+    Object.values(esqueletoActual.casillas).forEach(casilla => {
+      if (!casilla.temas || casilla.temas.length === 0) return;
+      const bloque = document.createElement("div");
+      bloque.style.marginBottom = "16px";
+      bloque.innerHTML = `<div style="font-family:'Fraunces',serif;font-weight:600;margin-bottom:6px;">${escapeHtml(casilla.nombre)}</div>`;
+      casilla.temas.forEach((tema, i) => {
+        const linea = document.createElement("div");
+        linea.style.marginBottom = "6px";
+        linea.innerHTML = `${i + 1}. ${escapeHtml(tema.etiqueta)}${tema.driveId ? `<br><span style="color:var(--text-sec);font-size:0.75rem;">https://drive.google.com/file/d/${tema.driveId}/view</span>` : ""}`;
+        bloque.appendChild(linea);
+      });
+      cont.appendChild(bloque);
+    });
+    if (!cont.innerHTML) cont.innerHTML = `<p style="color:var(--text-sec);">Este esqueleto todavía no tiene ningún tema.</p>`;
+    aparienciaModal.style.display = "flex";
+  });
+  document.getElementById("cerrarAparienciaBtn").addEventListener("click", () => {
+    aparienciaModal.style.display = "none";
+  });
+  document.getElementById("exportarAparienciaBtn").addEventListener("click", () => {
+    if (!esqueletoActual) return;
+    let texto = `${esqueletoActual.nombre}\n\n`;
+    Object.values(esqueletoActual.casillas).forEach(casilla => {
+      if (!casilla.temas || casilla.temas.length === 0) return;
+      texto += `${casilla.nombre}\n`;
+      casilla.temas.forEach((tema, i) => {
+        texto += `${i + 1}. ${tema.etiqueta}${tema.driveId ? ` — https://drive.google.com/file/d/${tema.driveId}/view` : ""}\n`;
+      });
+      texto += "\n";
+    });
+    const blob = new Blob([texto], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${esqueletoActual.nombre.replace(/[^a-z0-9áéíóúñ\s-]/gi, "").trim()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
   // Refleja en los 3 botones del lector el estado guardado del recurso/publicación actual
   function todosLosRecursosComprendidos(libroId, recursos) {
     const p = progresoDeLibro(libroId);
@@ -5767,42 +6292,19 @@
     setTimeout(() => btn.classList.remove("pulso"), 220);
   }
 
-  // Aviso fugaz: confirma con texto + color que la acción sí ocurrió,
-  // más allá del cambio de color del botón.
-  function mostrarAvisoToast(mensaje, color) {
-    const toast = document.getElementById("avisoToast");
-    if (!toast) return;
-    toast.textContent = mensaje;
-    toast.style.setProperty("--color-aviso", color || "var(--verde)");
-    toast.classList.remove("visible");
-    void toast.offsetWidth;
-    toast.classList.add("visible");
-    clearTimeout(toast._ocultarTimeout);
-    toast._ocultarTimeout = setTimeout(() => toast.classList.remove("visible"), 1800);
-  }
-
   document.getElementById("marcarComprendidoBtn").addEventListener("click", (e) => {
     if (!libroIdActual) return;
     pulsarBoton(e.currentTarget);
-    const p = progresoDeLibro(libroIdActual);
-    const yaEstaba = !!(p && p.estados && p.estados[indiceActual] === "comprendido");
-    mostrarAvisoToast(yaEstaba ? "Comprendido retirado" : "✓ Marcado como comprendido", "#39ff8c");
     marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "comprendido");
   });
   document.getElementById("marcarCongelarBtn").addEventListener("click", (e) => {
     if (!libroIdActual) return;
     pulsarBoton(e.currentTarget);
-    const p = progresoDeLibro(libroIdActual);
-    const yaEstaba = !!(p && p.estados && p.estados[indiceActual] === "congelado");
-    mostrarAvisoToast(yaEstaba ? "Congelado retirado" : "❄ Contenido congelado", "#9b7cf6");
     marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "congelado");
   });
   document.getElementById("marcarRevisadoBtn").addEventListener("click", (e) => {
     if (!libroIdActual || e.currentTarget.disabled) return;
     pulsarBoton(e.currentTarget);
-    const p = progresoDeLibro(libroIdActual);
-    const yaEstaba = !!(p && p.revisado);
-    mostrarAvisoToast(yaEstaba ? "Ya no está marcada como revisada" : "✓ Publicación marcada como revisada", "#22d3c4");
     alternarPublicacionRevisada(libroIdActual, tituloPublicacionActual);
   });
 
