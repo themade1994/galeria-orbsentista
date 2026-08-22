@@ -1105,15 +1105,17 @@
     background:rgba(57,255,140,0.08);
     color:var(--verde);
     border:1px solid var(--verde);
-    padding:7px 12px;
-    border-radius:999px;
-    font-size:0.72rem;
+    width:30px;
+    height:30px;
+    padding:0;
+    border-radius:50%;
+    font-size:0.82rem;
     font-weight:700;
     cursor:pointer;
     flex-shrink:0;
     display:flex;
     align-items:center;
-    gap:4px;
+    justify-content:center;
     transition:background .2s ease, box-shadow .2s ease;
   }
   .destacar-noticia-btn:hover{ box-shadow:0 0 12px -3px var(--verde); }
@@ -5125,7 +5127,7 @@
         <div class="admin-row-titulo">${escapeHtml(libro.titulo)}</div>
         <div class="admin-row-controles">
           <select class="mover-select">${opciones.join("")}</select>
-          ${mostrarBotonDestacar ? `<button class="destacar-noticia-btn${yaEsDestacada ? " destacada" : ""}">${yaEsDestacada ? "★ Destacada hoy" : "☆ Destacar"}</button>` : ""}
+          ${mostrarBotonDestacar ? `<button class="destacar-noticia-btn${yaEsDestacada ? " destacada" : ""}" title="${yaEsDestacada ? "Destacada hoy — tocar para quitar" : "Destacar esta noticia hoy"}">${yaEsDestacada ? "★" : "☆"}</button>` : ""}
           <button class="editar-btn">Editar</button>
           <button class="transferir-btn">Transferir</button>
           <button class="delete-btn">Eliminar</button>
@@ -5856,6 +5858,10 @@
 
   onSnapshot(esqueletosCol, (snapshot) => {
     esqueletos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const vistaAbierta = document.getElementById("esqueletosVista");
+    if (vistaAbierta && vistaAbierta.style.display !== "none") {
+      renderListaEsqueletos();
+    }
   }, (error) => console.error("Error al leer esqueletos:", error));
 
   function estructuraVacia(tipo, niveles) {
@@ -5868,8 +5874,21 @@
         }
       }
     } else {
-      ["cabeza", "cuello", "torso", "brazos", "manos", "piernas", "pies"].forEach(k => {
-        casillas[k] = { nombre: k.charAt(0).toUpperCase() + k.slice(1), temas: [] };
+      const zonas = {
+        cabeza: "Cabeza",
+        cuello: "Cuello",
+        torso: "Torso",
+        brazoIzquierdo: "Brazo izquierdo",
+        brazoDerecho: "Brazo derecho",
+        manoIzquierda: "Mano izquierda",
+        manoDerecha: "Mano derecha",
+        piernaIzquierda: "Pierna izquierda",
+        piernaDerecha: "Pierna derecha",
+        pieIzquierdo: "Pie izquierdo",
+        pieDerecho: "Pie derecho"
+      };
+      Object.entries(zonas).forEach(([k, nombre]) => {
+        casillas[k] = { nombre, temas: [] };
       });
     }
     return casillas;
@@ -6061,15 +6080,15 @@
     agregarNodo(100, 34, 17, "#9b7cf6", "cabeza", esq, "Cabeza");
     agregarNodo(100, 68, 8, "#5b4b8a", "cuello", esq, "Cuello");
     agregarNodo(100, 95, 11, "#22d3c4", "torso", esq, "Torso");
-    agregarNodo(30, 175, 9, "#39ff8c", "brazos", esq, "Brazos");
-    agregarNodo(170, 175, 9, "#39ff8c", "brazos", esq, "Brazos");
-    agregarNodo(65, 300, 9, "#c7c7cf", "piernas", esq, "Piernas");
-    agregarNodo(135, 300, 9, "#c7c7cf", "piernas", esq, "Piernas");
+    agregarNodo(30, 175, 9, "#39ff8c", "brazoIzquierdo", esq, "Brazo izquierdo");
+    agregarNodo(170, 175, 9, "#39ff8c", "brazoDerecho", esq, "Brazo derecho");
+    agregarNodo(65, 300, 9, "#c7c7cf", "piernaIzquierda", esq, "Pierna izquierda");
+    agregarNodo(135, 300, 9, "#c7c7cf", "piernaDerecha", esq, "Pierna derecha");
     // Manos y pies, como casillas propias colgando de brazos/piernas
-    agregarNodo(20, 200, 7, "#8b8b96", "manos", esq, "Manos");
-    agregarNodo(180, 200, 7, "#8b8b96", "manos", esq, "Manos");
-    agregarNodo(60, 325, 7, "#3a3a44", "pies", esq, "Pies");
-    agregarNodo(140, 325, 7, "#3a3a44", "pies", esq, "Pies");
+    agregarNodo(20, 200, 7, "#8b8b96", "manoIzquierda", esq, "Mano izquierda");
+    agregarNodo(180, 200, 7, "#8b8b96", "manoDerecha", esq, "Mano derecha");
+    agregarNodo(60, 325, 7, "#3a3a44", "pieIzquierdo", esq, "Pie izquierdo");
+    agregarNodo(140, 325, 7, "#3a3a44", "pieDerecho", esq, "Pie derecho");
     Array.from(esqueletoSvg.querySelectorAll(".esqueleto-nodo")).forEach(n => esqueletoSvg.appendChild(n));
   }
 
@@ -6144,17 +6163,20 @@
 
       row.querySelector(".op-mover-casilla").addEventListener("click", async () => {
         const claves = Object.keys(esqueletoActual.casillas).filter(k => k !== key);
-        const nombres = claves.map(k => `${k}: ${esqueletoActual.casillas[k].nombre}`).join("\n");
-        const destino = prompt(`¿A qué casilla quieres mover este tema?\nEscribe la clave exacta:\n\n${nombres}`);
-        if (destino && esqueletoActual.casillas[destino]) {
-          const casillas = { ...esqueletoActual.casillas };
-          casillas[key].temas.splice(i, 1);
-          casillas[destino].temas = [...(casillas[destino].temas || []), tema];
-          await guardarCasillas(casillas);
-          renderTemasCasilla(esqueletoActual, key);
-        } else if (destino) {
-          alert("No encontré esa casilla.");
+        const listaNumerada = claves.map((k, idx) => `${idx + 1}. ${esqueletoActual.casillas[k].nombre}`).join("\n");
+        const respuesta = prompt(`¿A qué casilla quieres mover este tema?\nEscribe el número:\n\n${listaNumerada}`);
+        const idx = parseInt(respuesta, 10) - 1;
+        if (respuesta === null) return;
+        if (isNaN(idx) || idx < 0 || idx >= claves.length) {
+          alert("Ese número no corresponde a ninguna casilla de la lista.");
+          return;
         }
+        const destino = claves[idx];
+        const casillas = { ...esqueletoActual.casillas };
+        casillas[key].temas.splice(i, 1);
+        casillas[destino].temas = [...(casillas[destino].temas || []), tema];
+        await guardarCasillas(casillas);
+        renderTemasCasilla(esqueletoActual, key);
       });
 
       row.querySelector(".op-mover-jerarquia").addEventListener("click", async () => {
