@@ -2331,11 +2331,12 @@
     <div id="crearEsqueletoForm" style="display:none;padding:0 14px 14px;">
       <input type="text" id="inputNombreEsqueleto" placeholder="Nombre del esqueleto (ej: MICSES)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;margin-bottom:8px;">
       <select id="inputTipoEsqueleto" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;margin-bottom:8px;">
-        <option value="piramidal">Pirámide</option>
+        <option value="piramidal">Pirámide (se ramifica hacia abajo)</option>
+        <option value="jerarquico">Jerárquico (una sola casilla por nivel)</option>
         <option value="anatomico">Figura humana</option>
       </select>
       <div id="nivelesPiramideWrap" style="margin-bottom:8px;">
-        <label style="font-size:0.75rem;color:var(--text-sec);">Niveles de la pirámide (3 a 6)</label>
+        <label id="labelNivelesEsqueleto" style="font-size:0.75rem;color:var(--text-sec);">Niveles de la pirámide (3 a 6)</label>
         <select id="inputNivelesEsqueleto" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;">
           <option value="3">3</option>
           <option value="4" selected>4</option>
@@ -5868,10 +5869,17 @@
     const casillas = {};
     if (tipo === "piramidal") {
       const n = niveles || 4;
+      let contador = 1;
       for (let nivel = 1; nivel <= n; nivel++) {
         for (let i = 0; i < nivel; i++) {
-          casillas[`n${nivel}_${i}`] = { nombre: `Nivel ${nivel}`, temas: [] };
+          casillas[`n${nivel}_${i}`] = { nombre: `Punto ${contador}`, temas: [] };
+          contador++;
         }
+      }
+    } else if (tipo === "jerarquico") {
+      const n = niveles || 4;
+      for (let nivel = 1; nivel <= n; nivel++) {
+        casillas[`j${nivel}`] = { nombre: `Nivel ${nivel}`, temas: [] };
       }
     } else {
       const zonas = {
@@ -5899,7 +5907,11 @@
   const inputTipoEsqueleto = document.getElementById("inputTipoEsqueleto");
   document.getElementById("nivelesPiramideWrap").style.display = "block";
   inputTipoEsqueleto.addEventListener("change", () => {
-    document.getElementById("nivelesPiramideWrap").style.display = inputTipoEsqueleto.value === "piramidal" ? "block" : "none";
+    const esConNiveles = inputTipoEsqueleto.value === "piramidal" || inputTipoEsqueleto.value === "jerarquico";
+    document.getElementById("nivelesPiramideWrap").style.display = esConNiveles ? "block" : "none";
+    document.getElementById("labelNivelesEsqueleto").textContent = inputTipoEsqueleto.value === "jerarquico"
+      ? "Cuántos niveles (3 a 6)"
+      : "Niveles de la pirámide (3 a 6)";
   });
 
   document.getElementById("abrirEsqueletosBtn").addEventListener("click", () => {
@@ -5933,7 +5945,7 @@
         ownerId: uidActual,
         nombre,
         tipo,
-        niveles: tipo === "piramidal" ? niveles : null,
+        niveles: (tipo === "piramidal" || tipo === "jerarquico") ? niveles : null,
         casillas: estructuraVacia(tipo, niveles),
         fecha: serverTimestamp()
       });
@@ -5962,7 +5974,7 @@
       item.className = "nota-guardada-item";
       item.innerHTML = `
         <div class="nota-guardada-titulo">${escapeHtml(esq.nombre)}</div>
-        <div class="nota-guardada-preview">${esq.tipo === "piramidal" ? "Pirámide" : "Figura humana"} · ${totalTemas} tema${totalTemas === 1 ? "" : "s"}</div>
+        <div class="nota-guardada-preview">${esq.tipo === "piramidal" ? "Pirámide" : esq.tipo === "jerarquico" ? "Jerárquico" : "Figura humana"} · ${totalTemas} tema${totalTemas === 1 ? "" : "s"}</div>
         <div class="nota-guardada-controles">
           <button class="abrir-plantilla">Abrir</button>
           <button class="renombrar">Cambiar título</button>
@@ -6011,6 +6023,9 @@
     if (esq.tipo === "piramidal") {
       esqueletoSvg.setAttribute("viewBox", "0 0 260 " + (60 + (esq.niveles || 4) * 55));
       renderNodosPiramide(esq);
+    } else if (esq.tipo === "jerarquico") {
+      esqueletoSvg.setAttribute("viewBox", "0 0 260 " + (60 + (esq.niveles || 4) * 60));
+      renderNodosJerarquico(esq);
     } else {
       esqueletoSvg.setAttribute("viewBox", "0 0 200 340");
       renderNodosAnatomico(esq);
@@ -6066,6 +6081,19 @@
       });
     }
     // Las líneas se dibujaron encima de los nodos; reordenamos para que los nodos queden visibles
+    Array.from(esqueletoSvg.querySelectorAll(".esqueleto-nodo")).forEach(n => esqueletoSvg.appendChild(n));
+  }
+
+  function renderNodosJerarquico(esq) {
+    const niveles = esq.niveles || 4;
+    const colores = ["#9b7cf6", "#22d3c4", "#39ff8c", "#c7c7cf", "#8b8b96", "#5b4b8a"];
+    let anterior = null;
+    for (let nivel = 1; nivel <= niveles; nivel++) {
+      const y = 34 + (nivel - 1) * 60;
+      const actual = agregarNodo(130, y, 12, colores[(nivel - 1) % colores.length], `j${nivel}`, esq, `Nivel ${nivel}`);
+      if (anterior) lineaSvg(anterior.x, anterior.y, actual.x, actual.y);
+      anterior = actual;
+    }
     Array.from(esqueletoSvg.querySelectorAll(".esqueleto-nodo")).forEach(n => esqueletoSvg.appendChild(n));
   }
 
