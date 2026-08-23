@@ -2198,7 +2198,7 @@
     <div class="herramienta-item" id="abrirEsqueletosBtn">
       <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-esqueleto-svg"/></svg>
       <div>
-        <div style="font-size:0.85rem;font-weight:600;">El Esqueleto</div>
+        <div style="font-size:0.85rem;font-weight:600;">Esqueleto</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Organiza tus ideas antes de publicar</div>
       </div>
     </div>
@@ -2327,13 +2327,13 @@
       <button id="volverAHerramientasDesdeEsqueletosBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
       <button id="crearEsqueletoBtn" style="margin-left:auto;background:transparent;border:1px solid var(--turquesa);color:var(--turquesa);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">+ Crear</button>
     </div>
-    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Organiza las ideas de un proyecto antes de publicarlo, en forma de pirámide o de figura humana.</p>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Organiza las ideas de un proyecto antes de publicarlo: jerárquico, piramidal o anatómico.</p>
     <div id="crearEsqueletoForm" style="display:none;padding:0 14px 14px;">
       <input type="text" id="inputNombreEsqueleto" placeholder="Nombre del esqueleto (ej: MICSES)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;margin-bottom:8px;">
       <select id="inputTipoEsqueleto" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;margin-bottom:8px;">
-        <option value="piramidal">Pirámide (se ramifica hacia abajo)</option>
+        <option value="piramidal">Piramidal (se ramifica hacia abajo)</option>
         <option value="jerarquico">Jerárquico (una sola casilla por nivel)</option>
-        <option value="anatomico">Figura humana</option>
+        <option value="anatomico">Anatómico</option>
       </select>
       <div id="nivelesPiramideWrap" style="margin-bottom:8px;">
         <label id="labelNivelesEsqueleto" style="font-size:0.75rem;color:var(--text-sec);">Niveles de la pirámide (3 a 6)</label>
@@ -5865,6 +5865,14 @@
     }
   }, (error) => console.error("Error al leer esqueletos:", error));
 
+  // Solo en piramidal hace falta aclarar el nivel al mover un tema entre casillas
+  // (jerárquico y anatómico ya lo dejan claro con el propio nombre de cada casilla).
+  function nivelDeClave(clave, tipo) {
+    if (tipo !== "piramidal") return "";
+    const match = clave.match(/^n(\d+)_/);
+    return match ? ` (Nvl ${match[1]})` : "";
+  }
+
   function estructuraVacia(tipo, niveles) {
     const casillas = {};
     if (tipo === "piramidal") {
@@ -5974,7 +5982,7 @@
       item.className = "nota-guardada-item";
       item.innerHTML = `
         <div class="nota-guardada-titulo">${escapeHtml(esq.nombre)}</div>
-        <div class="nota-guardada-preview">${esq.tipo === "piramidal" ? "Pirámide" : esq.tipo === "jerarquico" ? "Jerárquico" : "Figura humana"} · ${totalTemas} tema${totalTemas === 1 ? "" : "s"}</div>
+        <div class="nota-guardada-preview">${esq.tipo === "piramidal" ? "Piramidal" : esq.tipo === "jerarquico" ? "Jerárquico" : "Anatómico"} · ${totalTemas} tema${totalTemas === 1 ? "" : "s"}</div>
         <div class="nota-guardada-controles">
           <button class="abrir-plantilla">Abrir</button>
           <button class="renombrar">Cambiar título</button>
@@ -6027,7 +6035,7 @@
       esqueletoSvg.setAttribute("viewBox", "0 0 260 " + (60 + (esq.niveles || 4) * 60));
       renderNodosJerarquico(esq);
     } else {
-      esqueletoSvg.setAttribute("viewBox", "0 0 200 340");
+      esqueletoSvg.setAttribute("viewBox", "0 0 280 340");
       renderNodosAnatomico(esq);
     }
   }
@@ -6098,25 +6106,25 @@
   }
 
   function renderNodosAnatomico(esq) {
-    lineaSvg(100, 54, 100, 95);
-    lineaSvg(100, 95, 55, 95); lineaSvg(100, 95, 145, 95);
-    lineaSvg(55, 95, 30, 175); lineaSvg(145, 95, 170, 175);
-    lineaSvg(100, 95, 100, 165);
-    lineaSvg(100, 165, 72, 175); lineaSvg(100, 165, 128, 175);
-    lineaSvg(72, 175, 65, 300); lineaSvg(128, 175, 135, 300);
+    lineaSvg(140, 54, 140, 95);
+    lineaSvg(140, 95, 95, 95); lineaSvg(140, 95, 185, 95);
+    lineaSvg(95, 95, 70, 175); lineaSvg(185, 95, 210, 175);
+    lineaSvg(140, 95, 140, 165);
+    lineaSvg(140, 165, 112, 175); lineaSvg(140, 165, 168, 175);
+    lineaSvg(112, 175, 105, 300); lineaSvg(168, 175, 175, 300);
 
-    agregarNodo(100, 34, 17, "#9b7cf6", "cabeza", esq, "Cabeza");
-    agregarNodo(100, 68, 8, "#5b4b8a", "cuello", esq, "Cuello");
-    agregarNodo(100, 95, 11, "#22d3c4", "torso", esq, "Torso");
-    agregarNodo(30, 175, 9, "#39ff8c", "brazoIzquierdo", esq, "Brazo izquierdo");
-    agregarNodo(170, 175, 9, "#39ff8c", "brazoDerecho", esq, "Brazo derecho");
-    agregarNodo(65, 300, 9, "#c7c7cf", "piernaIzquierda", esq, "Pierna izquierda");
-    agregarNodo(135, 300, 9, "#c7c7cf", "piernaDerecha", esq, "Pierna derecha");
+    agregarNodo(140, 34, 17, "#9b7cf6", "cabeza", esq, "Cabeza");
+    agregarNodo(140, 68, 8, "#5b4b8a", "cuello", esq, "Cuello");
+    agregarNodo(140, 95, 11, "#22d3c4", "torso", esq, "Torso");
+    agregarNodo(70, 175, 9, "#39ff8c", "brazoIzquierdo", esq, "Brazo izquierdo");
+    agregarNodo(210, 175, 9, "#39ff8c", "brazoDerecho", esq, "Brazo derecho");
+    agregarNodo(105, 300, 9, "#c7c7cf", "piernaIzquierda", esq, "Pierna izquierda");
+    agregarNodo(175, 300, 9, "#c7c7cf", "piernaDerecha", esq, "Pierna derecha");
     // Manos y pies, como casillas propias colgando de brazos/piernas
-    agregarNodo(20, 200, 7, "#8b8b96", "manoIzquierda", esq, "Mano izquierda");
-    agregarNodo(180, 200, 7, "#8b8b96", "manoDerecha", esq, "Mano derecha");
-    agregarNodo(60, 325, 7, "#3a3a44", "pieIzquierdo", esq, "Pie izquierdo");
-    agregarNodo(140, 325, 7, "#3a3a44", "pieDerecho", esq, "Pie derecho");
+    agregarNodo(58, 200, 7, "#8b8b96", "manoIzquierda", esq, "Mano izquierda");
+    agregarNodo(222, 200, 7, "#8b8b96", "manoDerecha", esq, "Mano derecha");
+    agregarNodo(98, 325, 7, "#3a3a44", "pieIzquierdo", esq, "Pie izquierdo");
+    agregarNodo(182, 325, 7, "#3a3a44", "pieDerecho", esq, "Pie derecho");
     Array.from(esqueletoSvg.querySelectorAll(".esqueleto-nodo")).forEach(n => esqueletoSvg.appendChild(n));
   }
 
@@ -6191,7 +6199,10 @@
 
       row.querySelector(".op-mover-casilla").addEventListener("click", async () => {
         const claves = Object.keys(esqueletoActual.casillas).filter(k => k !== key);
-        const listaNumerada = claves.map((k, idx) => `${idx + 1}. ${esqueletoActual.casillas[k].nombre}`).join("\n");
+        const listaNumerada = claves.map((k, idx) => {
+          const sufijoNivel = nivelDeClave(k, esqueletoActual.tipo);
+          return `${idx + 1}. ${esqueletoActual.casillas[k].nombre}${sufijoNivel}`;
+        }).join("\n");
         const respuesta = prompt(`¿A qué casilla quieres mover este tema?\nEscribe el número:\n\n${listaNumerada}`);
         const idx = parseInt(respuesta, 10) - 1;
         if (respuesta === null) return;
