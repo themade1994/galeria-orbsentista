@@ -6035,7 +6035,7 @@
       esqueletoSvg.setAttribute("viewBox", "0 0 260 " + (60 + (esq.niveles || 4) * 60));
       renderNodosJerarquico(esq);
     } else {
-      esqueletoSvg.setAttribute("viewBox", "0 0 280 340");
+      esqueletoSvg.setAttribute("viewBox", "0 0 280 470");
       renderNodosAnatomico(esq);
     }
   }
@@ -6106,25 +6106,30 @@
   }
 
   function renderNodosAnatomico(esq) {
-    lineaSvg(140, 54, 140, 95);
-    lineaSvg(140, 95, 95, 95); lineaSvg(140, 95, 185, 95);
-    lineaSvg(95, 95, 70, 175); lineaSvg(185, 95, 210, 175);
-    lineaSvg(140, 95, 140, 165);
-    lineaSvg(140, 165, 112, 175); lineaSvg(140, 165, 168, 175);
-    lineaSvg(112, 175, 105, 300); lineaSvg(168, 175, 175, 300);
+    lineaSvg(140, 51, 140, 85);   // cabeza → cuello
+    lineaSvg(140, 93, 140, 145);  // cuello → torso (torso queda a medio camino, no pegado al cuello)
+    lineaSvg(140, 145, 65, 235);  // torso → brazo izquierdo
+    lineaSvg(140, 145, 215, 235); // torso → brazo derecho
+    lineaSvg(65, 235, 50, 330);   // brazo izquierdo → mano izquierda
+    lineaSvg(215, 235, 230, 330); // brazo derecho → mano derecha
+    lineaSvg(140, 156, 140, 210); // torso → cadera (punto de ramificación de piernas)
+    lineaSvg(140, 210, 105, 340); // cadera → pierna izquierda
+    lineaSvg(140, 210, 175, 340); // cadera → pierna derecha
+    lineaSvg(105, 340, 95, 430);  // pierna izquierda → pie izquierdo
+    lineaSvg(175, 340, 185, 430); // pierna derecha → pie derecho
 
     agregarNodo(140, 34, 17, "#9b7cf6", "cabeza", esq, "Cabeza");
-    agregarNodo(140, 68, 8, "#5b4b8a", "cuello", esq, "Cuello");
-    agregarNodo(140, 95, 11, "#22d3c4", "torso", esq, "Torso");
-    agregarNodo(70, 175, 9, "#39ff8c", "brazoIzquierdo", esq, "Brazo izquierdo");
-    agregarNodo(210, 175, 9, "#39ff8c", "brazoDerecho", esq, "Brazo derecho");
-    agregarNodo(105, 300, 9, "#c7c7cf", "piernaIzquierda", esq, "Pierna izquierda");
-    agregarNodo(175, 300, 9, "#c7c7cf", "piernaDerecha", esq, "Pierna derecha");
+    agregarNodo(140, 85, 8, "#5b4b8a", "cuello", esq, "Cuello");
+    agregarNodo(140, 145, 11, "#22d3c4", "torso", esq, "Torso");
+    agregarNodo(65, 235, 9, "#39ff8c", "brazoIzquierdo", esq, "Brazo izquierdo");
+    agregarNodo(215, 235, 9, "#39ff8c", "brazoDerecho", esq, "Brazo derecho");
+    agregarNodo(105, 340, 9, "#c7c7cf", "piernaIzquierda", esq, "Pierna izquierda");
+    agregarNodo(175, 340, 9, "#c7c7cf", "piernaDerecha", esq, "Pierna derecha");
     // Manos y pies, como casillas propias colgando de brazos/piernas
-    agregarNodo(58, 200, 7, "#8b8b96", "manoIzquierda", esq, "Mano izquierda");
-    agregarNodo(222, 200, 7, "#8b8b96", "manoDerecha", esq, "Mano derecha");
-    agregarNodo(98, 325, 7, "#3a3a44", "pieIzquierdo", esq, "Pie izquierdo");
-    agregarNodo(182, 325, 7, "#3a3a44", "pieDerecho", esq, "Pie derecho");
+    agregarNodo(50, 330, 7, "#8b8b96", "manoIzquierda", esq, "Mano izquierda");
+    agregarNodo(230, 330, 7, "#8b8b96", "manoDerecha", esq, "Mano derecha");
+    agregarNodo(95, 430, 7, "#3a3a44", "pieIzquierdo", esq, "Pie izquierdo");
+    agregarNodo(185, 430, 7, "#3a3a44", "pieDerecho", esq, "Pie derecho");
     Array.from(esqueletoSvg.querySelectorAll(".esqueleto-nodo")).forEach(n => esqueletoSvg.appendChild(n));
   }
 
