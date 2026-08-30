@@ -1501,9 +1501,8 @@
 
   /* FRANJA DE FRAGMENTOS: banda con acento de orbSY, casillas con color insignia distinto cada una */
   .franja-fragmentos-wrap{
-    position:sticky;
-    top:0;
-    z-index:40;
+    position:static;
+    z-index:auto;
     background:
       radial-gradient(ellipse at 12% 15%, rgba(34,211,196,0.12), transparent 55%),
       radial-gradient(ellipse at 88% 85%, rgba(155,124,246,0.12), transparent 55%),
@@ -1810,6 +1809,130 @@
     background:rgba(255,255,255,0.35);
   }
   .galeria-img-dot.activo{ background:var(--turquesa); }
+
+  #imagenDescripcionBtn{
+    position:absolute;
+    top:14px;
+    right:14px;
+    background:var(--accent);
+    color:#06201d;
+    border:none;
+    font-weight:700;
+    font-size:0.72rem;
+    letter-spacing:0.02em;
+    padding:8px 14px;
+    border-radius:20px;
+    cursor:pointer;
+    box-shadow:0 2px 10px rgba(0,0,0,0.45);
+    z-index:2;
+  }
+  #imagenDescripcionBtn:active{ transform:scale(0.96); }
+
+  #imagenDescripcionOverlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.8);
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:5;
+  }
+  #imagenDescripcionCard{
+    background:#15151b;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    max-width:420px;
+    width:100%;
+    max-height:70vh;
+    overflow-y:auto;
+  }
+  #imagenDescripcionTexto{
+    color:#fff;
+    font-size:0.9rem;
+    line-height:1.65;
+    white-space:pre-wrap;
+    margin-bottom:16px;
+  }
+  #cerrarImagenDescripcionBtn{
+    width:100%;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    padding:10px;
+    border-radius:9px;
+    cursor:pointer;
+    font-size:0.82rem;
+  }
+  #cerrarImagenDescripcionBtn:active{ background:#1c1c22; }
+
+  /* RECURSO "TEXTO" (puente entre dos recursos): a propósito claro,
+     al revés del resto del lector, como una página escrita aparte. */
+  #puenteViewer{
+    position:absolute;
+    inset:0;
+    background:#fdfdfb;
+    overflow-y:auto;
+    display:flex;
+    justify-content:center;
+  }
+  #puenteViewerContenido{
+    max-width:560px;
+    width:100%;
+    padding:36px 24px 60px;
+    color:#161616;
+    font-size:1rem;
+    line-height:1.75;
+  }
+  #puenteViewerContenido h2{
+    font-family:'Fraunces', serif;
+    font-size:1.5rem;
+    font-weight:600;
+    margin:0 0 14px;
+    color:#111;
+  }
+  #puenteViewerContenido p{ margin:0 0 12px; }
+
+  /* Editor del recurso "texto" dentro del Taller (mismo criterio: claro) */
+  .puente-toolbar{
+    display:flex;
+    gap:6px;
+    margin-bottom:6px;
+  }
+  .puente-btn{
+    background:#eeeeec;
+    color:#111;
+    border:1px solid #ccc;
+    border-radius:6px;
+    width:36px;
+    height:32px;
+    font-size:0.8rem;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .puente-btn:active{ background:#dcdcd9; }
+  .puente-editor{
+    background:#fff;
+    color:#111;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px;
+    min-height:110px;
+    font-size:0.92rem;
+    line-height:1.6;
+    outline:none;
+  }
+  .puente-editor h2{
+    font-family:'Fraunces', serif;
+    font-size:1.25rem;
+    font-weight:600;
+    margin:0 0 8px;
+  }
+  .puente-editor p{ margin:0 0 8px; }
+  .puente-editor:empty:before{
+    content: attr(data-placeholder);
+    color:#999;
+  }
 
   /* PORTADA PARA AUDIO (tipo "cover" de canción, estilo Spotify) */
   .pdf-body.con-portada-audio{
@@ -2334,6 +2457,7 @@
         <option value="piramidal">Piramidal (se ramifica hacia abajo)</option>
         <option value="jerarquico">Jerárquico (una sola casilla por nivel)</option>
         <option value="anatomico">Anatómico</option>
+        <option value="araneae">Araneae (mapa conceptual, sin jerarquía)</option>
       </select>
       <div id="nivelesPiramideWrap" style="margin-bottom:8px;">
         <label id="labelNivelesEsqueleto" style="font-size:0.75rem;color:var(--text-sec);">Niveles de la pirámide (3 a 6)</label>
@@ -2343,6 +2467,33 @@
           <option value="5">5</option>
           <option value="6">6</option>
         </select>
+      </div>
+      <div id="ramasAraneaeWrap" style="display:none;margin-bottom:8px;">
+        <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Cuántas ramas salen de cada lado del centro (1 a 6, independiente cada lado).</p>
+        <div style="display:flex;gap:8px;">
+          <div style="flex:1;">
+            <label style="font-size:0.72rem;color:var(--text-sec);">Lado izquierdo</label>
+            <select id="inputRamasIzquierdaEsqueleto" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:0.72rem;color:var(--text-sec);">Lado derecho</label>
+            <select id="inputRamasDerechaEsqueleto" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.82rem;">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+        </div>
       </div>
       <button id="guardarNuevoEsqueletoBtn" style="width:100%;background:var(--turquesa);border:none;color:#0b0b0e;padding:10px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;">Crear esqueleto</button>
     </div>
@@ -2866,10 +3017,21 @@
       <button id="imagenAnteriorBtn" class="galeria-img-nav izq">←</button>
       <button id="imagenSiguienteBtn" class="galeria-img-nav der">→</button>
       <div id="galeriaImagenesDots" class="galeria-img-dots"></div>
+      <button id="imagenDescripcionBtn" style="display:none;">Descripción</button>
+      <div id="imagenDescripcionOverlay" style="display:none;">
+        <div id="imagenDescripcionCard">
+          <div id="imagenDescripcionTexto"></div>
+          <button id="cerrarImagenDescripcionBtn">✕ Cerrar</button>
+        </div>
+      </div>
     </div>
 
     <div id="audioPortadaWrap" style="display:none;">
       <img id="audioPortadaImg" src="" alt="Portada del audio">
+    </div>
+
+    <div id="puenteViewer" style="display:none;">
+      <div id="puenteViewerContenido"></div>
     </div>
   </div>
 
@@ -3288,12 +3450,14 @@
       const row = document.createElement("div");
       row.className = "recurso-row";
       const esImagenes = r.tipo === "imagenes";
+      const esPuente = r.tipo === "puente";
       row.innerHTML = `
         <select class="recurso-tipo">
-          <option value="texto" ${r.tipo === "texto" ? "selected" : ""}>Texto (PDF)</option>
+          <option value="texto" ${r.tipo === "texto" ? "selected" : ""}>PDF</option>
           <option value="audio" ${r.tipo === "audio" ? "selected" : ""}>Audio</option>
           <option value="video" ${r.tipo === "video" ? "selected" : ""}>Video</option>
           <option value="imagenes" ${r.tipo === "imagenes" ? "selected" : ""}>Galería de imágenes</option>
+          <option value="puente" ${r.tipo === "puente" ? "selected" : ""}>Texto</option>
         </select>
         ${r.tipo === "video" ? `
         <select class="recurso-fuente">
@@ -3302,7 +3466,25 @@
         </select>` : ""}
         <input type="text" class="recurso-etiqueta" placeholder="Etiqueta, ej: Mi narrativa sobre la arrogancia" value="${escapeAttr(r.etiqueta)}">
         ${esImagenes ? `
-        <textarea class="recurso-enlaces-multiples" placeholder="Un enlace de Drive por línea (una imagen cada uno)" rows="4">${escapeAttr(r.enlacesMultiples || "")}</textarea>
+        <div class="imagenes-sub-lista">
+          ${(r.imagenesBuilder || []).map((img, j) => `
+            <div class="imagen-sub-row" data-j="${j}">
+              <input type="text" class="imagen-sub-enlace" placeholder="Enlace de Google Drive de la imagen" value="${escapeAttr(img.enlace)}">
+              <textarea class="imagen-sub-descripcion" placeholder="Descripción de esta imagen (opcional)" rows="2">${escapeAttr(img.descripcion || "")}</textarea>
+              <button type="button" class="imagen-sub-quitar" title="Quitar esta imagen">✕</button>
+            </div>
+          `).join("")}
+        </div>
+        <button type="button" class="imagen-sub-agregar">+ Agregar imagen</button>
+        ` : esPuente ? `
+        <p style="font-size:0.72rem;color:var(--text-sec);margin:2px 0 6px;">Un puente corto de texto entre dos recursos — no se exporta, queda guardado aquí.</p>
+        <div class="puente-toolbar">
+          <button type="button" class="puente-btn puente-negrita" title="Negrita"><b>N</b></button>
+          <button type="button" class="puente-btn puente-cursiva" title="Cursiva"><i>C</i></button>
+          <button type="button" class="puente-btn puente-titulo" title="Tamaño de título">T+</button>
+          <button type="button" class="puente-btn puente-alinear" title="Alineación">≡</button>
+        </div>
+        <div class="puente-editor" contenteditable="true" data-placeholder="Escribe aquí el texto puente...">${r.contenido || ""}</div>
         ` : `
         <input type="text" class="recurso-enlace" placeholder="${r.tipo === 'video' && r.fuente === 'youtube' ? 'Enlace de YouTube' : 'Enlace de Google Drive'}" value="${escapeAttr(r.enlace)}">
         `}
@@ -3317,6 +3499,12 @@
       `;
       row.querySelector(".recurso-tipo").addEventListener("change", (e) => {
         recursosBuilder[i].tipo = e.target.value;
+        if (e.target.value === "imagenes" && !recursosBuilder[i].imagenesBuilder) {
+          recursosBuilder[i].imagenesBuilder = [{ enlace: "", descripcion: "" }];
+        }
+        if (e.target.value === "puente" && recursosBuilder[i].contenido === undefined) {
+          recursosBuilder[i].contenido = "";
+        }
         renderRecursosBuilder();
       });
       const fuenteSelect = row.querySelector(".recurso-fuente");
@@ -3329,8 +3517,69 @@
       row.querySelector(".recurso-etiqueta").addEventListener("input", (e) => { recursosBuilder[i].etiqueta = e.target.value; });
       const enlaceInput = row.querySelector(".recurso-enlace");
       if (enlaceInput) enlaceInput.addEventListener("input", (e) => { recursosBuilder[i].enlace = e.target.value; });
-      const enlacesMultiplesInput = row.querySelector(".recurso-enlaces-multiples");
-      if (enlacesMultiplesInput) enlacesMultiplesInput.addEventListener("input", (e) => { recursosBuilder[i].enlacesMultiples = e.target.value; });
+      row.querySelectorAll(".imagen-sub-row").forEach(subRow => {
+        const j = parseInt(subRow.dataset.j, 10);
+        subRow.querySelector(".imagen-sub-enlace").addEventListener("input", (e) => {
+          recursosBuilder[i].imagenesBuilder[j].enlace = e.target.value;
+        });
+        subRow.querySelector(".imagen-sub-descripcion").addEventListener("input", (e) => {
+          recursosBuilder[i].imagenesBuilder[j].descripcion = e.target.value;
+        });
+        subRow.querySelector(".imagen-sub-quitar").addEventListener("click", () => {
+          recursosBuilder[i].imagenesBuilder.splice(j, 1);
+          renderRecursosBuilder();
+        });
+      });
+      const agregarImagenBtn = row.querySelector(".imagen-sub-agregar");
+      if (agregarImagenBtn) {
+        agregarImagenBtn.addEventListener("click", () => {
+          recursosBuilder[i].imagenesBuilder.push({ enlace: "", descripcion: "" });
+          renderRecursosBuilder();
+        });
+      }
+      const puenteEditor = row.querySelector(".puente-editor");
+      if (puenteEditor) {
+        puenteEditor.addEventListener("input", (e) => {
+          recursosBuilder[i].contenido = e.target.innerHTML;
+        });
+        row.querySelector(".puente-negrita").addEventListener("click", () => {
+          puenteEditor.focus();
+          document.execCommand("bold");
+          recursosBuilder[i].contenido = puenteEditor.innerHTML;
+        });
+        row.querySelector(".puente-cursiva").addEventListener("click", () => {
+          puenteEditor.focus();
+          document.execCommand("italic");
+          recursosBuilder[i].contenido = puenteEditor.innerHTML;
+        });
+        row.querySelector(".puente-titulo").addEventListener("click", () => {
+          puenteEditor.focus();
+          // Alterna: si el bloque donde está el cursor ya es un título, lo
+          // vuelve a texto normal; si no, lo agranda como título.
+          let bloqueEsTitulo = false;
+          const sel = window.getSelection();
+          if (sel.rangeCount > 0) {
+            let nodo = sel.getRangeAt(0).startContainer;
+            if (nodo.nodeType !== 1) nodo = nodo.parentNode;
+            while (nodo && nodo !== puenteEditor) {
+              if (nodo.tagName === "H2") { bloqueEsTitulo = true; break; }
+              nodo = nodo.parentNode;
+            }
+          }
+          document.execCommand("formatBlock", false, bloqueEsTitulo ? "P" : "H2");
+          recursosBuilder[i].contenido = puenteEditor.innerHTML;
+        });
+        row.querySelector(".puente-alinear").addEventListener("click", () => {
+          puenteEditor.focus();
+          const CICLO_ALINEACION = ["left", "center", "right", "justify"];
+          const COMANDOS_ALINEACION = ["justifyLeft", "justifyCenter", "justifyRight", "justifyFull"];
+          const actual = getComputedStyle(puenteEditor).textAlign;
+          let idx = CICLO_ALINEACION.indexOf(actual);
+          idx = (idx + 1) % CICLO_ALINEACION.length;
+          document.execCommand(COMANDOS_ALINEACION[idx]);
+          recursosBuilder[i].contenido = puenteEditor.innerHTML;
+        });
+      }
       const imagenAudioInput = row.querySelector(".recurso-imagen-audio");
       if (imagenAudioInput) imagenAudioInput.addEventListener("input", (e) => { recursosBuilder[i].imagenAudio = e.target.value; });
       row.querySelector(".recurso-subir").addEventListener("click", () => {
@@ -3458,7 +3707,18 @@
         return {
           tipo: "imagenes",
           etiqueta: r.etiqueta,
-          enlacesMultiples: (r.imagenes || []).map(id => `https://drive.google.com/file/d/${id}/view`).join("\n")
+          imagenesBuilder: (r.imagenes || []).map(img => {
+            const id = typeof img === "string" ? img : img.id;
+            const descripcion = typeof img === "string" ? "" : (img.descripcion || "");
+            return { enlace: `https://drive.google.com/file/d/${id}/view`, descripcion };
+          })
+        };
+      }
+      if (r.tipo === "puente") {
+        return {
+          tipo: "puente",
+          etiqueta: r.etiqueta,
+          contenido: r.contenido || ""
         };
       }
       return {
@@ -3533,7 +3793,8 @@
     }
     const recursosIncompletos = recursosBuilder.some(r => {
       if (!r.etiqueta.trim()) return true;
-      if (r.tipo === "imagenes") return !(r.enlacesMultiples || "").trim();
+      if (r.tipo === "imagenes") return !(r.imagenesBuilder || []).some(img => img.enlace.trim() !== "");
+      if (r.tipo === "puente") return !(r.contenido || "").replace(/<[^>]*>/g, "").trim();
       return !r.enlace.trim();
     });
     if (recursosIncompletos) {
@@ -3549,15 +3810,20 @@
       : [];
     const recursos = recursosBuilder.map(r => {
       if (r.tipo === "imagenes") {
-        const imagenes = (r.enlacesMultiples || "")
-          .split("\n")
-          .map(linea => linea.trim())
-          .filter(linea => linea !== "")
-          .map(linea => extraerIdDrive(linea));
+        const imagenes = (r.imagenesBuilder || [])
+          .filter(img => img.enlace.trim() !== "")
+          .map(img => ({ id: extraerIdDrive(img.enlace.trim()), descripcion: (img.descripcion || "").trim() }));
         return {
           tipo: "imagenes",
           etiqueta: r.etiqueta.trim(),
           imagenes
+        };
+      }
+      if (r.tipo === "puente") {
+        return {
+          tipo: "puente",
+          etiqueta: r.etiqueta.trim(),
+          contenido: r.contenido || ""
         };
       }
       const esYoutube = r.tipo === "video" && r.fuente === "youtube";
@@ -5889,6 +6155,12 @@
       for (let nivel = 1; nivel <= n; nivel++) {
         casillas[`j${nivel}`] = { nombre: `Nivel ${nivel}`, temas: [] };
       }
+    } else if (tipo === "araneae") {
+      const izq = (niveles && niveles.izquierda) || 3;
+      const der = (niveles && niveles.derecha) || 3;
+      casillas["centro"] = { nombre: "Centro", temas: [] };
+      for (let i = 0; i < izq; i++) casillas[`izq${i}`] = { nombre: `Rama izquierda ${i + 1}`, temas: [] };
+      for (let i = 0; i < der; i++) casillas[`der${i}`] = { nombre: `Rama derecha ${i + 1}`, temas: [] };
     } else {
       const zonas = {
         cabeza: "Cabeza",
@@ -5917,6 +6189,7 @@
   inputTipoEsqueleto.addEventListener("change", () => {
     const esConNiveles = inputTipoEsqueleto.value === "piramidal" || inputTipoEsqueleto.value === "jerarquico";
     document.getElementById("nivelesPiramideWrap").style.display = esConNiveles ? "block" : "none";
+    document.getElementById("ramasAraneaeWrap").style.display = inputTipoEsqueleto.value === "araneae" ? "block" : "none";
     document.getElementById("labelNivelesEsqueleto").textContent = inputTipoEsqueleto.value === "jerarquico"
       ? "Cuántos niveles (3 a 6)"
       : "Niveles de la pirámide (3 a 6)";
@@ -5944,6 +6217,8 @@
     const nombre = document.getElementById("inputNombreEsqueleto").value.trim();
     const tipo = inputTipoEsqueleto.value;
     const niveles = parseInt(document.getElementById("inputNivelesEsqueleto").value, 10);
+    const ramasIzquierda = parseInt(document.getElementById("inputRamasIzquierdaEsqueleto").value, 10);
+    const ramasDerecha = parseInt(document.getElementById("inputRamasDerechaEsqueleto").value, 10);
     if (!nombre) {
       alert("Ponle un nombre a tu esqueleto.");
       return;
@@ -5954,7 +6229,9 @@
         nombre,
         tipo,
         niveles: (tipo === "piramidal" || tipo === "jerarquico") ? niveles : null,
-        casillas: estructuraVacia(tipo, niveles),
+        ramasIzquierda: tipo === "araneae" ? ramasIzquierda : null,
+        ramasDerecha: tipo === "araneae" ? ramasDerecha : null,
+        casillas: estructuraVacia(tipo, tipo === "araneae" ? { izquierda: ramasIzquierda, derecha: ramasDerecha } : niveles),
         fecha: serverTimestamp()
       });
       document.getElementById("inputNombreEsqueleto").value = "";
@@ -5982,7 +6259,7 @@
       item.className = "nota-guardada-item";
       item.innerHTML = `
         <div class="nota-guardada-titulo">${escapeHtml(esq.nombre)}</div>
-        <div class="nota-guardada-preview">${esq.tipo === "piramidal" ? "Piramidal" : esq.tipo === "jerarquico" ? "Jerárquico" : "Anatómico"} · ${totalTemas} tema${totalTemas === 1 ? "" : "s"}</div>
+        <div class="nota-guardada-preview">${esq.tipo === "piramidal" ? "Piramidal" : esq.tipo === "jerarquico" ? "Jerárquico" : esq.tipo === "araneae" ? "Araneae" : "Anatómico"} · ${totalTemas} tema${totalTemas === 1 ? "" : "s"}</div>
         <div class="nota-guardada-controles">
           <button class="abrir-plantilla">Abrir</button>
           <button class="renombrar">Cambiar título</button>
@@ -6034,6 +6311,11 @@
     } else if (esq.tipo === "jerarquico") {
       esqueletoSvg.setAttribute("viewBox", "0 0 260 " + (60 + (esq.niveles || 4) * 60));
       renderNodosJerarquico(esq);
+    } else if (esq.tipo === "araneae") {
+      const maxRamas = Math.max(esq.ramasIzquierda || 3, esq.ramasDerecha || 3);
+      const alto = 70 + maxRamas * 50;
+      esqueletoSvg.setAttribute("viewBox", "0 0 280 " + alto);
+      renderNodosAranea(esq, alto);
     } else {
       esqueletoSvg.setAttribute("viewBox", "0 0 280 470");
       renderNodosAnatomico(esq);
@@ -6102,6 +6384,40 @@
       if (anterior) lineaSvg(anterior.x, anterior.y, actual.x, actual.y);
       anterior = actual;
     }
+    Array.from(esqueletoSvg.querySelectorAll(".esqueleto-nodo")).forEach(n => esqueletoSvg.appendChild(n));
+  }
+
+  // Araneae: mapa conceptual sin jerarquía. Una única casilla central de color
+  // distintivo, y dos "patas" de ramas hacia los lados (como una araña), cada
+  // lado con su propio color y su propia cantidad de ramas (1 a 6, independiente).
+  function renderNodosAranea(esq, alto) {
+    const colorCentro = "#22d3c4";    // turquesa: distintivo del centro
+    const colorIzquierda = "#9b7cf6"; // violeta: todo el lado izquierdo
+    const colorDerecha = "#39ff8c";   // verde fosforescente: todo el lado derecho
+    const centroX = 140;
+    const centroY = alto / 2;
+    const espacio = 46;
+
+    function puntosLado(cantidad) {
+      const inicioY = centroY - ((cantidad - 1) * espacio) / 2;
+      const ys = [];
+      for (let i = 0; i < cantidad; i++) ys.push(inicioY + i * espacio);
+      return ys;
+    }
+
+    const izq = esq.ramasIzquierda || 3;
+    const der = esq.ramasDerecha || 3;
+    const ysIzq = puntosLado(izq);
+    const ysDer = puntosLado(der);
+
+    ysIzq.forEach(y => lineaSvg(centroX, centroY, 42, y));
+    ysDer.forEach(y => lineaSvg(centroX, centroY, 238, y));
+
+    ysIzq.forEach((y, i) => agregarNodo(42, y, 9, colorIzquierda, `izq${i}`, esq, `Rama izquierda ${i + 1}`));
+    ysDer.forEach((y, i) => agregarNodo(238, y, 9, colorDerecha, `der${i}`, esq, `Rama derecha ${i + 1}`));
+
+    agregarNodo(centroX, centroY, 15, colorCentro, "centro", esq, "Centro");
+
     Array.from(esqueletoSvg.querySelectorAll(".esqueleto-nodo")).forEach(n => esqueletoSvg.appendChild(n));
   }
 
@@ -6976,12 +7292,24 @@
       pdfFrame.style.display = "none";
       pdfFrame.src = ""; // corta cualquier audio/video que siguiera sonando de fondo
       pdfLoading.style.display = "none";
+      document.getElementById("puenteViewer").style.display = "none";
       galeriaImagenesViewer.style.display = "flex";
       document.getElementById("audioPortadaWrap").style.display = "none";
       document.querySelector(".pdf-body").classList.remove("con-portada-audio");
       imagenesActualIndex = 0;
       renderImagenGaleria(recurso.imagenes);
+    } else if (recurso.tipo === "puente") {
+      // Texto puente: página aparte, clara, sin nada que cargar de Drive.
+      pdfFrame.style.display = "none";
+      pdfFrame.src = "";
+      pdfLoading.style.display = "none";
+      galeriaImagenesViewer.style.display = "none";
+      document.getElementById("audioPortadaWrap").style.display = "none";
+      document.querySelector(".pdf-body").classList.remove("con-portada-audio");
+      document.getElementById("puenteViewer").style.display = "flex";
+      document.getElementById("puenteViewerContenido").innerHTML = recurso.contenido || "";
     } else {
+      document.getElementById("puenteViewer").style.display = "none";
       galeriaImagenesViewer.style.display = "none";
       pdfFrame.style.display = "block";
       pdfLoading.style.display = "flex";
@@ -7038,8 +7366,14 @@
   }
 
   // ---------- Visor de galería de imágenes ----------
+  // Compatibilidad: publicaciones viejas guardaron cada imagen como un simple
+  // id de Drive (string); las nuevas guardan {id, descripcion}.
+  function imagenIdDe(img) { return typeof img === "string" ? img : img.id; }
+  function descripcionDe(img) { return typeof img === "string" ? "" : (img.descripcion || ""); }
+
   function renderImagenGaleria(imagenes) {
-    galeriaImagenesImg.src = imagenDirecta(imagenes[imagenesActualIndex]);
+    const actual = imagenes[imagenesActualIndex];
+    galeriaImagenesImg.src = imagenDirecta(imagenIdDe(actual));
     galeriaImagenesDots.innerHTML = "";
     imagenes.forEach((img, i) => {
       const dot = document.createElement("span");
@@ -7048,7 +7382,25 @@
     });
     document.getElementById("imagenAnteriorBtn").disabled = imagenesActualIndex === 0;
     document.getElementById("imagenSiguienteBtn").disabled = imagenesActualIndex === imagenes.length - 1;
+
+    // El botón "Descripción" solo aparece si esta imagen tiene una escrita;
+    // la ventana emergente se cierra sola al cambiar de imagen.
+    const descripcionActual = descripcionDe(actual);
+    document.getElementById("imagenDescripcionBtn").style.display = descripcionActual ? "block" : "none";
+    document.getElementById("imagenDescripcionOverlay").style.display = "none";
+    document.getElementById("imagenDescripcionTexto").textContent = descripcionActual;
   }
+
+  document.getElementById("imagenDescripcionBtn").addEventListener("click", () => {
+    document.getElementById("imagenDescripcionOverlay").style.display = "flex";
+  });
+  document.getElementById("cerrarImagenDescripcionBtn").addEventListener("click", () => {
+    document.getElementById("imagenDescripcionOverlay").style.display = "none";
+  });
+  // Tocar fuera de la tarjeta (el fondo oscuro) también cierra la ventana.
+  document.getElementById("imagenDescripcionOverlay").addEventListener("click", (e) => {
+    if (e.target.id === "imagenDescripcionOverlay") e.currentTarget.style.display = "none";
+  });
 
   document.getElementById("imagenAnteriorBtn").addEventListener("click", () => {
     const recurso = recursosActuales[indiceActual];
