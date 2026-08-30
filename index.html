@@ -527,26 +527,27 @@
   }
 
   /* Firma de sesión: recuerda desde qué perfil se entró, visible en toda la app.
-     Abajo a la izquierda a propósito: arriba a la izquierda es donde viven los
-     botones "← Volver" de cada página, así nunca se pisan. */
+     Abajo a la izquierda, pero por ENCIMA de la insignia (niño con telescopio)
+     en altura — así nunca se superponen, sin importar el ancho del nombre. */
   #firmaSesion{
     position:fixed;
-    bottom:10px;
+    bottom:104px;
     left:10px;
     z-index:45;
     background:rgba(14,14,18,0.86);
     border:1px solid var(--border);
-    color:var(--text-sec);
-    padding:6px 12px;
+    color:var(--accent);
+    padding:5px 11px;
     border-radius:999px;
     font-size:0.66rem;
+    font-weight:700;
     font-family:'IBM Plex Mono',monospace;
     display:none;
     align-items:center;
     gap:6px;
     backdrop-filter:blur(4px);
     pointer-events:none;
-    max-width:64vw;
+    max-width:42vw;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
@@ -554,7 +555,7 @@
   #firmaSesion.visible{ display:flex; }
   #firmaSesion .firma-nombre{ color:var(--accent); font-weight:700; }
   @media (max-width:640px){
-    #firmaSesion{ font-size:0.6rem; padding:5px 10px; bottom:8px; left:8px; max-width:56vw; }
+    #firmaSesion{ font-size:0.62rem; padding:5px 10px; bottom:96px; left:8px; max-width:46vw; }
   }
 
   /* Animación de entrada tipo "flipbook": 3 cuadros que alternan */
@@ -2264,7 +2265,7 @@
 
 <img id="insigniaOrbsy" src="orbsy-insignia.png" alt="" aria-hidden="true">
 <div id="avisoToast"></div>
-<div id="firmaSesion"><span>Estás entrando desde</span><span class="firma-nombre" id="firmaSesionNombre"></span></div>
+<div id="firmaSesion"><span class="firma-nombre" id="firmaSesionNombre"></span></div>
 
 <div id="introFlipbook" aria-hidden="true">
   <img id="introFlipbookImg" src="intro-1.png" alt="">
@@ -3094,6 +3095,18 @@
       <button id="cambiarColorConexionBtn" title="Cambiar el color de esta línea" style="width:40px;height:40px;border-radius:50%;background:#1a1a22;border:1.5px solid var(--turquesa);color:var(--turquesa);font-size:1rem;cursor:pointer;">🎨</button>
     </div>
     <button id="cerrarAccionesConexionBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:6px 14px;border-radius:8px;font-size:0.74rem;cursor:pointer;">Cancelar</button>
+  </div>
+</div>
+
+<!-- POPUP: menú grande de acciones al tocar una casilla del modelo Libre (más fácil en pantallas chicas que 3 botones diminutos) -->
+<div id="casillaLibreAccionesOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9800;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;max-width:280px;width:100%;">
+    <p id="casillaLibreAccionesNombre" style="font-family:'Fraunces',serif;font-size:1rem;text-align:center;margin-bottom:14px;"></p>
+    <button id="verCasillaLibreBtn" style="width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:11px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:8px;">📖 Ver / editar contenido</button>
+    <button id="conectarCasillaLibreBtn" style="width:100%;background:transparent;border:1px solid #facc15;color:#facc15;padding:11px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:8px;">🔗 Conectar desde aquí</button>
+    <button id="nucleoCasillaLibreBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:11px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:8px;">☆ Marcar como núcleo</button>
+    <button id="eliminarCasillaLibreBtn" style="width:100%;background:transparent;border:1px solid #f87171;color:#f87171;padding:11px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:12px;">✕ Eliminar casilla</button>
+    <button id="cerrarCasillaLibreAccionesBtn" style="width:100%;background:transparent;border:none;color:var(--text-sec);padding:6px;font-size:0.76rem;cursor:pointer;">Cancelar</button>
   </div>
 </div>
 
@@ -6673,7 +6686,11 @@
     if (esNucleo) {
       g.appendChild(svgEl("circle", { class: "esqueleto-nodo-nucleo-anillo", cx: x, cy: y, r: r + 4 }));
     }
-    g.appendChild(svgEl("circle", { cx: x, cy: y, r, fill: esNucleo ? COLOR_NUCLEO_DORADO : "#22d3c4" }));
+    // Zona de toque ampliada (igual criterio que la casilla fantasma): el
+    // círculo visible es chico en el mapa denso, pero el área que responde
+    // al dedo es bastante más grande para que no haga falta acertar el pixel.
+    g.appendChild(svgEl("circle", { cx: x, cy: y, r: r + 10, fill: "transparent" }));
+    g.appendChild(svgEl("circle", { cx: x, cy: y, r, fill: esNucleo ? COLOR_NUCLEO_DORADO : "#22d3c4", "pointer-events": "none" }));
     const label = svgEl("text", { class: "esqueleto-nodo-etiqueta", x, y: y - r - 6 });
     label.textContent = casilla.nombre || "Casilla";
     g.appendChild(label);
@@ -6682,62 +6699,17 @@
       badge.textContent = `${casilla.temas.length} tema${casilla.temas.length === 1 ? "" : "s"}`;
       g.appendChild(badge);
     }
+    // Un solo toque grande en toda la casilla: si hay una conexión armada
+    // desde OTRA casilla, este toque la conecta; si no, abre un menú grande
+    // con las 4 acciones (ver, conectar, núcleo, eliminar) — más fácil de
+    // acertar en pantallas chicas que 3 botones diminutos pegados al círculo.
     g.addEventListener("click", () => {
       if (conectandoDesde && conectandoDesde !== key) {
         manejarClicConectar(key);
       } else if (!conectandoDesde) {
-        abrirCasilla(key, esq);
+        abrirAccionesCasillaLibre(key, esq);
       }
     });
-
-    // Botón eliminar (arriba a la derecha)
-    const bx1 = x + r * 0.75 + 4, by1 = y - r * 0.75 - 4;
-    const elimGrupo = svgEl("g", { class: "esqueleto-nodo-eliminar" });
-    elimGrupo.appendChild(svgEl("circle", { cx: bx1, cy: by1, r: 7, fill: "#1a1a22", stroke: "#f87171", "stroke-width": 1.2 }));
-    const cruz = svgEl("text", { class: "esqueleto-nodo-eliminar-cruz", x: bx1, y: by1 + 3, "text-anchor": "middle" });
-    cruz.textContent = "✕";
-    elimGrupo.appendChild(cruz);
-    elimGrupo.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (confirm(`¿Eliminar "${casilla.nombre || "esta casilla"}"? Se perderán sus temas y sus conexiones.`)) {
-        const casillas = { ...esqueletoActual.casillas };
-        delete casillas[key];
-        const conexiones = (esqueletoActual.conexiones || []).filter(c => c.a !== key && c.b !== key);
-        const nucleo = esqueletoActual.nucleo === key ? null : esqueletoActual.nucleo;
-        guardarCasillas(casillas).then(() => guardarConexionesYNucleo(conexiones, nucleo)).then(() => renderConstelacion(esqueletoActual));
-      }
-    });
-    g.appendChild(elimGrupo);
-
-    // Botón conectar (abajo a la derecha) — enciende/apaga el modo conectar
-    const bx2 = x + r * 0.75 + 4, by2 = y + r * 0.75 + 4;
-    const conectarGrupo = svgEl("g", { class: "esqueleto-nodo-conectar" });
-    const armado = conectandoDesde === key;
-    conectarGrupo.appendChild(svgEl("circle", { class: armado ? "esqueleto-nodo-conectar-circulo activo" : "esqueleto-nodo-conectar-circulo", cx: bx2, cy: by2, r: 7 }));
-    const iconoConectar = svgEl("text", { class: "esqueleto-nodo-conectar-icono", x: bx2, y: by2 + 2.6, "text-anchor": "middle" });
-    iconoConectar.textContent = "🔗";
-    conectarGrupo.appendChild(iconoConectar);
-    conectarGrupo.addEventListener("click", (e) => {
-      e.stopPropagation();
-      conectandoDesde = conectandoDesde === key ? null : key;
-      actualizarAvisoConectando();
-      renderConstelacion(esqueletoActual);
-    });
-    g.appendChild(conectarGrupo);
-
-    // Botón núcleo (abajo a la izquierda) — marca/desmarca esta casilla como eje
-    const bx3 = x - r * 0.75 - 4, by3 = y + r * 0.75 + 4;
-    const nucleoGrupo = svgEl("g", { class: "esqueleto-nodo-nucleo-boton" });
-    nucleoGrupo.appendChild(svgEl("circle", { cx: bx3, cy: by3, r: 7, fill: "#1a1a22", stroke: esNucleo ? COLOR_NUCLEO_DORADO : "#6b6b78", "stroke-width": 1.2 }));
-    const estrella = svgEl("text", { x: bx3, y: by3 + 3, "text-anchor": "middle", "font-size": 8, fill: esNucleo ? COLOR_NUCLEO_DORADO : "#8b8b96" });
-    estrella.textContent = esNucleo ? "★" : "☆";
-    nucleoGrupo.appendChild(estrella);
-    nucleoGrupo.addEventListener("click", (e) => {
-      e.stopPropagation();
-      alternarNucleo(key);
-    });
-    g.appendChild(nucleoGrupo);
-
     esqueletoSvg.appendChild(g);
     return { x, y };
   }
@@ -6771,6 +6743,59 @@
     if (!conexiones[indice]) return;
     conexiones[indice] = { ...conexiones[indice], color: nuevoColor };
     guardarConexionesYNucleo(conexiones, esqueletoActual.nucleo || null).then(() => renderConstelacion(esqueletoActual));
+  });
+
+  // Menú grande de acciones al tocar una casilla del modelo Libre —
+  // reemplaza los 3 botones diminutos alrededor del círculo, que en
+  // pantallas chicas eran muy difíciles de acertar con el dedo.
+  let casillaLibreSeleccionadaKey = null;
+
+  function abrirAccionesCasillaLibre(key, esq) {
+    casillaLibreSeleccionadaKey = key;
+    const casilla = esq.casillas[key] || { nombre: "Casilla" };
+    const esNucleo = esq.nucleo === key;
+    document.getElementById("casillaLibreAccionesNombre").textContent = casilla.nombre || "Casilla";
+    const btnNucleo = document.getElementById("nucleoCasillaLibreBtn");
+    btnNucleo.textContent = esNucleo ? "★ Quitar de núcleo" : "☆ Marcar como núcleo";
+    btnNucleo.style.borderColor = esNucleo ? "#facc15" : "var(--border)";
+    btnNucleo.style.color = esNucleo ? "#facc15" : "var(--text)";
+    document.getElementById("casillaLibreAccionesOverlay").style.display = "flex";
+  }
+  function cerrarAccionesCasillaLibre() {
+    casillaLibreSeleccionadaKey = null;
+    document.getElementById("casillaLibreAccionesOverlay").style.display = "none";
+  }
+  document.getElementById("cerrarCasillaLibreAccionesBtn").addEventListener("click", cerrarAccionesCasillaLibre);
+  document.getElementById("verCasillaLibreBtn").addEventListener("click", () => {
+    const key = casillaLibreSeleccionadaKey;
+    cerrarAccionesCasillaLibre();
+    if (key) abrirCasilla(key, esqueletoActual);
+  });
+  document.getElementById("conectarCasillaLibreBtn").addEventListener("click", () => {
+    const key = casillaLibreSeleccionadaKey;
+    cerrarAccionesCasillaLibre();
+    if (!key) return;
+    conectandoDesde = conectandoDesde === key ? null : key;
+    actualizarAvisoConectando();
+    renderConstelacion(esqueletoActual);
+  });
+  document.getElementById("nucleoCasillaLibreBtn").addEventListener("click", () => {
+    const key = casillaLibreSeleccionadaKey;
+    cerrarAccionesCasillaLibre();
+    if (key) alternarNucleo(key);
+  });
+  document.getElementById("eliminarCasillaLibreBtn").addEventListener("click", () => {
+    const key = casillaLibreSeleccionadaKey;
+    cerrarAccionesCasillaLibre();
+    if (!key) return;
+    const casilla = esqueletoActual.casillas[key] || {};
+    if (confirm(`¿Eliminar "${casilla.nombre || "esta casilla"}"? Se perderán sus temas y sus conexiones.`)) {
+      const casillas = { ...esqueletoActual.casillas };
+      delete casillas[key];
+      const conexiones = (esqueletoActual.conexiones || []).filter(c => c.a !== key && c.b !== key);
+      const nucleo = esqueletoActual.nucleo === key ? null : esqueletoActual.nucleo;
+      guardarCasillas(casillas).then(() => guardarConexionesYNucleo(conexiones, nucleo)).then(() => renderConstelacion(esqueletoActual));
+    }
   });
 
   function renderNodosLibre(esq) {
