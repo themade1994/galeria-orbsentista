@@ -1461,6 +1461,32 @@
     pointer-events:none;
   }
 
+  /* Modelo "Libre": botones de conectar y núcleo, y el anillo dorado del eje */
+  .esqueleto-nodo-nucleo-anillo{
+    fill:none;
+    stroke:#facc15;
+    stroke-width:2;
+    filter:drop-shadow(0 0 3px #facc15);
+    pointer-events:none;
+  }
+  .esqueleto-nodo-conectar{ cursor:pointer; }
+  .esqueleto-nodo-conectar-circulo{
+    fill:#1a1a22;
+    stroke:#8b8b96;
+    stroke-width:1.2;
+  }
+  .esqueleto-nodo-conectar-circulo.activo{
+    fill:#facc15;
+    stroke:#facc15;
+    filter:drop-shadow(0 0 4px #facc15);
+  }
+  .esqueleto-nodo-conectar-icono{
+    font-size:8px;
+    text-anchor:middle;
+    pointer-events:none;
+  }
+  .esqueleto-nodo-nucleo-boton{ cursor:pointer; }
+
   .tema-row-esqueleto{
     display:flex;
     align-items:center;
@@ -2567,6 +2593,7 @@
         <option value="jerarquico">Jerárquico (una sola casilla por nivel)</option>
         <option value="anatomico">Anatómico</option>
         <option value="araneae">Araneae (mapa conceptual, sin jerarquía)</option>
+        <option value="libre">Libre (mapa abierto, con núcleo y conexiones)</option>
       </select>
       <p style="font-size:0.72rem;color:var(--text-sec);margin:-2px 0 8px;">Empieza solo con la casilla principal. Cada nivel o rama nueva se agrega después, ya adentro, tocando el "+".</p>
       <button id="guardarNuevoEsqueletoBtn" style="width:100%;background:var(--turquesa);border:none;color:#0b0b0e;padding:10px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;">Crear esqueleto</button>
@@ -3024,8 +3051,23 @@
     <div id="esqueletoModalTitulo"></div>
     <button id="verAparienciaEsqueletoBtn" style="background:transparent;border:1px solid var(--turquesa);color:var(--turquesa);padding:8px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;">Ver apariencia</button>
   </div>
+  <div id="avisoConectandoEsqueleto" style="display:none;text-align:center;font-size:0.74rem;color:#facc15;background:rgba(250,204,21,0.08);border-bottom:1px solid rgba(250,204,21,0.3);padding:7px;">🔗 Modo conectar activo — tocá otra casilla para unirla. Tocá de nuevo el botón de enlace para apagarlo.</div>
   <div style="flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:24px 12px;">
     <svg id="esqueletoSvg" viewBox="0 0 260 340" style="width:min(90vw, 320px);height:auto;"></svg>
+  </div>
+</div>
+
+<!-- POPUP: elegir color de línea al conectar dos casillas (modelo Libre) -->
+<div id="colorLineaOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9800;align-items:center;justify-content:center;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;max-width:260px;width:90%;text-align:center;">
+    <p style="font-size:0.82rem;color:var(--text-sec);margin-bottom:14px;">Elegí el color de la línea que conecta estas casillas</p>
+    <div style="display:flex;justify-content:center;gap:12px;margin-bottom:14px;">
+      <button class="color-linea-opcion" data-color="#ffffff" style="width:34px;height:34px;border-radius:50%;background:#ffffff;border:2px solid #444;cursor:pointer;"></button>
+      <button class="color-linea-opcion" data-color="#22d3c4" style="width:34px;height:34px;border-radius:50%;background:#22d3c4;border:2px solid #444;cursor:pointer;"></button>
+      <button class="color-linea-opcion" data-color="#39ff8c" style="width:34px;height:34px;border-radius:50%;background:#39ff8c;border:2px solid #444;cursor:pointer;"></button>
+      <button class="color-linea-opcion" data-color="#9b7cf6" style="width:34px;height:34px;border-radius:50%;background:#9b7cf6;border:2px solid #444;cursor:pointer;"></button>
+    </div>
+    <button id="cancelarColorLineaBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 14px;border-radius:8px;font-size:0.76rem;cursor:pointer;">Cancelar</button>
   </div>
 </div>
 
@@ -6284,6 +6326,8 @@
       return { j1: { nombre: "Nivel 1", temas: [] } };
     } else if (tipo === "araneae") {
       return { centro: { nombre: "Centro", temas: [] } };
+    } else if (tipo === "libre") {
+      return {};
     } else {
       const casillas = {};
       const zonas = {
@@ -6341,6 +6385,8 @@
         nombre,
         tipo,
         casillas: estructuraVacia(tipo),
+        conexiones: [],
+        nucleo: null,
         fecha: serverTimestamp()
       });
       document.getElementById("inputNombreEsqueleto").value = "";
@@ -6401,6 +6447,7 @@
 
   function abrirEsqueletoModal(esq) {
     esqueletoActual = esq;
+    conectandoDesde = null;
     document.getElementById("esqueletoModalTitulo").textContent = esq.nombre;
     renderConstelacion(esq);
     esqueletoModal.style.display = "flex";
@@ -6410,6 +6457,7 @@
     esqueletoModal.style.display = "none";
     document.body.style.overflow = "";
     esqueletoActual = null;
+    conectandoDesde = null;
   });
 
   function renderConstelacion(esq) {
@@ -6428,6 +6476,9 @@
       const alto = 70 + Math.max(izq, der) * 50;
       esqueletoSvg.setAttribute("viewBox", "0 0 280 " + alto);
       renderNodosAranea(esq, alto);
+    } else if (esq.tipo === "libre") {
+      esqueletoSvg.setAttribute("viewBox", "0 0 280 400");
+      renderNodosLibre(esq);
     } else {
       esqueletoSvg.setAttribute("viewBox", "0 0 280 470");
       renderNodosAnatomico(esq);
@@ -6496,6 +6547,199 @@
 
   function lineaSvg(x1, y1, x2, y2) {
     esqueletoSvg.appendChild(svgEl("line", { x1, y1, x2, y2, stroke: "#3a3a44", "stroke-width": 1.3 }));
+  }
+
+  // ---------- Libre: mapa abierto en cuadrícula, con un núcleo/eje opcional
+  // y conexiones manuales entre casillas (activadas con un botón, no
+  // instantáneas). Si alguno de los dos extremos de una conexión es el
+  // núcleo, la línea sale automáticamente dorada; si no, se pregunta el
+  // color entre los 4 de la paleta de orbSY. ----------
+  const LIBRE_COLS = 5;
+  const LIBRE_ROWS = 7;
+  const LIBRE_MARGEN_X = 30;
+  const LIBRE_MARGEN_Y = 34;
+  const LIBRE_GAP_X = (280 - LIBRE_MARGEN_X * 2) / (LIBRE_COLS - 1);
+  const LIBRE_GAP_Y = (400 - LIBRE_MARGEN_Y * 2) / (LIBRE_ROWS - 1);
+  const COLOR_NUCLEO_DORADO = "#facc15";
+
+  function posicionLibre(key) {
+    const m = key.match(/^libre_(\d+)_(\d+)$/);
+    if (!m) return null;
+    const fila = parseInt(m[1], 10);
+    const col = parseInt(m[2], 10);
+    return { x: LIBRE_MARGEN_X + col * LIBRE_GAP_X, y: LIBRE_MARGEN_Y + fila * LIBRE_GAP_Y };
+  }
+
+  function lineaColorSvg(x1, y1, x2, y2, color) {
+    const dorado = color === COLOR_NUCLEO_DORADO;
+    esqueletoSvg.appendChild(svgEl("line", {
+      x1, y1, x2, y2, stroke: color, "stroke-width": dorado ? 2.2 : 1.6,
+      style: dorado ? `filter:drop-shadow(0 0 3px ${COLOR_NUCLEO_DORADO})` : ""
+    }));
+  }
+
+  async function guardarConexionesYNucleo(conexiones, nucleo) {
+    const anterioresConexiones = esqueletoActual.conexiones;
+    const anteriorNucleo = esqueletoActual.nucleo;
+    esqueletoActual.conexiones = conexiones;
+    esqueletoActual.nucleo = nucleo;
+    try {
+      await updateDoc(doc(db, "esqueletos", esqueletoActual.id), { conexiones, nucleo });
+    } catch (e) {
+      esqueletoActual.conexiones = anterioresConexiones;
+      esqueletoActual.nucleo = anteriorNucleo;
+      alert("No se pudo guardar el cambio: " + e.message);
+      throw e;
+    }
+  }
+
+  // Popup de 4 colores: devuelve una Promise con el color elegido, o null si se cancela.
+  function pedirColorLinea() {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById("colorLineaOverlay");
+      overlay.style.display = "flex";
+      function limpiar() {
+        overlay.style.display = "none";
+        overlay.querySelectorAll(".color-linea-opcion").forEach(b => b.replaceWith(b.cloneNode(true)));
+        document.getElementById("cancelarColorLineaBtn").replaceWith(document.getElementById("cancelarColorLineaBtn").cloneNode(true));
+      }
+      overlay.querySelectorAll(".color-linea-opcion").forEach(btn => {
+        btn.addEventListener("click", () => { limpiar(); resolve(btn.dataset.color); });
+      });
+      document.getElementById("cancelarColorLineaBtn").addEventListener("click", () => { limpiar(); resolve(null); });
+    });
+  }
+
+  let conectandoDesde = null; // key de la casilla con el modo "conectar" encendido
+
+  function actualizarAvisoConectando() {
+    document.getElementById("avisoConectandoEsqueleto").style.display = conectandoDesde ? "block" : "none";
+  }
+
+  async function manejarClicConectar(keyDestino) {
+    if (keyDestino === conectandoDesde) return;
+    const origen = conectandoDesde;
+    const esq = esqueletoActual;
+    const yaExiste = (esq.conexiones || []).some(c =>
+      (c.a === origen && c.b === keyDestino) || (c.a === keyDestino && c.b === origen));
+    if (yaExiste) return;
+    const involucraNucleo = esq.nucleo && (origen === esq.nucleo || keyDestino === esq.nucleo);
+    let color = COLOR_NUCLEO_DORADO;
+    if (!involucraNucleo) {
+      color = await pedirColorLinea();
+      if (!color) return; // cancelado
+    }
+    const conexiones = [...(esq.conexiones || []), { a: origen, b: keyDestino, color }];
+    guardarConexionesYNucleo(conexiones, esq.nucleo || null).then(() => renderConstelacion(esqueletoActual));
+  }
+
+  async function alternarNucleo(key) {
+    const esq = esqueletoActual;
+    const nuevoNucleo = esq.nucleo === key ? null : key;
+    guardarConexionesYNucleo(esq.conexiones || [], nuevoNucleo).then(() => renderConstelacion(esqueletoActual));
+  }
+
+  function agregarNodoLibreReal(x, y, r, key, esq) {
+    const casilla = esq.casillas[key] || { nombre: "Casilla", temas: [] };
+    const esNucleo = esq.nucleo === key;
+    const g = svgEl("g", { class: "esqueleto-nodo" });
+
+    if (esNucleo) {
+      g.appendChild(svgEl("circle", { class: "esqueleto-nodo-nucleo-anillo", cx: x, cy: y, r: r + 4 }));
+    }
+    g.appendChild(svgEl("circle", { cx: x, cy: y, r, fill: esNucleo ? COLOR_NUCLEO_DORADO : "#22d3c4" }));
+    const label = svgEl("text", { class: "esqueleto-nodo-etiqueta", x, y: y - r - 6 });
+    label.textContent = casilla.nombre || "Casilla";
+    g.appendChild(label);
+    if (casilla.temas && casilla.temas.length > 0) {
+      const badge = svgEl("text", { class: "esqueleto-nodo-badge", x, y: y + r + 12 });
+      badge.textContent = `${casilla.temas.length} tema${casilla.temas.length === 1 ? "" : "s"}`;
+      g.appendChild(badge);
+    }
+    g.addEventListener("click", () => {
+      if (conectandoDesde && conectandoDesde !== key) {
+        manejarClicConectar(key);
+      } else if (!conectandoDesde) {
+        abrirCasilla(key, esq);
+      }
+    });
+
+    // Botón eliminar (arriba a la derecha)
+    const bx1 = x + r * 0.75 + 4, by1 = y - r * 0.75 - 4;
+    const elimGrupo = svgEl("g", { class: "esqueleto-nodo-eliminar" });
+    elimGrupo.appendChild(svgEl("circle", { cx: bx1, cy: by1, r: 7, fill: "#1a1a22", stroke: "#f87171", "stroke-width": 1.2 }));
+    const cruz = svgEl("text", { class: "esqueleto-nodo-eliminar-cruz", x: bx1, y: by1 + 3, "text-anchor": "middle" });
+    cruz.textContent = "✕";
+    elimGrupo.appendChild(cruz);
+    elimGrupo.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (confirm(`¿Eliminar "${casilla.nombre || "esta casilla"}"? Se perderán sus temas y sus conexiones.`)) {
+        const casillas = { ...esqueletoActual.casillas };
+        delete casillas[key];
+        const conexiones = (esqueletoActual.conexiones || []).filter(c => c.a !== key && c.b !== key);
+        const nucleo = esqueletoActual.nucleo === key ? null : esqueletoActual.nucleo;
+        guardarCasillas(casillas).then(() => guardarConexionesYNucleo(conexiones, nucleo)).then(() => renderConstelacion(esqueletoActual));
+      }
+    });
+    g.appendChild(elimGrupo);
+
+    // Botón conectar (abajo a la derecha) — enciende/apaga el modo conectar
+    const bx2 = x + r * 0.75 + 4, by2 = y + r * 0.75 + 4;
+    const conectarGrupo = svgEl("g", { class: "esqueleto-nodo-conectar" });
+    const armado = conectandoDesde === key;
+    conectarGrupo.appendChild(svgEl("circle", { class: armado ? "esqueleto-nodo-conectar-circulo activo" : "esqueleto-nodo-conectar-circulo", cx: bx2, cy: by2, r: 7 }));
+    const iconoConectar = svgEl("text", { class: "esqueleto-nodo-conectar-icono", x: bx2, y: by2 + 2.6, "text-anchor": "middle" });
+    iconoConectar.textContent = "🔗";
+    conectarGrupo.appendChild(iconoConectar);
+    conectarGrupo.addEventListener("click", (e) => {
+      e.stopPropagation();
+      conectandoDesde = conectandoDesde === key ? null : key;
+      actualizarAvisoConectando();
+      renderConstelacion(esqueletoActual);
+    });
+    g.appendChild(conectarGrupo);
+
+    // Botón núcleo (abajo a la izquierda) — marca/desmarca esta casilla como eje
+    const bx3 = x - r * 0.75 - 4, by3 = y + r * 0.75 + 4;
+    const nucleoGrupo = svgEl("g", { class: "esqueleto-nodo-nucleo-boton" });
+    nucleoGrupo.appendChild(svgEl("circle", { cx: bx3, cy: by3, r: 7, fill: "#1a1a22", stroke: esNucleo ? COLOR_NUCLEO_DORADO : "#6b6b78", "stroke-width": 1.2 }));
+    const estrella = svgEl("text", { x: bx3, y: by3 + 3, "text-anchor": "middle", "font-size": 8, fill: esNucleo ? COLOR_NUCLEO_DORADO : "#8b8b96" });
+    estrella.textContent = esNucleo ? "★" : "☆";
+    nucleoGrupo.appendChild(estrella);
+    nucleoGrupo.addEventListener("click", (e) => {
+      e.stopPropagation();
+      alternarNucleo(key);
+    });
+    g.appendChild(nucleoGrupo);
+
+    esqueletoSvg.appendChild(g);
+    return { x, y };
+  }
+
+  function renderNodosLibre(esq) {
+    // Primero las líneas ya guardadas, para que queden debajo de los nodos
+    (esq.conexiones || []).forEach(con => {
+      const pa = posicionLibre(con.a);
+      const pb = posicionLibre(con.b);
+      if (pa && pb) lineaColorSvg(pa.x, pa.y, pb.x, pb.y, con.color || "#ffffff");
+    });
+
+    for (let fila = 0; fila < LIBRE_ROWS; fila++) {
+      for (let col = 0; col < LIBRE_COLS; col++) {
+        const clave = `libre_${fila}_${col}`;
+        const { x, y } = posicionLibre(clave);
+        if (esq.casillas[clave]) {
+          agregarNodoLibreReal(x, y, 9, clave, esq);
+        } else {
+          agregarNodoFantasma(x, y, 9, () => {
+            const casillas = { ...esqueletoActual.casillas };
+            casillas[clave] = { nombre: `Casilla ${fila + 1}.${col + 1}`, temas: [] };
+            guardarCasillas(casillas).then(() => renderConstelacion(esqueletoActual));
+          });
+        }
+      }
+    }
+    actualizarAvisoConectando();
   }
 
   // ---------- Piramidal: se crea solo con la punta; cada nivel se completa
