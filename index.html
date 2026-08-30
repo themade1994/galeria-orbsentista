@@ -497,6 +497,35 @@
     filter:drop-shadow(0 0 6px rgba(0,0,0,0.5));
   }
 
+  /* Firma de sesión: recuerda desde qué perfil se entró, visible en toda la app */
+  #firmaSesion{
+    position:fixed;
+    top:10px;
+    left:10px;
+    z-index:45;
+    background:rgba(14,14,18,0.86);
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:0.66rem;
+    font-family:'IBM Plex Mono',monospace;
+    display:none;
+    align-items:center;
+    gap:6px;
+    backdrop-filter:blur(4px);
+    pointer-events:none;
+    max-width:64vw;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  #firmaSesion.visible{ display:flex; }
+  #firmaSesion .firma-nombre{ color:var(--accent); font-weight:700; }
+  @media (max-width:640px){
+    #firmaSesion{ font-size:0.6rem; padding:5px 10px; top:8px; left:8px; }
+  }
+
   /* Animación de entrada tipo "flipbook": 3 cuadros que alternan */
   #introFlipbook{
     position:fixed; inset:0; z-index:9999;
@@ -1910,8 +1939,32 @@
     color:#111;
   }
   #puenteViewerContenido p{ margin:0 0 12px; }
+  #puenteViewer.tema-oscuro{ background:#0e0e12; }
+  #puenteViewer.tema-oscuro #puenteViewerContenido{ color:#f0f0f0; }
+  #puenteViewer.tema-oscuro #puenteViewerContenido h2{ color:#fff; }
 
-  /* Editor del recurso "texto" dentro del Taller (mismo criterio: claro) */
+  /* Editor del recurso "texto" dentro del Taller (mismo criterio: claro por defecto,
+     pero editable a oscuro las veces que se desee) */
+  .puente-tema-selector{
+    display:flex;
+    gap:6px;
+    margin-bottom:8px;
+  }
+  .puente-tema-btn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-sec);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:0.72rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .puente-tema-btn.activo{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#0e0e12;
+  }
   .puente-toolbar{
     display:flex;
     gap:6px;
@@ -1940,6 +1993,11 @@
     line-height:1.6;
     outline:none;
   }
+  .puente-editor.tema-oscuro{
+    background:#0e0e12;
+    color:#f0f0f0;
+    border-color:#333;
+  }
   .puente-editor h2{
     font-family:'Fraunces', serif;
     font-size:1.25rem;
@@ -1951,6 +2009,7 @@
     content: attr(data-placeholder);
     color:#999;
   }
+  .puente-editor.tema-oscuro:empty:before{ color:#777; }
 
   /* PORTADA PARA AUDIO (tipo "cover" de canción, estilo Spotify) */
   .pdf-body.con-portada-audio{
@@ -2134,6 +2193,7 @@
 </div>
 
 <img id="insigniaOrbsy" src="orbsy-insignia.png" alt="" aria-hidden="true">
+<div id="firmaSesion"><span>Estás entrando desde</span><span class="firma-nombre" id="firmaSesionNombre"></span></div>
 
 <div id="introFlipbook" aria-hidden="true">
   <img id="introFlipbookImg" src="intro-1.png" alt="">
@@ -3336,6 +3396,7 @@
   onAuthStateChanged(auth, async (user) => {
     isAdmin = !!user;
     uidActual = user ? user.uid : null;
+    actualizarFirmaSesion();
     if (isAdmin) {
       loginSection.style.display = "none";
       formSection.style.display = "block";
@@ -3378,6 +3439,22 @@
     }
     renderSolicitudes();
   });
+
+  // Firma persistente: recuerda desde qué perfil se entró, visible en toda la app
+  // (se oculta sola dentro del lector, igual que la franja de fragmentos, para
+  // no interrumpir la lectura).
+  function actualizarFirmaSesion() {
+    const firma = document.getElementById("firmaSesion");
+    if (!firma) return;
+    const miPerfilFirma = isAdmin && uidActual ? usuarios.find(u => u.id === uidActual) : null;
+    const nombreFirma = miPerfilFirma ? (miPerfilFirma.nombre || "").trim() : "";
+    if (!nombreFirma) {
+      firma.classList.remove("visible");
+      return;
+    }
+    document.getElementById("firmaSesionNombre").textContent = nombreFirma;
+    firma.classList.add("visible");
+  }
 
   // ---------- Configurar perfil (nombre, foto, color de galaxia) ----------
   document.getElementById("editarPerfilBtn").addEventListener("click", () => {
@@ -3483,13 +3560,17 @@
         <button type="button" class="imagen-sub-agregar">+ Agregar imagen</button>
         ` : esPuente ? `
         <p style="font-size:0.72rem;color:var(--text-sec);margin:2px 0 6px;">Un puente corto de texto entre dos recursos — no se exporta, queda guardado aquí.</p>
+        <div class="puente-tema-selector">
+          <button type="button" class="puente-tema-btn ${(r.tema || "claro") === "claro" ? "activo" : ""}" data-tema="claro">☀ Fondo claro</button>
+          <button type="button" class="puente-tema-btn ${r.tema === "oscuro" ? "activo" : ""}" data-tema="oscuro">🌙 Fondo oscuro</button>
+        </div>
         <div class="puente-toolbar">
           <button type="button" class="puente-btn puente-negrita" title="Negrita"><b>N</b></button>
           <button type="button" class="puente-btn puente-cursiva" title="Cursiva"><i>C</i></button>
           <button type="button" class="puente-btn puente-titulo" title="Tamaño de título">T+</button>
           <button type="button" class="puente-btn puente-alinear" title="Alineación">≡</button>
         </div>
-        <div class="puente-editor" contenteditable="true" data-placeholder="Escribe aquí el texto puente...">${r.contenido || ""}</div>
+        <div class="puente-editor ${r.tema === "oscuro" ? "tema-oscuro" : ""}" contenteditable="true" data-placeholder="Escribe aquí el texto puente...">${r.contenido || ""}</div>
         ` : `
         <input type="text" class="recurso-enlace" placeholder="${r.tipo === 'video' && r.fuente === 'youtube' ? 'Enlace de YouTube' : 'Enlace de Google Drive'}" value="${escapeAttr(r.enlace)}">
         `}
@@ -3544,6 +3625,13 @@
       }
       const puenteEditor = row.querySelector(".puente-editor");
       if (puenteEditor) {
+        row.querySelectorAll(".puente-tema-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            recursosBuilder[i].tema = btn.dataset.tema;
+            row.querySelectorAll(".puente-tema-btn").forEach(b => b.classList.toggle("activo", b.dataset.tema === btn.dataset.tema));
+            puenteEditor.classList.toggle("tema-oscuro", btn.dataset.tema === "oscuro");
+          });
+        });
         // Evita que el navegador pierda la selección/cursor de texto al hacer
         // clic en un botón de la barra (si no, el comando de formato podría
         // no aplicarse sobre lo que el usuario tenía seleccionado).
@@ -3726,7 +3814,8 @@
         return {
           tipo: "puente",
           etiqueta: r.etiqueta,
-          contenido: r.contenido || ""
+          contenido: r.contenido || "",
+          tema: r.tema === "oscuro" ? "oscuro" : "claro"
         };
       }
       return {
@@ -3831,7 +3920,8 @@
         return {
           tipo: "puente",
           etiqueta: r.etiqueta.trim(),
-          contenido: r.contenido || ""
+          contenido: r.contenido || "",
+          tema: r.tema === "oscuro" ? "oscuro" : "claro"
         };
       }
       const esYoutube = r.tipo === "video" && r.fuente === "youtube";
@@ -4398,6 +4488,7 @@
     errorMsgPerfiles.style.display = "none";
     renderPerfiles();
     renderSolicitudes();
+    actualizarFirmaSesion();
     if (typeof aplicarModoCuenta === "function") aplicarModoCuenta();
   }, (error) => {
     loadingMsgPerfiles.style.display = "none";
@@ -7409,6 +7500,7 @@
       document.getElementById("audioPortadaWrap").style.display = "none";
       document.querySelector(".pdf-body").classList.remove("con-portada-audio");
       document.getElementById("puenteViewer").style.display = "flex";
+      document.getElementById("puenteViewer").classList.toggle("tema-oscuro", recurso.tema === "oscuro");
       document.getElementById("puenteViewerContenido").innerHTML = recurso.contenido || "";
     } else {
       document.getElementById("puenteViewer").style.display = "none";
