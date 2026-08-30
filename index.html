@@ -526,10 +526,12 @@
     transform:translateX(-50%) translateY(0);
   }
 
-  /* Firma de sesión: recuerda desde qué perfil se entró, visible en toda la app */
+  /* Firma de sesión: recuerda desde qué perfil se entró, visible en toda la app.
+     Abajo a la izquierda a propósito: arriba a la izquierda es donde viven los
+     botones "← Volver" de cada página, así nunca se pisan. */
   #firmaSesion{
     position:fixed;
-    top:10px;
+    bottom:10px;
     left:10px;
     z-index:45;
     background:rgba(14,14,18,0.86);
@@ -552,7 +554,7 @@
   #firmaSesion.visible{ display:flex; }
   #firmaSesion .firma-nombre{ color:var(--accent); font-weight:700; }
   @media (max-width:640px){
-    #firmaSesion{ font-size:0.6rem; padding:5px 10px; top:8px; left:8px; }
+    #firmaSesion{ font-size:0.6rem; padding:5px 10px; bottom:8px; left:8px; max-width:56vw; }
   }
 
   /* Animación de entrada tipo "flipbook": 3 cuadros que alternan */
