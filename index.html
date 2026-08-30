@@ -2475,18 +2475,18 @@
         <div style="font-size:0.72rem;color:var(--text-sec);">Organiza tus ideas antes de publicar</div>
       </div>
     </div>
-    <div class="herramienta-item" style="opacity:0.45;cursor:default;">
-      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">☕</div>
+    <div class="herramienta-item" id="abrirCafeAbiertoBtn">
+      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">☕</div>
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Café Abierto</div>
-        <div style="font-size:0.72rem;color:var(--text-sec);">Próximamente</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Se abre en una pestaña nueva</div>
       </div>
     </div>
-    <div class="herramienta-item" style="opacity:0.45;cursor:default;">
-      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">🃏</div>
+    <div class="herramienta-item" id="abrirPokerCafeBtn">
+      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🃏</div>
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Póker Café</div>
-        <div style="font-size:0.72rem;color:var(--text-sec);">Próximamente</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Se abre en una pestaña nueva</div>
       </div>
     </div>
   </div>
@@ -6402,6 +6402,17 @@
   document.getElementById("volverAHerramientasDesdeEsqueletosBtn").addEventListener("click", () => {
     esqueletosVista.style.display = "none";
     herramientasMenu.style.display = "block";
+  });
+
+  // Café Abierto y Póker Café son apps propias, aparte del código de orbSY
+  // (proyectos y bases de datos separados) — se abren en una pestaña nueva.
+  document.getElementById("abrirCafeAbiertoBtn").addEventListener("click", () => {
+    document.getElementById("cerrarHerramientasBtn").click();
+    window.open("https://themade1994.github.io/caf%C3%A9-abierto/", "_blank");
+  });
+  document.getElementById("abrirPokerCafeBtn").addEventListener("click", () => {
+    document.getElementById("cerrarHerramientasBtn").click();
+    window.open("https://themade1994.github.io/poker-cafe/", "_blank");
   });
   document.getElementById("crearEsqueletoBtn").addEventListener("click", () => {
     if (!uidActual) {
