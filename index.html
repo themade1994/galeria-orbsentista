@@ -3539,6 +3539,12 @@
       }
       const puenteEditor = row.querySelector(".puente-editor");
       if (puenteEditor) {
+        // Evita que el navegador pierda la selección/cursor de texto al hacer
+        // clic en un botón de la barra (si no, el comando de formato podría
+        // no aplicarse sobre lo que el usuario tenía seleccionado).
+        row.querySelectorAll(".puente-btn").forEach(btn => {
+          btn.addEventListener("mousedown", (e) => e.preventDefault());
+        });
         puenteEditor.addEventListener("input", (e) => {
           recursosBuilder[i].contenido = e.target.innerHTML;
         });
@@ -3571,12 +3577,10 @@
         });
         row.querySelector(".puente-alinear").addEventListener("click", () => {
           puenteEditor.focus();
-          const CICLO_ALINEACION = ["left", "center", "right", "justify"];
           const COMANDOS_ALINEACION = ["justifyLeft", "justifyCenter", "justifyRight", "justifyFull"];
-          const actual = getComputedStyle(puenteEditor).textAlign;
-          let idx = CICLO_ALINEACION.indexOf(actual);
-          idx = (idx + 1) % CICLO_ALINEACION.length;
-          document.execCommand(COMANDOS_ALINEACION[idx]);
+          if (typeof recursosBuilder[i].alineacionIndice !== "number") recursosBuilder[i].alineacionIndice = 0;
+          recursosBuilder[i].alineacionIndice = (recursosBuilder[i].alineacionIndice + 1) % COMANDOS_ALINEACION.length;
+          document.execCommand(COMANDOS_ALINEACION[recursosBuilder[i].alineacionIndice]);
           recursosBuilder[i].contenido = puenteEditor.innerHTML;
         });
       }
@@ -5665,6 +5669,12 @@
 
   // ---------- Barra vertical: herramientas de formato ----------
   function enfocarHoja() { notasHoja.focus(); }
+
+  // Igual que en el editor de texto puente: evita perder la selección al
+  // hacer clic en los botones de la barra vertical de formato.
+  document.querySelectorAll(".notas-barra button").forEach(btn => {
+    btn.addEventListener("mousedown", (e) => e.preventDefault());
+  });
 
   document.getElementById("notaBtnNegrita").addEventListener("click", () => {
     enfocarHoja(); document.execCommand("bold"); guardarNotaActual();
