@@ -497,6 +497,35 @@
     filter:drop-shadow(0 0 6px rgba(0,0,0,0.5));
   }
 
+  /* Aviso fugaz (toast): confirma con texto que la acción sí ocurrió */
+  #avisoToast{
+    position:fixed;
+    left:50%;
+    bottom:clamp(80px, 16vh, 120px);
+    transform:translateX(-50%) translateY(12px);
+    background:#15151a;
+    border:1px solid var(--color-aviso, var(--verde));
+    color:var(--text);
+    padding:10px 20px;
+    border-radius:999px;
+    font-size:0.82rem;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    box-shadow:0 0 20px -4px var(--color-aviso, var(--verde));
+    z-index:10001;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .22s ease, transform .22s ease;
+    white-space:nowrap;
+    max-width:88vw;
+  }
+  #avisoToast.visible{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
   /* Firma de sesión: recuerda desde qué perfil se entró, visible en toda la app */
   #firmaSesion{
     position:fixed;
@@ -1421,12 +1450,13 @@
     text-anchor:middle;
     pointer-events:none;
   }
-  .esqueleto-nodo-fantasma{ cursor:pointer; opacity:0.55; }
-  .esqueleto-nodo-fantasma:active{ opacity:0.85; }
+  .esqueleto-nodo-fantasma{ cursor:pointer; pointer-events:all; }
+  .esqueleto-nodo-fantasma-circulo{ opacity:0.5; }
+  .esqueleto-nodo-fantasma:active .esqueleto-nodo-fantasma-circulo{ opacity:0.85; }
   .esqueleto-nodo-fantasma-cruz{
     font-family:'Space Grotesk', sans-serif;
     font-weight:700;
-    fill:#5a5a66;
+    fill:#ffffff;
     text-anchor:middle;
     pointer-events:none;
   }
@@ -1681,9 +1711,9 @@
   #marcarComprendidoBtn, #marcarCongelarBtn, #marcarRevisadoBtn{
     transition:background-color .15s ease, color .15s ease, border-color .15s ease, transform .12s ease;
   }
-  #marcarComprendidoBtn{ background:rgba(57,255,140,0.10); }
-  #marcarCongelarBtn{ background:rgba(155,124,246,0.10); }
-  #marcarRevisadoBtn{ background:rgba(34,211,196,0.08); }
+  #marcarComprendidoBtn{ background:rgba(57,255,140,0.10); border:1px solid var(--verde); color:var(--verde); }
+  #marcarCongelarBtn{ background:rgba(155,124,246,0.10); border:1px solid var(--violeta); color:var(--violeta); }
+  #marcarRevisadoBtn{ background:rgba(34,211,196,0.08); border:1px solid var(--border); color:var(--text-sec); }
   #marcarComprendidoBtn.activo{ background:var(--verde); color:#0e0e12; box-shadow:0 0 14px -3px var(--verde); }
   #marcarCongelarBtn.activo{ background:var(--violeta); color:#0e0e12; box-shadow:0 0 14px -3px var(--violeta); }
   #marcarRevisadoBtn.activo{ background:var(--accent); border-color:var(--accent); color:#0e0e12; box-shadow:0 0 14px -3px var(--accent); }
@@ -2193,6 +2223,7 @@
 </div>
 
 <img id="insigniaOrbsy" src="orbsy-insignia.png" alt="" aria-hidden="true">
+<div id="avisoToast"></div>
 <div id="firmaSesion"><span>Estás entrando desde</span><span class="firma-nombre" id="firmaSesionNombre"></span></div>
 
 <div id="introFlipbook" aria-hidden="true">
@@ -3043,9 +3074,9 @@
   </div>
   <div id="firmaLectorBar" style="text-align:center;font-style:italic;font-size:0.72rem;color:var(--text-sec);padding:3px 10px;border-bottom:1px solid var(--border);"></div>
   <div id="progresoLectorBar" style="display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);align-items:center;flex-wrap:wrap;">
-    <button type="button" id="marcarComprendidoBtn" style="flex:1;min-width:110px;background:transparent;border:1px solid var(--verde);color:var(--verde);padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">✓ Comprendido</button>
-    <button type="button" id="marcarCongelarBtn" style="flex:1;min-width:110px;background:transparent;border:1px solid var(--violeta);color:var(--violeta);padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">❄ Congelar</button>
-    <button type="button" id="marcarRevisadoBtn" style="flex:0 0 100%;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">✓ Marcar publicación completa como revisada</button>
+    <button type="button" id="marcarComprendidoBtn" style="flex:1;min-width:110px;padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">✓ Comprendido</button>
+    <button type="button" id="marcarCongelarBtn" style="flex:1;min-width:110px;padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">❄ Congelar</button>
+    <button type="button" id="marcarRevisadoBtn" style="flex:0 0 100%;padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">✓ Marcar publicación completa como revisada</button>
   </div>
   <div id="navBar">
     <button id="anteriorBtn">← Anterior</button>
@@ -6445,10 +6476,13 @@
     return { x, y };
   }
 
-  // Casilla fantasma: opaca, con una cruz para crear la siguiente casilla real ahí mismo.
+  // Casilla fantasma: opaca, con una cruz blanca (bien visible) para crear
+  // la siguiente casilla real ahí mismo. El relleno "fill" no puede ser
+  // "none": en SVG eso deja SOLO el trazo punteado como zona clickeable
+  // (por eso antes no reaccionaba al tocar el "+" en el centro).
   function agregarNodoFantasma(x, y, r, alCrear) {
     const g = svgEl("g", { class: "esqueleto-nodo-fantasma" });
-    g.appendChild(svgEl("circle", { cx: x, cy: y, r, fill: "none", stroke: "#4a4a56", "stroke-width": 1.4, "stroke-dasharray": "3,3" }));
+    g.appendChild(svgEl("circle", { class: "esqueleto-nodo-fantasma-circulo", cx: x, cy: y, r, fill: "#1a1a22", stroke: "#4a4a56", "stroke-width": 1.4, "stroke-dasharray": "3,3" }));
     const cruz = svgEl("text", { class: "esqueleto-nodo-fantasma-cruz", x, y: y + 4, "text-anchor": "middle", "font-size": Math.max(10, r) });
     cruz.textContent = "+";
     g.appendChild(cruz);
@@ -6876,19 +6910,42 @@
     setTimeout(() => btn.classList.remove("pulso"), 220);
   }
 
+  // Aviso fugaz: confirma con texto + color que la acción sí ocurrió,
+  // más allá del cambio de color del botón.
+  function mostrarAvisoToast(mensaje, color) {
+    const toast = document.getElementById("avisoToast");
+    if (!toast) return;
+    toast.textContent = mensaje;
+    toast.style.setProperty("--color-aviso", color || "var(--verde)");
+    toast.classList.remove("visible");
+    void toast.offsetWidth;
+    toast.classList.add("visible");
+    clearTimeout(toast._ocultarTimeout);
+    toast._ocultarTimeout = setTimeout(() => toast.classList.remove("visible"), 1800);
+  }
+
   document.getElementById("marcarComprendidoBtn").addEventListener("click", (e) => {
     if (!libroIdActual) return;
     pulsarBoton(e.currentTarget);
+    const p = progresoDeLibro(libroIdActual);
+    const yaEstaba = !!(p && p.estados && p.estados[indiceActual] === "comprendido");
+    mostrarAvisoToast(yaEstaba ? "Comprendido retirado" : "✓ Marcado como comprendido", "#39ff8c");
     marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "comprendido");
   });
   document.getElementById("marcarCongelarBtn").addEventListener("click", (e) => {
     if (!libroIdActual) return;
     pulsarBoton(e.currentTarget);
+    const p = progresoDeLibro(libroIdActual);
+    const yaEstaba = !!(p && p.estados && p.estados[indiceActual] === "congelado");
+    mostrarAvisoToast(yaEstaba ? "Congelado retirado" : "❄ Contenido congelado", "#9b7cf6");
     marcarEstadoRecurso(libroIdActual, tituloPublicacionActual, indiceActual, "congelado");
   });
   document.getElementById("marcarRevisadoBtn").addEventListener("click", (e) => {
     if (!libroIdActual || e.currentTarget.disabled) return;
     pulsarBoton(e.currentTarget);
+    const p = progresoDeLibro(libroIdActual);
+    const yaEstaba = !!(p && p.revisado);
+    mostrarAvisoToast(yaEstaba ? "Ya no está marcada como revisada" : "✓ Publicación marcada como revisada", "#22d3c4");
     alternarPublicacionRevisada(libroIdActual, tituloPublicacionActual);
   });
 
