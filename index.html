@@ -3444,6 +3444,28 @@
   let recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
   const recursosBuilderContainer = document.getElementById("recursosBuilderContainer");
 
+  // Alinea el bloque de texto donde está el cursor dentro de un editor
+  // contenteditable, aplicando el estilo directamente (no depende de
+  // document.execCommand, que ya no es fiable en todos los navegadores).
+  function alinearBloqueActual(editorEl, alineacion) {
+    editorEl.focus();
+    const sel = window.getSelection();
+    let nodo = null;
+    if (sel && sel.rangeCount > 0 && editorEl.contains(sel.anchorNode)) {
+      nodo = sel.getRangeAt(0).startContainer;
+    }
+    if (nodo && nodo.nodeType !== 1) nodo = nodo.parentNode;
+    let bloque = nodo;
+    while (bloque && bloque !== editorEl && !["DIV", "P", "H1", "H2", "H3", "LI"].includes(bloque.tagName)) {
+      bloque = bloque.parentNode;
+    }
+    if (!bloque || bloque === editorEl || !editorEl.contains(bloque)) {
+      editorEl.style.textAlign = alineacion;
+    } else {
+      bloque.style.textAlign = alineacion;
+    }
+  }
+
   function renderRecursosBuilder() {
     recursosBuilderContainer.innerHTML = "";
     recursosBuilder.forEach((r, i) => {
@@ -3576,11 +3598,10 @@
           recursosBuilder[i].contenido = puenteEditor.innerHTML;
         });
         row.querySelector(".puente-alinear").addEventListener("click", () => {
-          puenteEditor.focus();
-          const COMANDOS_ALINEACION = ["justifyLeft", "justifyCenter", "justifyRight", "justifyFull"];
+          const CICLO_ALINEACION = ["left", "center", "right", "justify"];
           if (typeof recursosBuilder[i].alineacionIndice !== "number") recursosBuilder[i].alineacionIndice = 0;
-          recursosBuilder[i].alineacionIndice = (recursosBuilder[i].alineacionIndice + 1) % COMANDOS_ALINEACION.length;
-          document.execCommand(COMANDOS_ALINEACION[recursosBuilder[i].alineacionIndice]);
+          recursosBuilder[i].alineacionIndice = (recursosBuilder[i].alineacionIndice + 1) % CICLO_ALINEACION.length;
+          alinearBloqueActual(puenteEditor, CICLO_ALINEACION[recursosBuilder[i].alineacionIndice]);
           recursosBuilder[i].contenido = puenteEditor.innerHTML;
         });
       }
@@ -5689,12 +5710,11 @@
     enfocarHoja(); document.execCommand("formatBlock", false, "P"); guardarNotaActual();
   });
 
-  const ALINEACIONES = ["justifyLeft", "justifyCenter", "justifyRight", "justifyFull"];
+  const ALINEACIONES = ["left", "center", "right", "justify"];
   let alineacionIndice = 0;
   document.getElementById("notaBtnAlinear").addEventListener("click", () => {
-    enfocarHoja();
     alineacionIndice = (alineacionIndice + 1) % ALINEACIONES.length;
-    document.execCommand(ALINEACIONES[alineacionIndice]);
+    alinearBloqueActual(notasHoja, ALINEACIONES[alineacionIndice]);
     guardarNotaActual();
   });
 
