@@ -1487,6 +1487,18 @@
   }
   .esqueleto-nodo-nucleo-boton{ cursor:pointer; }
 
+  /* Marcador en el punto medio de cada línea conectora (Libre): visible pero
+     no deforma la línea recta; al tocarlo abre eliminar/cambiar color. */
+  .esqueleto-conexion-marcador{ cursor:pointer; }
+  .esqueleto-conexion-marcador-circulo{
+    fill:#0e0e12;
+    stroke:#ffffff;
+    stroke-width:1.3;
+  }
+  .esqueleto-conexion-marcador:active .esqueleto-conexion-marcador-circulo{
+    stroke:var(--turquesa);
+  }
+
   .tema-row-esqueleto{
     display:flex;
     align-items:center;
@@ -3068,6 +3080,18 @@
       <button class="color-linea-opcion" data-color="#9b7cf6" style="width:34px;height:34px;border-radius:50%;background:#9b7cf6;border:2px solid #444;cursor:pointer;"></button>
     </div>
     <button id="cancelarColorLineaBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 14px;border-radius:8px;font-size:0.76rem;cursor:pointer;">Cancelar</button>
+  </div>
+</div>
+
+<!-- POPUP: mini ventana negra sobre una línea conectora concreta (eliminar / cambiar color) -->
+<div id="conexionAccionesOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9800;align-items:center;justify-content:center;">
+  <div style="background:#000;border:1px solid var(--border);border-radius:16px;padding:18px 22px;text-align:center;">
+    <p style="font-size:0.72rem;color:var(--text-sec);margin-bottom:12px;">Línea conectora</p>
+    <div style="display:flex;justify-content:center;gap:16px;margin-bottom:12px;">
+      <button id="eliminarConexionBtn" title="Eliminar solo esta línea" style="width:40px;height:40px;border-radius:50%;background:#1a1a22;border:1.5px solid #f87171;color:#f87171;font-size:1rem;cursor:pointer;">✕</button>
+      <button id="cambiarColorConexionBtn" title="Cambiar el color de esta línea" style="width:40px;height:40px;border-radius:50%;background:#1a1a22;border:1.5px solid var(--turquesa);color:var(--turquesa);font-size:1rem;cursor:pointer;">🎨</button>
+    </div>
+    <button id="cerrarAccionesConexionBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:6px 14px;border-radius:8px;font-size:0.74rem;cursor:pointer;">Cancelar</button>
   </div>
 </div>
 
@@ -6716,12 +6740,57 @@
     return { x, y };
   }
 
+  let conexionSeleccionadaIndice = null;
+
+  function abrirAccionesConexion(indice, esConexionDeNucleo) {
+    conexionSeleccionadaIndice = indice;
+    document.getElementById("cambiarColorConexionBtn").style.display = esConexionDeNucleo ? "none" : "flex";
+    document.getElementById("conexionAccionesOverlay").style.display = "flex";
+  }
+  function cerrarAccionesConexion() {
+    conexionSeleccionadaIndice = null;
+    document.getElementById("conexionAccionesOverlay").style.display = "none";
+  }
+  document.getElementById("cerrarAccionesConexionBtn").addEventListener("click", cerrarAccionesConexion);
+  document.getElementById("eliminarConexionBtn").addEventListener("click", () => {
+    if (conexionSeleccionadaIndice === null) return;
+    const indice = conexionSeleccionadaIndice;
+    cerrarAccionesConexion();
+    const conexiones = (esqueletoActual.conexiones || []).filter((_, i) => i !== indice);
+    guardarConexionesYNucleo(conexiones, esqueletoActual.nucleo || null).then(() => renderConstelacion(esqueletoActual));
+  });
+  document.getElementById("cambiarColorConexionBtn").addEventListener("click", async () => {
+    if (conexionSeleccionadaIndice === null) return;
+    const indice = conexionSeleccionadaIndice;
+    cerrarAccionesConexion();
+    const nuevoColor = await pedirColorLinea();
+    if (!nuevoColor) return;
+    const conexiones = [...(esqueletoActual.conexiones || [])];
+    if (!conexiones[indice]) return;
+    conexiones[indice] = { ...conexiones[indice], color: nuevoColor };
+    guardarConexionesYNucleo(conexiones, esqueletoActual.nucleo || null).then(() => renderConstelacion(esqueletoActual));
+  });
+
   function renderNodosLibre(esq) {
-    // Primero las líneas ya guardadas, para que queden debajo de los nodos
-    (esq.conexiones || []).forEach(con => {
+    // Primero las líneas ya guardadas (debajo de los nodos), cada una con
+    // un marcador chico en su punto medio para eliminarla o cambiarle el
+    // color SIN tocar las demás líneas de esa misma casilla.
+    (esq.conexiones || []).forEach((con, indice) => {
       const pa = posicionLibre(con.a);
       const pb = posicionLibre(con.b);
-      if (pa && pb) lineaColorSvg(pa.x, pa.y, pb.x, pb.y, con.color || "#ffffff");
+      if (!pa || !pb) return;
+      lineaColorSvg(pa.x, pa.y, pb.x, pb.y, con.color || "#ffffff");
+      const mx = (pa.x + pb.x) / 2;
+      const my = (pa.y + pb.y) / 2;
+      const esConexionDeNucleo = !!(esq.nucleo && (con.a === esq.nucleo || con.b === esq.nucleo));
+      const marcador = svgEl("g", { class: "esqueleto-conexion-marcador" });
+      marcador.appendChild(svgEl("circle", { cx: mx, cy: my, r: 8, fill: "transparent" }));
+      marcador.appendChild(svgEl("circle", { class: "esqueleto-conexion-marcador-circulo", cx: mx, cy: my, r: 4.2 }));
+      marcador.addEventListener("click", (e) => {
+        e.stopPropagation();
+        abrirAccionesConexion(indice, esConexionDeNucleo);
+      });
+      esqueletoSvg.appendChild(marcador);
     });
 
     for (let fila = 0; fila < LIBRE_ROWS; fila++) {
