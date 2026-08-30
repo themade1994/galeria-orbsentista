@@ -6672,8 +6672,17 @@
   });
 
   async function guardarCasillas(casillas) {
+    const anteriores = esqueletoActual.casillas;
     esqueletoActual.casillas = casillas;
-    await updateDoc(doc(db, "esqueletos", esqueletoActual.id), { casillas });
+    try {
+      await updateDoc(doc(db, "esqueletos", esqueletoActual.id), { casillas });
+    } catch (e) {
+      // Revierte el cambio local si el guardado falló, y avisa en vez de
+      // quedar en silencio (antes esto fallaba sin que se notara nada).
+      esqueletoActual.casillas = anteriores;
+      alert("No se pudo guardar el cambio en el esqueleto: " + e.message);
+      throw e;
+    }
   }
 
   function renderTemasCasilla(esq, key) {
