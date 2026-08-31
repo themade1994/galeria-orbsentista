@@ -2482,11 +2482,11 @@
         <div style="font-size:0.72rem;color:var(--text-sec);">Abre en una pestaña nueva</div>
       </div>
     </div>
-    <div class="herramienta-item" style="opacity:0.45;cursor:default;">
+    <div class="herramienta-item" id="abrirPokerCafeBtn">
       <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">🃏</div>
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Póker Café</div>
-        <div style="font-size:0.72rem;color:var(--text-sec);">Próximamente</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Abre en una pestaña nueva</div>
       </div>
     </div>
   </div>
@@ -6405,6 +6405,9 @@
   });
   document.getElementById("abrirCafeAbiertoBtn").addEventListener("click", () => {
     window.open("https://themade1994.github.io/cafe-abierto/", "_blank");
+  });
+  document.getElementById("abrirPokerCafeBtn").addEventListener("click", () => {
+    window.open("https://themade1994.github.io/poker-cafe/", "_blank");
   });
   document.getElementById("crearEsqueletoBtn").addEventListener("click", () => {
     if (!uidActual) {
