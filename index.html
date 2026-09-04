@@ -1738,6 +1738,232 @@
     font-style:italic;
   }
 
+  /* ================= ORBSYS: baraja, ficha flotante y detalle ================= */
+  .orbsys-deck-wrap{
+    position:static;
+    background:
+      radial-gradient(ellipse at 88% 10%, rgba(57,255,140,0.10), transparent 55%),
+      var(--card);
+    border-bottom:1px solid var(--border);
+    padding:12px clamp(10px,3vw,24px) 22px;
+    margin-bottom:20px;
+  }
+  .orbsys-deck-wrap.oculta{ display:none; }
+  .orbsys-deck{
+    position:relative;
+    width:100%;
+    max-width:480px;
+    aspect-ratio:4/5;
+    margin:0 auto;
+  }
+  .orbsys-carta{
+    position:absolute;
+    inset:0;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    background:#0c0c10;
+    cursor:pointer;
+    transform:translate(calc(var(--offset,0) * 8px), calc(var(--offset,0) * -8px)) rotate(calc(var(--offset,0) * 2deg));
+    transition:transform .25s ease;
+    box-shadow:0 10px 30px -12px rgba(0,0,0,0.6);
+  }
+  .orbsys-carta-img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .orbsys-carta-degradado{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:45%;
+    background:linear-gradient(to top, rgba(0,0,0,0.88), transparent);
+    pointer-events:none;
+  }
+  .orbsys-carta-titulo{
+    position:absolute;
+    left:16px; right:16px; bottom:16px;
+    color:#fff;
+    font-family:'Fraunces', serif;
+    font-size:1.15rem;
+    font-weight:600;
+    line-height:1.3;
+    text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  }
+  .orbsys-carta-sin-imagen{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+    background:var(--color-carta, var(--turquesa));
+    background-image:radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.22), transparent 60%);
+  }
+  .orbsys-carta-titulo-grande{
+    color:#fff;
+    font-family:'Fraunces', serif;
+    font-size:1.4rem;
+    font-weight:600;
+    line-height:1.35;
+    text-align:center;
+  }
+  .orbsys-deck-botones{
+    display:flex;
+    justify-content:space-between;
+    max-width:480px;
+    margin:14px auto 0;
+    gap:10px;
+  }
+  .orbsys-btn-abrir, .orbsys-btn-siguiente{
+    flex:1;
+    padding:11px 10px;
+    border-radius:10px;
+    font-size:0.82rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .orbsys-btn-abrir{
+    background:var(--turquesa);
+    border:none;
+    color:#0b0b0e;
+  }
+  .orbsys-btn-siguiente{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text);
+  }
+  .orbsys-btn-abrir:disabled, .orbsys-btn-siguiente:disabled{
+    opacity:0.4;
+    cursor:default;
+  }
+
+  #orbsyFabBtn{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    width:54px;
+    height:54px;
+    border-radius:50%;
+    background:var(--turquesa);
+    color:#0b0b0e;
+    border:none;
+    font-size:1.8rem;
+    line-height:1;
+    font-weight:400;
+    cursor:pointer;
+    z-index:550;
+    box-shadow:0 6px 18px -4px rgba(0,0,0,0.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  #orbsyFabBtn:active{ transform:scale(0.94); }
+
+  .orbsy-detalle-img{
+    width:100%;
+    max-width:520px;
+    display:block;
+    margin:0 auto;
+    aspect-ratio:4/5;
+    object-fit:cover;
+  }
+  .orbsy-detalle-cuerpo{
+    max-width:520px;
+    margin:0 auto;
+    padding:16px 18px 40px;
+  }
+  .orbsy-detalle-tiempo{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.7rem;
+    color:var(--text-sec);
+    margin-bottom:8px;
+  }
+  .orbsy-detalle-titulo{
+    font-family:'Fraunces', serif;
+    font-size:1.5rem;
+    margin-bottom:10px;
+  }
+  .orbsy-detalle-descripcion{
+    font-size:0.92rem;
+    line-height:1.65;
+    color:var(--text);
+    white-space:pre-wrap;
+  }
+  .orbsy-eliminar-btn{
+    margin-top:14px;
+    background:transparent;
+    border:1px solid #f87171;
+    color:#f87171;
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:0.78rem;
+    cursor:pointer;
+  }
+  .orbsy-detalle-separador{
+    border-top:1px solid var(--border);
+    margin:22px 0 16px;
+  }
+  .orbsy-comentario-fila{
+    background:var(--superficie);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    position:relative;
+  }
+  .orbsy-comentario-autor{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.68rem;
+    color:var(--accent);
+    margin-bottom:3px;
+  }
+  .orbsy-comentario-texto{
+    font-size:0.85rem;
+    line-height:1.5;
+    padding-right:20px;
+  }
+  .orbsy-comentario-eliminar{
+    position:absolute;
+    top:8px;
+    right:8px;
+    background:none;
+    border:none;
+    color:var(--text-sec);
+    font-size:0.8rem;
+    cursor:pointer;
+  }
+  .orbsy-comentario-form{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+    align-items:flex-end;
+  }
+  .orbsy-comentario-form textarea{
+    flex:1;
+    min-height:44px;
+    max-height:120px;
+    padding:9px 10px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#0e0e13;
+    color:var(--text);
+    font-size:0.85rem;
+    resize:vertical;
+  }
+  .orbsy-comentario-form button{
+    background:var(--turquesa);
+    border:none;
+    color:#0b0b0e;
+    padding:10px 14px;
+    border-radius:8px;
+    font-weight:600;
+    font-size:0.8rem;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .orbsy-comentario-form button:disabled{ opacity:0.4; cursor:default; }
+
   /* BARRA DE NAVEGACIÓN DENTRO DEL LECTOR (Anterior / Siguiente) */
   #navBar{
     display:none;
@@ -2148,6 +2374,17 @@
     flex-shrink:0;
   }
   #backBtn:active{ background:var(--accent-hover); }
+  #cerrarOrbsyDetalleBtn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:9px 14px;
+    border-radius:8px;
+    font-size:0.85rem;
+    font-weight:600;
+    cursor:pointer;
+    flex-shrink:0;
+  }
   #modalTitle{
     font-size:0.95rem;
     font-weight:600;
@@ -2909,6 +3146,49 @@
     <div id="franjaFragmentos" class="franja-fragmentos"></div>
   </div>
 
+  <div id="orbsysDeckWrap" class="orbsys-deck-wrap oculta">
+    <div class="franja-fragmentos-header">
+      <span class="franja-fragmentos-titulo">◆ Orbsys</span>
+      <span style="font-size:0.68rem;color:var(--text-sec);">Observaciones de hoy · se borran en 24h</span>
+    </div>
+    <div id="orbsysDeck" class="orbsys-deck"></div>
+    <div class="orbsys-deck-botones">
+      <button type="button" id="orbsysAbrirBtn" class="orbsys-btn-abrir">Abrir</button>
+      <button type="button" id="orbsysSiguienteBtn" class="orbsys-btn-siguiente">Siguiente →</button>
+    </div>
+  </div>
+
+  <button type="button" id="orbsyFabBtn" title="Añadir Orbsy">+</button>
+
+  <!-- Crear Orbsy -->
+  <div id="orbsyCrearModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;padding:20px;max-height:86vh;overflow-y:auto;">
+      <h3 style="margin-bottom:4px;">Compartir un Orbsy</h3>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:14px;">Una observación del día. Se borra junto a sus comentarios en 24 horas.</p>
+      <label style="font-size:0.75rem;color:var(--text-sec);">Título (obligatorio)</label>
+      <input type="text" id="inputTituloOrbsy" maxlength="80" placeholder="Ej: La luna que ya nadie mira" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.85rem;margin:6px 0 12px;">
+      <label style="font-size:0.75rem;color:var(--text-sec);">Imagen (opcional, enlace de Drive)</label>
+      <input type="text" id="inputImagenOrbsy" placeholder="https://drive.google.com/..." style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.85rem;margin:6px 0 12px;">
+      <label style="font-size:0.75rem;color:var(--text-sec);">Descripción (opcional)</label>
+      <textarea id="inputDescripcionOrbsy" maxlength="600" placeholder="Comparte la observación o reflexión, si quieres..." style="width:100%;min-height:100px;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.85rem;margin:6px 0 2px;resize:vertical;"></textarea>
+      <div style="text-align:right;font-size:0.7rem;color:var(--text-sec);margin-bottom:14px;"><span id="contadorDescripcionOrbsy">0</span>/600</div>
+      <div style="display:flex;gap:8px;">
+        <button type="button" id="cerrarOrbsyCrearBtn" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
+        <button type="button" id="publicarOrbsyBtn" style="flex:1;background:var(--turquesa);border:none;color:#0b0b0e;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;">Publicar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detalle de Orbsy: imagen, título, descripción y comentarios -->
+  <div id="orbsyDetalleModal" style="display:none;position:fixed;inset:0;background:#0e0e12;z-index:9550;flex-direction:column;">
+    <div class="modal-bar">
+      <button id="cerrarOrbsyDetalleBtn">← Volver</button>
+      <div>Orbsy</div>
+      <span></span>
+    </div>
+    <div id="orbsyDetalleContenido" style="flex:1;overflow-y:auto;"></div>
+  </div>
+
   <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
   <div id="vistaPerfiles">
     <div class="fila-superior-perfiles">
@@ -3248,7 +3528,8 @@
     onSnapshot,
     query,
     orderBy,
-    serverTimestamp
+    serverTimestamp,
+    Timestamp
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import {
     getAuth,
@@ -4975,12 +5256,22 @@
     } else if (vGalerias && vGalerias.style.display !== "none") {
       destino = vGalerias;
     }
-    if (!destino) { wrap.classList.add("oculta"); return; }
+    if (!destino) {
+      wrap.classList.add("oculta");
+      const deckWrapOculto = document.getElementById("orbsysDeckWrap");
+      if (deckWrapOculto) deckWrapOculto.classList.add("oculta");
+      return;
+    }
     wrap.classList.remove("oculta");
     if (anclaDespuesDe) {
       if (anclaDespuesDe.nextElementSibling !== wrap) anclaDespuesDe.insertAdjacentElement("afterend", wrap);
     } else if (destino.firstElementChild !== wrap) {
       destino.insertBefore(wrap, destino.firstElementChild);
+    }
+    const deckWrap = document.getElementById("orbsysDeckWrap");
+    if (deckWrap) {
+      deckWrap.classList.remove("oculta");
+      if (wrap.nextElementSibling !== deckWrap) wrap.insertAdjacentElement("afterend", deckWrap);
     }
   }
   let _reposicionarFranjaTimeout = null;
@@ -4996,6 +5287,7 @@
     const franja = document.getElementById("franjaFragmentos");
     if (!franja) return;
     posicionarFranjaFragmentos();
+    if (typeof renderOrbsysDeck === "function") renderOrbsysDeck();
     const disponibles = obtenerFragmentosDisponibles();
     const cupos = numCasillasFranja();
     franja.innerHTML = "";
@@ -7212,8 +7504,246 @@
     URL.revokeObjectURL(url);
   });
 
-  // Refleja en los 3 botones del lector el estado guardado del recurso/publicación actual
-  function todosLosRecursosComprendidos(libroId, recursos) {
+  // ================= ORBSYS =================
+  // Observaciones efímeras del día: título obligatorio, imagen y descripción
+  // opcionales. Sin "me gusta" — solo comentarios. Todo se borra a las 24h
+  // (política TTL de Firestore sobre el campo expiraEn, configurada en la consola).
+  const orbsysCol = collection(db, "orbsys");
+  const orbsysComentariosCol = collection(db, "orbsysComentarios");
+  let orbsys = [];
+  let orbsysComentarios = [];
+  let orbsysIndiceFrente = 0;
+  let orbsyDetalleActualId = null;
+  const PALETA_ORBSYS = ["#39ff8c", "#22d3c4", "#9b7cf6"];
+
+  onSnapshot(orbsysCol, (snapshot) => {
+    orbsys = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderOrbsysDeck === "function") renderOrbsysDeck();
+    if (typeof renderOrbsyDetalle === "function") renderOrbsyDetalle();
+  }, (error) => {
+    console.error("Error al leer orbsys:", error);
+  });
+
+  onSnapshot(orbsysComentariosCol, (snapshot) => {
+    orbsysComentarios = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (typeof renderOrbsyDetalle === "function") renderOrbsyDetalle();
+  }, (error) => {
+    console.error("Error al leer comentarios de orbsys:", error);
+  });
+
+  // Filtra del lado del cliente por si la política TTL de Firestore aún no
+  // barrió un documento ya vencido (el borrado del servidor no es instantáneo).
+  function orbsysActivos() {
+    const ahora = Date.now();
+    return orbsys
+      .filter(o => !o.expiraEn || o.expiraEn.toMillis() > ahora)
+      .sort((a, b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0));
+  }
+
+  function tiempoRestanteOrbsy(o) {
+    if (!o.expiraEn) return "";
+    const msRestantes = o.expiraEn.toMillis() - Date.now();
+    if (msRestantes <= 0) return "Por expirar";
+    const horas = Math.floor(msRestantes / (1000 * 60 * 60));
+    const minutos = Math.floor((msRestantes % (1000 * 60 * 60)) / (1000 * 60));
+    if (horas >= 1) return `Se borra en ${horas} h`;
+    return `Se borra en ${Math.max(1, minutos)} min`;
+  }
+
+  function renderOrbsysDeck() {
+    const cont = document.getElementById("orbsysDeck");
+    if (!cont) return;
+    const activos = orbsysActivos();
+    const abrirBtn = document.getElementById("orbsysAbrirBtn");
+    const siguienteBtn = document.getElementById("orbsysSiguienteBtn");
+    if (orbsysIndiceFrente >= activos.length) orbsysIndiceFrente = 0;
+    cont.innerHTML = "";
+    if (activos.length === 0) {
+      const carta = document.createElement("div");
+      carta.className = "orbsys-carta";
+      carta.innerHTML = `<div class="orbsys-carta-sin-imagen" style="--color-carta:${PALETA_ORBSYS[0]}"><div class="orbsys-carta-titulo-grande">Nadie ha compartido un Orbsy en las últimas 24 horas.</div></div>`;
+      cont.appendChild(carta);
+      if (abrirBtn) abrirBtn.disabled = true;
+      if (siguienteBtn) siguienteBtn.disabled = true;
+      return;
+    }
+    if (abrirBtn) abrirBtn.disabled = false;
+    if (siguienteBtn) siguienteBtn.disabled = activos.length < 2;
+
+    const maxApiladas = Math.min(3, activos.length);
+    for (let i = maxApiladas - 1; i >= 0; i--) {
+      const idx = (orbsysIndiceFrente + i) % activos.length;
+      const orbsy = activos[idx];
+      const carta = document.createElement("div");
+      carta.className = "orbsys-carta";
+      carta.style.setProperty("--offset", i);
+      carta.style.zIndex = String(maxApiladas - i);
+      if (orbsy.imagenId) {
+        carta.innerHTML = `
+          <img class="orbsys-carta-img" src="${imagenDirecta(orbsy.imagenId)}" data-alt-src="${imagenAlternativa(orbsy.imagenId)}" data-tried-alt="0" alt="" loading="lazy" onerror="manejarErrorImagen(this)">
+          <div class="orbsys-carta-degradado"></div>
+          <div class="orbsys-carta-titulo">${escapeHtml(orbsy.titulo)}</div>
+        `;
+      } else {
+        const color = PALETA_ORBSYS[idx % PALETA_ORBSYS.length];
+        carta.innerHTML = `<div class="orbsys-carta-sin-imagen" style="--color-carta:${color}"><div class="orbsys-carta-titulo-grande">${escapeHtml(orbsy.titulo)}</div></div>`;
+      }
+      if (i === 0) carta.addEventListener("click", () => abrirOrbsy(orbsy.id));
+      cont.appendChild(carta);
+    }
+  }
+
+  document.getElementById("orbsysSiguienteBtn").addEventListener("click", () => {
+    const activos = orbsysActivos();
+    if (activos.length < 2) return;
+    orbsysIndiceFrente = (orbsysIndiceFrente + 1) % activos.length;
+    renderOrbsysDeck();
+  });
+
+  document.getElementById("orbsysAbrirBtn").addEventListener("click", () => {
+    const activos = orbsysActivos();
+    if (activos.length === 0) return;
+    abrirOrbsy(activos[orbsysIndiceFrente % activos.length].id);
+  });
+
+  function abrirOrbsy(id) {
+    orbsyDetalleActualId = id;
+    document.getElementById("orbsyDetalleModal").style.display = "flex";
+    renderOrbsyDetalle();
+  }
+  function cerrarOrbsyDetalle() {
+    orbsyDetalleActualId = null;
+    document.getElementById("orbsyDetalleModal").style.display = "none";
+  }
+  document.getElementById("cerrarOrbsyDetalleBtn").addEventListener("click", cerrarOrbsyDetalle);
+
+  function renderOrbsyDetalle() {
+    if (!orbsyDetalleActualId) return;
+    const orbsy = orbsys.find(o => o.id === orbsyDetalleActualId);
+    const cont = document.getElementById("orbsyDetalleContenido");
+    if (!orbsy) {
+      cont.innerHTML = `<p style="padding:30px 16px;text-align:center;color:var(--text-sec);">Este Orbsy ya expiró.</p>`;
+      return;
+    }
+    const esDueno = uidActual && orbsy.ownerId === uidActual;
+    const comentarios = orbsysComentarios
+      .filter(c => c.orbsyId === orbsy.id)
+      .sort((a, b) => (a.fecha?.seconds || 0) - (b.fecha?.seconds || 0));
+
+    cont.innerHTML = `
+      ${orbsy.imagenId ? `<img class="orbsy-detalle-img" src="${imagenDirecta(orbsy.imagenId)}" data-alt-src="${imagenAlternativa(orbsy.imagenId)}" data-tried-alt="0" alt="" onerror="manejarErrorImagen(this)">` : ""}
+      <div class="orbsy-detalle-cuerpo">
+        <div class="orbsy-detalle-tiempo">${tiempoRestanteOrbsy(orbsy)} · ${escapeHtml(nombreCreador(orbsy.ownerId))}</div>
+        <h2 class="orbsy-detalle-titulo">${escapeHtml(orbsy.titulo)}</h2>
+        ${orbsy.descripcion ? `<p class="orbsy-detalle-descripcion">${escapeHtml(orbsy.descripcion)}</p>` : ""}
+        ${esDueno ? `<button type="button" id="eliminarOrbsyBtn" class="orbsy-eliminar-btn">🗑 Eliminar Orbsy</button>` : ""}
+        <div class="orbsy-detalle-separador"></div>
+        <div class="orbsy-comentarios-lista" id="orbsyComentariosLista"></div>
+        <div class="orbsy-comentario-form">
+          <textarea id="orbsyComentarioInput" maxlength="300" placeholder="${uidActual ? "Escribe un comentario..." : "Inicia sesión (Admin) para comentar"}" ${uidActual ? "" : "disabled"}></textarea>
+          <button type="button" id="orbsyComentarBtn" ${uidActual ? "" : "disabled"}>Comentar</button>
+        </div>
+      </div>
+    `;
+
+    const listaComentarios = document.getElementById("orbsyComentariosLista");
+    if (comentarios.length === 0) {
+      listaComentarios.innerHTML = `<p style="color:var(--text-sec);font-size:0.8rem;text-align:center;padding:10px 0;">Sé el primero en comentar.</p>`;
+    } else {
+      comentarios.forEach(c => {
+        const fila = document.createElement("div");
+        fila.className = "orbsy-comentario-fila";
+        fila.innerHTML = `
+          <div class="orbsy-comentario-autor">${escapeHtml(nombreCreador(c.ownerId))}</div>
+          <div class="orbsy-comentario-texto">${escapeHtml(c.texto)}</div>
+          ${c.ownerId === uidActual ? `<button type="button" class="orbsy-comentario-eliminar" title="Eliminar comentario">✕</button>` : ""}
+        `;
+        if (c.ownerId === uidActual) {
+          fila.querySelector(".orbsy-comentario-eliminar").addEventListener("click", async () => {
+            try { await deleteDoc(doc(db, "orbsysComentarios", c.id)); } catch (e) { alert("No se pudo eliminar: " + e.message); }
+          });
+        }
+        listaComentarios.appendChild(fila);
+      });
+    }
+
+    if (esDueno) {
+      document.getElementById("eliminarOrbsyBtn").addEventListener("click", async () => {
+        if (!confirm("¿Eliminar este Orbsy y todos sus comentarios?")) return;
+        try {
+          await deleteDoc(doc(db, "orbsys", orbsy.id));
+          await Promise.all(comentarios.map(c => deleteDoc(doc(db, "orbsysComentarios", c.id))));
+          cerrarOrbsyDetalle();
+        } catch (e) {
+          alert("No se pudo eliminar el Orbsy: " + e.message);
+        }
+      });
+    }
+
+    if (uidActual) {
+      document.getElementById("orbsyComentarBtn").addEventListener("click", async () => {
+        const texto = document.getElementById("orbsyComentarioInput").value.trim();
+        if (!texto) return;
+        try {
+          await addDoc(orbsysComentariosCol, {
+            orbsyId: orbsy.id,
+            ownerId: uidActual,
+            texto,
+            fecha: serverTimestamp(),
+            expiraEn: orbsy.expiraEn
+          });
+          document.getElementById("orbsyComentarioInput").value = "";
+        } catch (e) {
+          alert("No se pudo publicar el comentario: " + e.message);
+        }
+      });
+    }
+  }
+
+  // ---------- Crear Orbsy (botón flotante, siempre disponible) ----------
+  const orbsyCrearModal = document.getElementById("orbsyCrearModal");
+  document.getElementById("orbsyFabBtn").addEventListener("click", () => {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para compartir un Orbsy.");
+      return;
+    }
+    document.getElementById("inputTituloOrbsy").value = "";
+    document.getElementById("inputImagenOrbsy").value = "";
+    document.getElementById("inputDescripcionOrbsy").value = "";
+    document.getElementById("contadorDescripcionOrbsy").textContent = "0";
+    orbsyCrearModal.style.display = "flex";
+  });
+  document.getElementById("cerrarOrbsyCrearBtn").addEventListener("click", () => {
+    orbsyCrearModal.style.display = "none";
+  });
+  document.getElementById("inputDescripcionOrbsy").addEventListener("input", (e) => {
+    document.getElementById("contadorDescripcionOrbsy").textContent = String(e.target.value.length);
+  });
+  document.getElementById("publicarOrbsyBtn").addEventListener("click", async () => {
+    const titulo = document.getElementById("inputTituloOrbsy").value.trim().slice(0, 80);
+    const imagenUrl = document.getElementById("inputImagenOrbsy").value.trim();
+    const descripcion = document.getElementById("inputDescripcionOrbsy").value.trim().slice(0, 600);
+    if (!titulo) {
+      alert("El título es obligatorio.");
+      return;
+    }
+    const ahora = Date.now();
+    const expiraEn = Timestamp.fromMillis(ahora + 24 * 60 * 60 * 1000);
+    try {
+      await addDoc(orbsysCol, {
+        ownerId: uidActual,
+        titulo,
+        imagenId: imagenUrl ? extraerIdDrive(imagenUrl) : "",
+        descripcion,
+        fecha: serverTimestamp(),
+        expiraEn
+      });
+      orbsyCrearModal.style.display = "none";
+    } catch (e) {
+      alert("No se pudo publicar el Orbsy: " + e.message);
+    }
+  });
+
     const p = progresoDeLibro(libroId);
     if (!p || !p.estados || !recursos || recursos.length === 0) return false;
     return recursos.every((r, i) => p.estados[i] === "comprendido");
