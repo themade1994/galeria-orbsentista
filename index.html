@@ -7744,6 +7744,8 @@
     }
   });
 
+  // Refleja en los 3 botones del lector el estado guardado del recurso/publicación actual
+  function todosLosRecursosComprendidos(libroId, recursos) {
     const p = progresoDeLibro(libroId);
     if (!p || !p.estados || !recursos || recursos.length === 0) return false;
     return recursos.every((r, i) => p.estados[i] === "comprendido");
