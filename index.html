@@ -1798,11 +1798,11 @@
     align-items:center;
     justify-content:center;
     padding:30px;
-    background:var(--color-carta, var(--turquesa));
-    background-image:radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.22), transparent 60%);
+    background:#e9e9ee;
+    background-image:radial-gradient(ellipse at 30% 20%, rgba(0,0,0,0.05), transparent 60%);
   }
   .orbsys-carta-titulo-grande{
-    color:#fff;
+    color:#17171c;
     font-family:'Fraunces', serif;
     font-size:1.4rem;
     font-weight:600;
@@ -1963,6 +1963,74 @@
     flex-shrink:0;
   }
   .orbsy-comentario-form button:disabled{ opacity:0.4; cursor:default; }
+
+  .orbsy-guardar-btn{
+    margin-top:14px;
+    background:var(--turquesa);
+    border:none;
+    color:#0b0b0e;
+    padding:9px 14px;
+    border-radius:8px;
+    font-size:0.78rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+
+  /* GALERÍA DE ORBSIS (Orbsis guardados) */
+  .orbsys-galeria-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));
+    gap:14px;
+  }
+  .orbsys-galeria-carta{
+    position:relative;
+    aspect-ratio:4/5;
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    background:#0c0c10;
+    cursor:pointer;
+  }
+  .orbsys-galeria-carta-img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .orbsys-galeria-carta-degradado{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:50%;
+    background:linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    pointer-events:none;
+  }
+  .orbsys-galeria-carta-titulo{
+    position:absolute;
+    left:8px; right:8px; bottom:8px;
+    color:#fff;
+    font-family:'Fraunces', serif;
+    font-size:0.8rem;
+    font-weight:600;
+    line-height:1.25;
+    text-shadow:0 2px 6px rgba(0,0,0,0.5);
+  }
+  .orbsys-galeria-carta-sin-imagen{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:12px;
+    background:#e9e9ee;
+  }
+  .orbsys-galeria-carta-titulo-grande{
+    color:#17171c;
+    font-family:'Fraunces', serif;
+    font-size:0.82rem;
+    font-weight:600;
+    line-height:1.3;
+    text-align:center;
+  }
 
   /* BARRA DE NAVEGACIÓN DENTRO DEL LECTOR (Anterior / Siguiente) */
   #navBar{
@@ -2712,6 +2780,13 @@
         <div style="font-size:0.72rem;color:var(--text-sec);">Organiza tus ideas antes de publicar</div>
       </div>
     </div>
+    <div class="herramienta-item" id="abrirOrbsysGaleriaBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-capsula-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">orbSYS galería</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Orbsis que guardaste, en forma de galería</div>
+      </div>
+    </div>
     <div class="herramienta-item" id="abrirCafeAbiertoBtn">
       <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">☕</div>
       <div>
@@ -2852,6 +2927,15 @@
     </div>
     <div class="notas-guardadas-lista" id="esqueletosLista"></div>
   </div>
+
+  <div id="orbsysGaleriaVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div style="padding:10px 14px;">
+      <button id="volverAHerramientasDesdeOrbsysGaleriaBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Orbsis que guardaste desde el detalle de un Orbsy. Quedan aquí aunque el original se borre o expire, pero sin sus comentarios.</p>
+    <div id="orbsysGaleriaGrid" class="orbsys-galeria-grid" style="padding:0 14px 16px;overflow-y:auto;flex:1;"></div>
+    <div id="orbsysGaleriaVaciaMsg" class="empty-msg" style="display:none;padding:20px;">Todavía no guardaste ningún Orbsy.</div>
+  </div>
 </div>
 
 
@@ -2933,6 +3017,13 @@
         <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:12px;">Galerías, colecciones o publicaciones que otros perfiles quieren pasarte, o que tú les enviaste.</p>
         <div id="solicitudesEntrantesContainer"></div>
         <div id="solicitudesEnviadasContainer" style="margin-top:10px;"></div>
+      </div>
+
+      <div id="orbsysGaleriaSolicitudesSection" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+        <h2 style="margin-bottom:4px;">🌌 Solicitudes de Orbsis</h2>
+        <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:12px;">Orbsis guardados que otros perfiles quieren compartirte (toca el título para verlo antes de aceptar), o que tú compartiste.</p>
+        <div id="orbsysGaleriaSolicitudesEntrantesContainer"></div>
+        <div id="orbsysGaleriaSolicitudesEnviadasContainer" style="margin-top:10px;"></div>
       </div>
 
       <div id="tallerHeader" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:16px;">
@@ -3189,6 +3280,16 @@
     <div id="orbsyDetalleContenido" style="flex:1;overflow-y:auto;"></div>
   </div>
 
+  <!-- Detalle de un Orbsy guardado en la galería (o de una solicitud recibida, en previsualización): solo título, imagen y descripción, sin comentarios -->
+  <div id="orbsysGaleriaDetalleModal" style="display:none;position:fixed;inset:0;background:#0e0e12;z-index:9560;flex-direction:column;">
+    <div class="modal-bar">
+      <button id="cerrarOrbsysGaleriaDetalleBtn">← Volver</button>
+      <div>Orbsy guardado</div>
+      <span></span>
+    </div>
+    <div id="orbsysGaleriaDetalleContenido" style="flex:1;overflow-y:auto;"></div>
+  </div>
+
   <!-- VISTA: PERFILES (selector tipo Netflix, nueva pantalla de entrada) -->
   <div id="vistaPerfiles">
     <div class="fila-superior-perfiles">
@@ -3286,6 +3387,20 @@
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button id="transferModalCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
       <button id="transferModalEnviar" style="flex:1;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">Enviar solicitud</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: COMPARTIR UN ORBSY GUARDADO CON OTRO PERFIL -->
+<div id="orbsysGaleriaCompartirModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:340px;width:100%;padding:22px;">
+    <h3 style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:6px;">Compartir Orbsy</h3>
+    <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:14px;">Le llegará una solicitud. Podrá verlo completo antes de decidir, y si lo acepta quedará guardado también en su galería de Orbsis.</p>
+    <select id="orbsysGaleriaCompartirDestinoSelect" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.85rem;"></select>
+    <p id="orbsysGaleriaCompartirError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:8px;"></p>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button id="orbsysGaleriaCompartirCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
+      <button id="orbsysGaleriaCompartirEnviar" style="flex:1;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">Enviar solicitud</button>
     </div>
   </div>
 </div>
@@ -6058,6 +6173,7 @@
     document.getElementById("notasGuardadasVista").style.display = "none";
     document.getElementById("fragmentosGuardadosVista").style.display = "none";
     document.getElementById("esqueletosVista").style.display = "none";
+    document.getElementById("orbsysGaleriaVista").style.display = "none";
     document.getElementById("herramientasMenu").style.display = "block";
   }
   function cerrarHerramientas() {
@@ -7636,6 +7752,7 @@
         <div class="orbsy-detalle-tiempo">${tiempoRestanteOrbsy(orbsy)} · ${escapeHtml(nombreCreador(orbsy.ownerId))}</div>
         <h2 class="orbsy-detalle-titulo">${escapeHtml(orbsy.titulo)}</h2>
         ${orbsy.descripcion ? `<p class="orbsy-detalle-descripcion">${escapeHtml(orbsy.descripcion)}</p>` : ""}
+        ${uidActual ? `<button type="button" id="guardarOrbsyGaleriaBtn" class="orbsy-guardar-btn">💾 Guardar en tu galería de Orbsis</button>` : ""}
         ${esDueno ? `<button type="button" id="eliminarOrbsyBtn" class="orbsy-eliminar-btn">🗑 Eliminar Orbsy</button>` : ""}
         <div class="orbsy-detalle-separador"></div>
         <div class="orbsy-comentarios-lista" id="orbsyComentariosLista"></div>
@@ -7697,6 +7814,9 @@
           alert("No se pudo publicar el comentario: " + e.message);
         }
       });
+      document.getElementById("guardarOrbsyGaleriaBtn").addEventListener("click", () => {
+        guardarOrbsyEnGaleria(orbsy);
+      });
     }
   }
 
@@ -7743,6 +7863,313 @@
       alert("No se pudo publicar el Orbsy: " + e.message);
     }
   });
+
+  // ================= GALERÍA DE ORBSIS (Orbsis guardados) =================
+  // Al guardar un Orbsy desde su detalle, se copia (título, imagen y
+  // descripción) a esta colección independiente. Por eso sigue disponible
+  // aunque el Orbsy original se borre o expire a las 24h — pero sin sus
+  // comentarios, que nunca se copian. Cada Orbsy guardado solo tiene dos
+  // acciones: compartir con otro perfil (mediante solicitud) o eliminar.
+  const orbsysGaleriaCol = collection(db, "orbsysGaleria");
+  const solicitudesOrbsysGaleriaCol = collection(db, "solicitudesOrbsysGaleria");
+  let orbsysGaleria = [];
+  let solicitudesOrbsysGaleria = [];
+  let orbsysGaleriaDetalleModo = null; // "guardado" | "solicitud"
+  let orbsysGaleriaDetalleId = null;
+  let itemOrbsyGaleriaCompartir = null;
+
+  onSnapshot(orbsysGaleriaCol, (snapshot) => {
+    orbsysGaleria = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const vistaAbierta = document.getElementById("orbsysGaleriaVista");
+    if (vistaAbierta && vistaAbierta.style.display !== "none") renderOrbsysGaleriaGrid();
+    if (orbsysGaleriaDetalleModo === "guardado") renderOrbsysGaleriaDetalleGuardado();
+  }, (error) => {
+    console.error("Error al leer la galería de Orbsis:", error);
+  });
+
+  onSnapshot(solicitudesOrbsysGaleriaCol, (snapshot) => {
+    solicitudesOrbsysGaleria = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderSolicitudesOrbsysGaleria();
+    if (orbsysGaleriaDetalleModo === "solicitud" && !solicitudesOrbsysGaleria.some(s => s.id === orbsysGaleriaDetalleId)) {
+      cerrarOrbsysGaleriaDetalle();
+    }
+  }, (error) => {
+    console.error("Error al leer solicitudes de Orbsis:", error);
+  });
+
+  async function guardarOrbsyEnGaleria(orbsy) {
+    if (!uidActual) {
+      alert("Necesitas iniciar sesión (Admin) para guardar Orbsis en tu galería.");
+      return;
+    }
+    try {
+      await addDoc(orbsysGaleriaCol, {
+        ownerId: uidActual,
+        titulo: orbsy.titulo || "Sin título",
+        imagenId: orbsy.imagenId || "",
+        descripcion: orbsy.descripcion || "",
+        guardadoEn: serverTimestamp()
+      });
+      mostrarAvisoToast("💾 Guardado en tu galería de Orbsis", "#39ff8c");
+    } catch (e) {
+      alert("No se pudo guardar el Orbsy: " + e.message);
+    }
+  }
+
+  function misOrbsysGuardados() {
+    return orbsysGaleria
+      .filter(o => o.ownerId === uidActual)
+      .sort((a, b) => (b.guardadoEn?.seconds || 0) - (a.guardadoEn?.seconds || 0));
+  }
+
+  function crearTarjetaOrbsyGaleria(item) {
+    const carta = document.createElement("div");
+    carta.className = "orbsys-galeria-carta";
+    if (item.imagenId) {
+      carta.innerHTML = `
+        <img class="orbsys-galeria-carta-img" src="${imagenDirecta(item.imagenId)}" data-alt-src="${imagenAlternativa(item.imagenId)}" data-tried-alt="0" alt="" loading="lazy" onerror="manejarErrorImagen(this)">
+        <div class="orbsys-galeria-carta-degradado"></div>
+        <div class="orbsys-galeria-carta-titulo">${escapeHtml(item.titulo)}</div>
+      `;
+    } else {
+      carta.innerHTML = `<div class="orbsys-galeria-carta-sin-imagen"><div class="orbsys-galeria-carta-titulo-grande">${escapeHtml(item.titulo)}</div></div>`;
+    }
+    carta.addEventListener("click", () => abrirOrbsysGaleriaDetalleGuardado(item.id));
+    return carta;
+  }
+
+  function renderOrbsysGaleriaGrid() {
+    const grid = document.getElementById("orbsysGaleriaGrid");
+    const vacioMsg = document.getElementById("orbsysGaleriaVaciaMsg");
+    if (!grid) return;
+    if (!uidActual) {
+      grid.innerHTML = "";
+      grid.style.display = "none";
+      vacioMsg.textContent = "Necesitas iniciar sesión (Admin) para ver tu galería de Orbsis.";
+      vacioMsg.style.display = "block";
+      return;
+    }
+    const items = misOrbsysGuardados();
+    grid.innerHTML = "";
+    if (items.length === 0) {
+      grid.style.display = "none";
+      vacioMsg.textContent = "Todavía no guardaste ningún Orbsy.";
+      vacioMsg.style.display = "block";
+      return;
+    }
+    grid.style.display = "grid";
+    vacioMsg.style.display = "none";
+    items.forEach(item => grid.appendChild(crearTarjetaOrbsyGaleria(item)));
+  }
+
+  const orbsysGaleriaVista = document.getElementById("orbsysGaleriaVista");
+  document.getElementById("abrirOrbsysGaleriaBtn").addEventListener("click", () => {
+    document.getElementById("herramientasMenu").style.display = "none";
+    orbsysGaleriaVista.style.display = "flex";
+    renderOrbsysGaleriaGrid();
+  });
+  document.getElementById("volverAHerramientasDesdeOrbsysGaleriaBtn").addEventListener("click", () => {
+    orbsysGaleriaVista.style.display = "none";
+    document.getElementById("herramientasMenu").style.display = "block";
+  });
+
+  // ---------- Detalle de un Orbsy guardado: solo descripción, "Compartir" y "Eliminar" ----------
+  function abrirOrbsysGaleriaDetalleGuardado(id) {
+    orbsysGaleriaDetalleModo = "guardado";
+    orbsysGaleriaDetalleId = id;
+    document.getElementById("orbsysGaleriaDetalleModal").style.display = "flex";
+    renderOrbsysGaleriaDetalleGuardado();
+  }
+  function cerrarOrbsysGaleriaDetalle() {
+    orbsysGaleriaDetalleModo = null;
+    orbsysGaleriaDetalleId = null;
+    document.getElementById("orbsysGaleriaDetalleModal").style.display = "none";
+  }
+  document.getElementById("cerrarOrbsysGaleriaDetalleBtn").addEventListener("click", cerrarOrbsysGaleriaDetalle);
+
+  function renderOrbsysGaleriaDetalleGuardado() {
+    if (orbsysGaleriaDetalleModo !== "guardado" || !orbsysGaleriaDetalleId) return;
+    const item = orbsysGaleria.find(o => o.id === orbsysGaleriaDetalleId);
+    const cont = document.getElementById("orbsysGaleriaDetalleContenido");
+    if (!item) {
+      cont.innerHTML = `<p style="padding:30px 16px;text-align:center;color:var(--text-sec);">Este Orbsy ya no está en tu galería.</p>`;
+      return;
+    }
+    cont.innerHTML = `
+      ${item.imagenId ? `<img class="orbsy-detalle-img" src="${imagenDirecta(item.imagenId)}" data-alt-src="${imagenAlternativa(item.imagenId)}" data-tried-alt="0" alt="" onerror="manejarErrorImagen(this)">` : ""}
+      <div class="orbsy-detalle-cuerpo">
+        <h2 class="orbsy-detalle-titulo">${escapeHtml(item.titulo)}</h2>
+        ${item.descripcion ? `<p class="orbsy-detalle-descripcion">${escapeHtml(item.descripcion)}</p>` : ""}
+        <div style="display:flex;gap:8px;margin-top:18px;">
+          <button type="button" id="compartirOrbsyGaleriaBtn" class="orbsy-guardar-btn" style="flex:1;margin-top:0;">🔗 Compartir</button>
+          <button type="button" id="eliminarOrbsyGaleriaBtn" class="orbsy-eliminar-btn" style="flex:1;margin-top:0;">🗑 Eliminar</button>
+        </div>
+      </div>
+    `;
+    document.getElementById("compartirOrbsyGaleriaBtn").addEventListener("click", () => abrirCompartirOrbsyGaleria(item));
+    document.getElementById("eliminarOrbsyGaleriaBtn").addEventListener("click", async () => {
+      if (!confirm("¿Eliminar este Orbsy de tu galería?")) return;
+      try {
+        await deleteDoc(doc(db, "orbsysGaleria", item.id));
+        cerrarOrbsysGaleriaDetalle();
+      } catch (e) {
+        alert("No se pudo eliminar: " + e.message);
+      }
+    });
+  }
+
+  // ---------- Compartir un Orbsy guardado con otro perfil ----------
+  function abrirCompartirOrbsyGaleria(item) {
+    const otrosPerfiles = usuarios.filter(u => u.id !== uidActual);
+    if (otrosPerfiles.length === 0) {
+      alert("Todavía no hay otros perfiles creados a quién compartirle esto.");
+      return;
+    }
+    itemOrbsyGaleriaCompartir = item;
+    document.getElementById("orbsysGaleriaCompartirError").style.display = "none";
+    document.getElementById("orbsysGaleriaCompartirDestinoSelect").innerHTML = otrosPerfiles
+      .map(u => `<option value="${u.id}">${escapeHtml(u.nombre || "Sin nombre")}</option>`)
+      .join("");
+    document.getElementById("orbsysGaleriaCompartirModal").style.display = "flex";
+  }
+  document.getElementById("orbsysGaleriaCompartirCancelar").addEventListener("click", () => {
+    document.getElementById("orbsysGaleriaCompartirModal").style.display = "none";
+    itemOrbsyGaleriaCompartir = null;
+  });
+  document.getElementById("orbsysGaleriaCompartirEnviar").addEventListener("click", async () => {
+    if (!itemOrbsyGaleriaCompartir) return;
+    const paraUid = document.getElementById("orbsysGaleriaCompartirDestinoSelect").value;
+    const errorEl = document.getElementById("orbsysGaleriaCompartirError");
+    if (!paraUid) return;
+    const yaHayPendiente = solicitudesOrbsysGaleria.some(s =>
+      s.deUid === uidActual && s.paraUid === paraUid && s.estado === "pendiente" && s.titulo === itemOrbsyGaleriaCompartir.titulo
+    );
+    if (yaHayPendiente) {
+      errorEl.textContent = "Ya le enviaste una solicitud pendiente con este Orbsy.";
+      errorEl.style.display = "block";
+      return;
+    }
+    try {
+      await addDoc(solicitudesOrbsysGaleriaCol, {
+        deUid: uidActual,
+        deNombre: nombrePerfil(uidActual),
+        paraUid,
+        titulo: itemOrbsyGaleriaCompartir.titulo,
+        imagenId: itemOrbsyGaleriaCompartir.imagenId || "",
+        descripcion: itemOrbsyGaleriaCompartir.descripcion || "",
+        estado: "pendiente",
+        fecha: serverTimestamp()
+      });
+      document.getElementById("orbsysGaleriaCompartirModal").style.display = "none";
+      itemOrbsyGaleriaCompartir = null;
+      mostrarAvisoToast("Solicitud enviada", "#22d3c4");
+    } catch (e) {
+      errorEl.textContent = "No se pudo enviar la solicitud: " + e.message;
+      errorEl.style.display = "block";
+    }
+  });
+
+  // ---------- Solicitudes de Orbsis entre perfiles ----------
+  // El destinatario puede ver el Orbsy completo (imagen, título y
+  // descripción) antes de decidir. Si acepta, se guarda automáticamente
+  // en su propia galería de Orbsis.
+  function renderSolicitudesOrbsysGaleria() {
+    const section = document.getElementById("orbsysGaleriaSolicitudesSection");
+    const entrantesCont = document.getElementById("orbsysGaleriaSolicitudesEntrantesContainer");
+    const enviadasCont = document.getElementById("orbsysGaleriaSolicitudesEnviadasContainer");
+    if (!section) return;
+    if (!isAdmin) { section.style.display = "none"; return; }
+
+    const entrantes = solicitudesOrbsysGaleria.filter(s => s.paraUid === uidActual && s.estado === "pendiente");
+    const enviadas = solicitudesOrbsysGaleria.filter(s => s.deUid === uidActual && s.estado === "pendiente");
+    section.style.display = (entrantes.length > 0 || enviadas.length > 0) ? "block" : "none";
+
+    entrantesCont.innerHTML = "";
+    entrantes.forEach(s => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+      row.innerHTML = `
+        <div class="admin-row-titulo" style="cursor:pointer;">${escapeHtml(s.titulo || "Sin título")}<br>
+          <span style="font-size:0.72rem;color:var(--text-sec);font-weight:400;">Orbsy · de ${escapeHtml(s.deNombre || "Alguien")} · toca para verlo</span>
+        </div>
+        <div class="admin-row-controles">
+          <button class="aceptar-btn">Aceptar</button>
+          <button class="delete-btn">Rechazar</button>
+        </div>
+      `;
+      row.querySelector(".admin-row-titulo").addEventListener("click", () => previsualizarSolicitudOrbsy(s));
+      row.querySelector(".aceptar-btn").addEventListener("click", () => aceptarSolicitudOrbsy(s));
+      row.querySelector(".delete-btn").addEventListener("click", () => rechazarSolicitudOrbsy(s));
+      entrantesCont.appendChild(row);
+    });
+
+    enviadasCont.innerHTML = "";
+    enviadas.forEach(s => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+      row.innerHTML = `
+        <div class="admin-row-titulo">${escapeHtml(s.titulo || "Sin título")}<br>
+          <span style="font-size:0.72rem;color:var(--text-sec);font-weight:400;">Enviada a ${escapeHtml(nombrePerfil(s.paraUid))} · esperando respuesta</span>
+        </div>
+        <div class="admin-row-controles">
+          <button class="delete-btn">Cancelar</button>
+        </div>
+      `;
+      row.querySelector(".delete-btn").addEventListener("click", () => rechazarSolicitudOrbsy(s));
+      enviadasCont.appendChild(row);
+    });
+  }
+
+  function previsualizarSolicitudOrbsy(sol) {
+    orbsysGaleriaDetalleModo = "solicitud";
+    orbsysGaleriaDetalleId = sol.id;
+    document.getElementById("orbsysGaleriaDetalleModal").style.display = "flex";
+    renderPrevisualizacionSolicitudOrbsy(sol);
+  }
+
+  function renderPrevisualizacionSolicitudOrbsy(sol) {
+    const cont = document.getElementById("orbsysGaleriaDetalleContenido");
+    cont.innerHTML = `
+      ${sol.imagenId ? `<img class="orbsy-detalle-img" src="${imagenDirecta(sol.imagenId)}" data-alt-src="${imagenAlternativa(sol.imagenId)}" data-tried-alt="0" alt="" onerror="manejarErrorImagen(this)">` : ""}
+      <div class="orbsy-detalle-cuerpo">
+        <div class="orbsy-detalle-tiempo">Te lo comparte ${escapeHtml(sol.deNombre || "Alguien")}</div>
+        <h2 class="orbsy-detalle-titulo">${escapeHtml(sol.titulo)}</h2>
+        ${sol.descripcion ? `<p class="orbsy-detalle-descripcion">${escapeHtml(sol.descripcion)}</p>` : ""}
+        <div style="display:flex;gap:8px;margin-top:18px;">
+          <button type="button" id="aceptarSolicitudOrbsyDetalleBtn" class="orbsy-guardar-btn" style="flex:1;margin-top:0;">Aceptar y guardar</button>
+          <button type="button" id="rechazarSolicitudOrbsyDetalleBtn" class="orbsy-eliminar-btn" style="flex:1;margin-top:0;">Rechazar</button>
+        </div>
+      </div>
+    `;
+    document.getElementById("aceptarSolicitudOrbsyDetalleBtn").addEventListener("click", () => aceptarSolicitudOrbsy(sol, true));
+    document.getElementById("rechazarSolicitudOrbsyDetalleBtn").addEventListener("click", () => rechazarSolicitudOrbsy(sol, true));
+  }
+
+  async function aceptarSolicitudOrbsy(sol, cerrarDetalle) {
+    try {
+      await addDoc(orbsysGaleriaCol, {
+        ownerId: uidActual,
+        titulo: sol.titulo || "Sin título",
+        imagenId: sol.imagenId || "",
+        descripcion: sol.descripcion || "",
+        guardadoEn: serverTimestamp()
+      });
+      await deleteDoc(doc(db, "solicitudesOrbsysGaleria", sol.id));
+      if (cerrarDetalle) cerrarOrbsysGaleriaDetalle();
+      mostrarAvisoToast("💾 Guardado en tu galería de Orbsis", "#39ff8c");
+    } catch (e) {
+      alert("No se pudo aceptar la solicitud: " + e.message);
+    }
+  }
+
+  async function rechazarSolicitudOrbsy(sol, cerrarDetalle) {
+    try {
+      await deleteDoc(doc(db, "solicitudesOrbsysGaleria", sol.id));
+      if (cerrarDetalle) cerrarOrbsysGaleriaDetalle();
+    } catch (e) {
+      alert("No se pudo procesar la solicitud: " + e.message);
+    }
+  }
 
   // Refleja en los 3 botones del lector el estado guardado del recurso/publicación actual
   function todosLosRecursosComprendidos(libroId, recursos) {
