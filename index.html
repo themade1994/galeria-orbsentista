@@ -1681,16 +1681,37 @@
     overflow:hidden;
     background:#0c0c10;
     border-radius:10px;
-    padding:16px 14px;
     display:flex;
     flex-direction:column;
+    min-height:220px;
+    border:1px solid var(--color-casilla, var(--turquesa));
+    box-shadow:0 0 18px -8px var(--color-casilla, var(--turquesa));
+  }
+  /* Sin imagen: la casilla vuelve a ser una sola zona centrada, como antes */
+  .franja-casilla:not(.con-imagen){
+    padding:16px 14px;
     align-items:center;
     justify-content:space-between;
     text-align:center;
-    min-height:150px;
     gap:10px;
-    border:1px solid var(--color-casilla, var(--turquesa));
-    box-shadow:0 0 18px -8px var(--color-casilla, var(--turquesa));
+    min-height:150px;
+  }
+  /* Con imagen: mitad de arriba = texto sobre un duplicado difuminado de la
+     imagen; mitad de abajo = la misma imagen nítida, con Guardar/IR encima */
+  .franja-superior{
+    position:relative;
+    flex:1 1 50%;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:14px;
+    text-align:center;
+  }
+  .franja-inferior{
+    position:relative;
+    flex:1 1 50%;
+    overflow:hidden;
   }
   .franja-fondo-img{
     position:absolute;
@@ -1698,13 +1719,21 @@
     width:calc(100% + 24px);
     height:calc(100% + 24px);
     object-fit:cover;
-    filter:blur(7px) brightness(0.62) saturate(1.15);
+    filter:blur(7px) brightness(0.55) saturate(1.15);
     z-index:0;
   }
   .franja-overlay{
     position:absolute;
     inset:0;
-    background:linear-gradient(180deg, rgba(6,6,9,0.28), rgba(6,6,9,0.55));
+    background:linear-gradient(180deg, rgba(6,6,9,0.3), rgba(6,6,9,0.58));
+    z-index:0;
+  }
+  .franja-imagen-nitida{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
     z-index:0;
   }
   .franja-usuario{
@@ -1730,13 +1759,23 @@
     text-shadow:0 1px 5px rgba(0,0,0,0.75);
   }
   .franja-pie{
-    position:relative;
-    z-index:1;
     width:100%;
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:8px;
+  }
+  .franja-casilla:not(.con-imagen) .franja-pie{
+    position:relative;
+    z-index:1;
+  }
+  .franja-inferior .franja-pie{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    z-index:1;
+    padding:10px 12px;
+    box-sizing:border-box;
+    background:linear-gradient(180deg, transparent, rgba(0,0,0,0.68));
   }
   .franja-guardar-btn{
     background:transparent;
@@ -5629,19 +5668,29 @@
     barajado.forEach((item, i) => {
       const yaGuardado = fragmentoYaGuardado(item.tipo, item.refId);
       const casilla = document.createElement("div");
-      casilla.className = "franja-casilla";
+      casilla.className = "franja-casilla" + (item.imagenId ? " con-imagen" : "");
       casilla.style.setProperty("--color-casilla", PALETA_FRANJA[i % PALETA_FRANJA.length]);
-      casilla.innerHTML = `
-        ${item.imagenId ? `
-          <img class="franja-fondo-img" src="${imagenDirecta(item.imagenId)}" data-alt-src="${imagenAlternativa(item.imagenId)}" data-tried-alt="0" alt="" loading="lazy" onerror="manejarErrorFondoDecorativo(this)">
-          <div class="franja-overlay"></div>
-        ` : ""}
-        <div class="franja-usuario">${escapeHtml(nombreCreador(item.ownerId))}</div>
-        <div class="franja-texto">${escapeHtml(item.texto)}</div>
+      const botonesPie = `
         <div class="franja-pie">
           <button type="button" class="franja-guardar-btn">${yaGuardado ? "Guardado ✓" : "Guardar"}</button>
           <button type="button" class="franja-ir-btn">IR</button>
         </div>
+      `;
+      casilla.innerHTML = item.imagenId ? `
+        <div class="franja-superior">
+          <img class="franja-fondo-img" src="${imagenDirecta(item.imagenId)}" data-alt-src="${imagenAlternativa(item.imagenId)}" data-tried-alt="0" alt="" loading="lazy" onerror="manejarErrorFondoDecorativo(this)">
+          <div class="franja-overlay"></div>
+          <div class="franja-usuario">${escapeHtml(nombreCreador(item.ownerId))}</div>
+          <div class="franja-texto">${escapeHtml(item.texto)}</div>
+        </div>
+        <div class="franja-inferior">
+          <img class="franja-imagen-nitida" src="${imagenDirecta(item.imagenId)}" data-alt-src="${imagenAlternativa(item.imagenId)}" data-tried-alt="0" alt="" loading="lazy" onerror="manejarErrorFondoDecorativo(this)">
+          ${botonesPie}
+        </div>
+      ` : `
+        <div class="franja-usuario">${escapeHtml(nombreCreador(item.ownerId))}</div>
+        <div class="franja-texto">${escapeHtml(item.texto)}</div>
+        ${botonesPie}
       `;
       casilla.querySelector(".franja-ir-btn").addEventListener("click", () => irAFragmentoContenido(item));
       casilla.querySelector(".franja-guardar-btn").addEventListener("click", (e) => alternarGuardarFragmento(item, e.target));
