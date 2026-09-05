@@ -2927,15 +2927,22 @@
     </div>
     <div class="notas-guardadas-lista" id="esqueletosLista"></div>
   </div>
+</div>
 
-  <div id="orbsysGaleriaVista" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
-    <div style="padding:10px 14px;">
-      <button id="volverAHerramientasDesdeOrbsysGaleriaBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Herramientas</button>
-    </div>
-    <p style="font-size:0.75rem;color:var(--text-sec);padding:0 14px 10px;">Orbsis que guardaste desde el detalle de un Orbsy. Quedan aquí aunque el original se borre o expire, pero sin sus comentarios.</p>
-    <div id="orbsysGaleriaGrid" class="orbsys-galeria-grid" style="padding:0 14px 16px;overflow-y:auto;flex:1;"></div>
-    <div id="orbsysGaleriaVaciaMsg" class="empty-msg" style="display:none;padding:20px;">Todavía no guardaste ningún Orbsy.</div>
+
+<!-- PÁGINA COMPLETA: GALERÍA DE ORBSIS GUARDADOS -->
+<div id="orbsysGaleriaVista" style="display:none;position:fixed;inset:0;background:#0e0e12;z-index:9540;flex-direction:column;">
+  <div class="modal-bar">
+    <button id="cerrarOrbsysGaleriaVistaBtn">← Volver</button>
+    <div>Galería de Orbsis</div>
+    <span></span>
   </div>
+  <p style="font-size:0.75rem;color:var(--text-sec);padding:12px 14px 6px;margin:0;">Orbsis que guardaste desde el detalle de un Orbsy, del más reciente al más antiguo. Quedan aquí aunque el original se borre o expire, pero sin sus comentarios.</p>
+  <div style="padding:6px 14px 10px;">
+    <input type="text" id="orbsysGaleriaBuscarInput" placeholder="🔍 Buscar por título..." style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.85rem;">
+  </div>
+  <div id="orbsysGaleriaGrid" class="orbsys-galeria-grid" style="padding:0 14px 16px;overflow-y:auto;flex:1;"></div>
+  <div id="orbsysGaleriaVaciaMsg" class="empty-msg" style="display:none;padding:20px;"></div>
 </div>
 
 
@@ -6173,7 +6180,6 @@
     document.getElementById("notasGuardadasVista").style.display = "none";
     document.getElementById("fragmentosGuardadosVista").style.display = "none";
     document.getElementById("esqueletosVista").style.display = "none";
-    document.getElementById("orbsysGaleriaVista").style.display = "none";
     document.getElementById("herramientasMenu").style.display = "block";
   }
   function cerrarHerramientas() {
@@ -7917,8 +7923,10 @@
   }
 
   function misOrbsysGuardados() {
+    const texto = (document.getElementById("orbsysGaleriaBuscarInput")?.value || "").trim().toLowerCase();
     return orbsysGaleria
       .filter(o => o.ownerId === uidActual)
+      .filter(o => !texto || (o.titulo || "").toLowerCase().includes(texto))
       .sort((a, b) => (b.guardadoEn?.seconds || 0) - (a.guardadoEn?.seconds || 0));
   }
 
@@ -7949,11 +7957,14 @@
       vacioMsg.style.display = "block";
       return;
     }
+    const hayGuardados = misOrbsysGaleriaTodos().length > 0;
     const items = misOrbsysGuardados();
     grid.innerHTML = "";
     if (items.length === 0) {
       grid.style.display = "none";
-      vacioMsg.textContent = "Todavía no guardaste ningún Orbsy.";
+      vacioMsg.textContent = hayGuardados
+        ? "No encontramos ningún Orbsy guardado con ese título."
+        : "Todavía no guardaste ningún Orbsy.";
       vacioMsg.style.display = "block";
       return;
     }
@@ -7961,16 +7972,22 @@
     vacioMsg.style.display = "none";
     items.forEach(item => grid.appendChild(crearTarjetaOrbsyGaleria(item)));
   }
+  function misOrbsysGaleriaTodos() {
+    return orbsysGaleria.filter(o => o.ownerId === uidActual);
+  }
 
   const orbsysGaleriaVista = document.getElementById("orbsysGaleriaVista");
   document.getElementById("abrirOrbsysGaleriaBtn").addEventListener("click", () => {
-    document.getElementById("herramientasMenu").style.display = "none";
+    cerrarHerramientas();
+    document.getElementById("orbsysGaleriaBuscarInput").value = "";
     orbsysGaleriaVista.style.display = "flex";
     renderOrbsysGaleriaGrid();
   });
-  document.getElementById("volverAHerramientasDesdeOrbsysGaleriaBtn").addEventListener("click", () => {
+  document.getElementById("cerrarOrbsysGaleriaVistaBtn").addEventListener("click", () => {
     orbsysGaleriaVista.style.display = "none";
-    document.getElementById("herramientasMenu").style.display = "block";
+  });
+  document.getElementById("orbsysGaleriaBuscarInput").addEventListener("input", () => {
+    renderOrbsysGaleriaGrid();
   });
 
   // ---------- Detalle de un Orbsy guardado: solo descripción, "Compartir" y "Eliminar" ----------
