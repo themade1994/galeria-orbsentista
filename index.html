@@ -1921,7 +1921,12 @@
     border-radius:8px;
     font-size:0.78rem;
     cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
   }
+  .orbsy-eliminar-btn svg, .orbsy-guardar-btn svg{ width:18px; height:18px; flex-shrink:0; }
   .orbsy-detalle-separador{
     border-top:1px solid var(--border);
     margin:22px 0 16px;
@@ -1995,6 +2000,10 @@
     font-size:0.78rem;
     font-weight:600;
     cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
   }
 
   /* GALERÍA DE ORBSIS (Orbsis guardados) */
@@ -2744,6 +2753,108 @@
       <line x1="50" y1="115" x2="150" y2="115" stroke="#22d3c4" stroke-width="6"/>
       <circle cx="72" cy="90" r="6" fill="#22d3c4"/>
     </g>
+    <!-- Ícono de Fragmentos guardados: fragmento/marcador con forma de punta
+         (bookmark roto), con líneas de texto adentro. Misma familia turquesa
+         "guardado por ti" que la cápsula, pero silueta propia. -->
+    <g id="icono-fragmento-svg">
+      <linearGradient id="fragmentoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#22d3c4" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#22d3c4" stop-opacity="0.55"/>
+      </linearGradient>
+      <path d="M 68 48 L 132 48 L 132 122 L 100 152 L 68 122 Z" fill="url(#fragmentoGrad)" stroke="#22d3c4" stroke-width="6" stroke-linejoin="round"/>
+      <line x1="82" y1="70" x2="118" y2="70" stroke="#22d3c4" stroke-width="5" stroke-linecap="round"/>
+      <line x1="82" y1="88" x2="106" y2="88" stroke="#22d3c4" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+    </g>
+
+    <!-- Ícono de orbSYS galería: dos marcos superpuestos (galería de fotos)
+         con un pequeño orbe y una línea de horizonte adentro, en turquesa. -->
+    <g id="icono-orbsysgaleria-svg">
+      <linearGradient id="orbsysGaleriaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#22d3c4" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#22d3c4" stop-opacity="0.55"/>
+      </linearGradient>
+      <rect x="50" y="64" width="68" height="68" rx="12" transform="rotate(-9 84 98)" fill="#15151b" stroke="#22d3c4" stroke-width="5"/>
+      <rect x="80" y="56" width="70" height="70" rx="12" fill="url(#orbsysGaleriaGrad)" stroke="#22d3c4" stroke-width="6"/>
+      <circle cx="104" cy="80" r="8" fill="#22d3c4"/>
+      <path d="M 90 116 L 108 94 L 122 108 L 140 88" fill="none" stroke="#22d3c4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Ícono de Guardar: un objeto cayendo y quedando capturado en órbita -->
+    <g id="icono-guardar-svg">
+      <ellipse cx="100" cy="112" rx="46" ry="18" fill="none" stroke="currentColor" stroke-width="6"/>
+      <path d="M 100 40 L 100 92" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+      <path d="M 78 72 L 100 96 L 122 72" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="100" cy="112" r="9" fill="currentColor" opacity="0.55"/>
+    </g>
+
+    <!-- Ícono de Compartir: un nodo transmitiendo hacia otros dos, mismo
+         lenguaje de constelación que "Seguidos" -->
+    <g id="icono-compartir-svg">
+      <circle cx="66" cy="100" r="14" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="5"/>
+      <circle cx="138" cy="66" r="12" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="5"/>
+      <circle cx="138" cy="134" r="12" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="5"/>
+      <line x1="78" y1="93" x2="126" y2="70" stroke="currentColor" stroke-width="5" opacity="0.9"/>
+      <line x1="78" y1="107" x2="126" y2="130" stroke="currentColor" stroke-width="5" opacity="0.9"/>
+    </g>
+
+    <!-- Ícono de Eliminar: la misma silueta de cápsula, pero tachada -->
+    <g id="icono-eliminar-svg">
+      <rect x="72" y="46" width="56" height="112" rx="28" fill="none" stroke="currentColor" stroke-width="6"/>
+      <line x1="84" y1="86" x2="116" y2="118" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+      <line x1="116" y1="86" x2="84" y2="118" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+    </g>
+
+    <!-- Ícono de Aceptar: anillo orbital con marca de verificación -->
+    <g id="icono-aceptar-svg">
+      <circle cx="100" cy="100" r="46" fill="none" stroke="currentColor" stroke-width="6"/>
+      <path d="M 76 102 L 94 120 L 128 82" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Ícono de Rechazar: anillo orbital tachado -->
+    <g id="icono-rechazar-svg">
+      <circle cx="100" cy="100" r="46" fill="none" stroke="currentColor" stroke-width="6"/>
+      <line x1="80" y1="80" x2="120" y2="120" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+      <line x1="120" y1="80" x2="80" y2="120" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+    </g>
+    <!-- Ícono de Conectar: dos nodos unidos por una línea, mismo lenguaje
+         de constelación que "Seguidos"/"Compartir" -->
+    <g id="icono-conectar-svg">
+      <circle cx="66" cy="140" r="13" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="5"/>
+      <circle cx="134" cy="60" r="13" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="5"/>
+      <line x1="76" y1="130" x2="124" y2="70" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="7" fill="currentColor"/>
+    </g>
+
+    <!-- Ícono de Editar: trazo tipo lápiz -->
+    <g id="icono-editar-svg">
+      <path d="M 68 132 L 128 72 L 148 92 L 88 152 L 62 158 Z" fill="currentColor" opacity="0.25" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/>
+      <line x1="116" y1="84" x2="136" y2="104" stroke="currentColor" stroke-width="5"/>
+    </g>
+
+    <!-- Ícono de Café Abierto: taza con vapor, en tono cálido propio (distinto
+         de la paleta fría de orbSY, para marcarlo como espacio social externo) -->
+    <g id="icono-cafe-svg">
+      <linearGradient id="cafeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#c9a267" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#c9a267" stop-opacity="0.6"/>
+      </linearGradient>
+      <path d="M 60 92 L 132 92 L 128 138 A 34 34 0 0 1 64 138 Z" fill="url(#cafeGrad)" stroke="#c9a267" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M 132 98 A 20 20 0 0 1 132 138" fill="none" stroke="#c9a267" stroke-width="6"/>
+      <path d="M 78 78 Q 84 66 78 56" fill="none" stroke="#c9a267" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+      <path d="M 100 78 Q 106 66 100 56" fill="none" stroke="#c9a267" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+    </g>
+
+    <!-- Ícono de Póker Café: carta con un pip propio de orbSY (orbe+triángulo
+         en vez de un palo de baraja real), en violeta -->
+    <g id="icono-poker-svg">
+      <linearGradient id="pokerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#9b7cf6" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#9b7cf6" stop-opacity="0.55"/>
+      </linearGradient>
+      <rect x="58" y="50" width="84" height="100" rx="10" fill="url(#pokerGrad)" stroke="#9b7cf6" stroke-width="6"/>
+      <circle cx="100" cy="88" r="12" fill="#9b7cf6"/>
+      <path d="M 100 108 L 88 132 L 112 132 Z" fill="#9b7cf6"/>
+    </g>
   </defs>
 </svg>
 
@@ -2781,7 +2892,7 @@
       </div>
     </div>
     <div class="herramienta-item" id="abrirFragmentosGuardadosBtn">
-      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-capsula-svg"/></svg>
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-fragmento-svg"/></svg>
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Fragmentos guardados</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Fragmentos que guardaste para después</div>
@@ -2802,21 +2913,21 @@
       </div>
     </div>
     <div class="herramienta-item" id="abrirOrbsysGaleriaBtn">
-      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-capsula-svg"/></svg>
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-orbsysgaleria-svg"/></svg>
       <div>
         <div style="font-size:0.85rem;font-weight:600;">orbSYS galería</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Orbsis que guardaste, en forma de galería</div>
       </div>
     </div>
     <div class="herramienta-item" id="abrirCafeAbiertoBtn">
-      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">☕</div>
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-cafe-svg"/></svg>
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Café Abierto</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Abre en una pestaña nueva</div>
       </div>
     </div>
     <div class="herramienta-item" id="abrirPokerCafeBtn">
-      <div style="width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">🃏</div>
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-poker-svg"/></svg>
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Póker Café</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Abre en una pestaña nueva</div>
@@ -2857,13 +2968,13 @@
         <button type="button" class="plantilla-tipo-btn" data-tipo="publicacion" data-color="violeta">📖 Publicación</button>
       </div>
 
-      <label id="plantillaNombreLabel"><span class="etiqueta-icono">✏️</span> <span class="etiqueta-texto">Nombre</span></label>
+      <label id="plantillaNombreLabel"><span class="etiqueta-icono"><svg viewBox="0 0 200 200" style="width:14px;height:14px;vertical-align:-2px;"><use href="#icono-editar-svg"/></svg></span> <span class="etiqueta-texto">Nombre</span></label>
       <div class="plantilla-campo-copiable">
         <input type="text" id="plantillaNombreInput" placeholder="Ej: La noche del nihilista">
         <button type="button" class="copiar-campo-btn" data-target="plantillaNombreInput">Copiar</button>
       </div>
 
-      <label id="plantillaResumenLabel"><span class="etiqueta-icono">📝</span> <span class="etiqueta-texto">Resumen</span></label>
+      <label id="plantillaResumenLabel"><span class="etiqueta-icono"><svg viewBox="0 0 200 200" style="width:14px;height:14px;vertical-align:-2px;"><use href="#icono-editar-svg"/></svg></span> <span class="etiqueta-texto">Resumen</span></label>
       <div class="plantilla-campo-copiable">
         <textarea id="plantillaResumenInput" placeholder="Resumen o frase de bienvenida..."></textarea>
         <button type="button" class="copiar-campo-btn" data-target="plantillaResumenInput">Copiar</button>
@@ -3234,7 +3345,7 @@
         </div>
         <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:18px;">Todas tus gestiones de cuenta, en un solo lugar — sin menús escondidos.</p>
 
-        <button type="button" id="editarPerfilBtn" style="width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px;border-radius:9px;cursor:pointer;font-weight:600;margin-bottom:10px;">✏️ Editar perfil (nombre, foto, color, resumen)</button>
+        <button type="button" id="editarPerfilBtn" style="width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px;border-radius:9px;cursor:pointer;font-weight:600;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;"><svg viewBox="0 0 200 200" style="width:16px;height:16px;flex-shrink:0;"><use href="#icono-editar-svg"/></svg>Editar perfil (nombre, foto, color, resumen)</button>
 
         <div style="background:var(--superficie);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
           <p style="font-size:0.78rem;font-weight:600;margin-bottom:2px;">Modo de cuenta: <span id="modoActualTexto" style="color:var(--accent);">Creador</span></p>
@@ -3489,7 +3600,7 @@
     <div id="esqueletoModalTitulo"></div>
     <button id="verAparienciaEsqueletoBtn" style="background:transparent;border:1px solid var(--turquesa);color:var(--turquesa);padding:8px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;">Ver apariencia</button>
   </div>
-  <div id="avisoConectandoEsqueleto" style="display:none;text-align:center;font-size:0.74rem;color:#facc15;background:rgba(250,204,21,0.08);border-bottom:1px solid rgba(250,204,21,0.3);padding:7px;">🔗 Modo conectar activo — tocá otra casilla para unirla. Tocá de nuevo el botón de enlace para apagarlo.</div>
+  <div id="avisoConectandoEsqueleto" style="display:none;text-align:center;font-size:0.74rem;color:#facc15;background:rgba(250,204,21,0.08);border-bottom:1px solid rgba(250,204,21,0.3);padding:7px;"><svg viewBox="0 0 200 200" style="width:15px;height:15px;flex-shrink:0;vertical-align:-3px;margin-right:5px;"><use href="#icono-conectar-svg"/></svg>Modo conectar activo — tocá otra casilla para unirla. Tocá de nuevo el botón de enlace para apagarlo.</div>
   <div style="flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:24px 12px;">
     <svg id="esqueletoSvg" viewBox="0 0 260 340" style="width:min(90vw, 320px);height:auto;"></svg>
   </div>
@@ -3526,7 +3637,7 @@
   <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;max-width:280px;width:100%;">
     <p id="casillaLibreAccionesNombre" style="font-family:'Fraunces',serif;font-size:1rem;text-align:center;margin-bottom:14px;"></p>
     <button id="verCasillaLibreBtn" style="width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:11px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:8px;">📖 Ver / editar contenido</button>
-    <button id="conectarCasillaLibreBtn" style="width:100%;background:transparent;border:1px solid #facc15;color:#facc15;padding:11px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:8px;">🔗 Conectar desde aquí</button>
+    <button id="conectarCasillaLibreBtn" style="width:100%;background:transparent;border:1px solid #facc15;color:#facc15;padding:11px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px;"><svg viewBox="0 0 200 200" style="width:17px;height:17px;flex-shrink:0;"><use href="#icono-conectar-svg"/></svg>Conectar desde aquí</button>
     <button id="nucleoCasillaLibreBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:11px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:8px;">☆ Marcar como núcleo</button>
     <button id="eliminarCasillaLibreBtn" style="width:100%;background:transparent;border:1px solid #f87171;color:#f87171;padding:11px;border-radius:9px;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:12px;">✕ Eliminar casilla</button>
     <button id="cerrarCasillaLibreAccionesBtn" style="width:100%;background:transparent;border:none;color:var(--text-sec);padding:6px;font-size:0.76rem;cursor:pointer;">Cancelar</button>
@@ -7515,10 +7626,10 @@
         <span class="tema-nombre-esqueleto">${escapeHtml(tema.etiqueta)}</span>
         <button class="tema-menu-btn-esqueleto">⋮</button>
         <div class="tema-menu-flotante">
-          <button class="tema-menu-opcion op-renombrar">✏️ Cambiar título</button>
+          <button class="tema-menu-opcion op-renombrar"><svg viewBox="0 0 200 200" style="width:16px;height:16px;flex-shrink:0;"><use href="#icono-editar-svg"/></svg>Cambiar título</button>
           <button class="tema-menu-opcion op-mover-casilla">📍 Mover a otra casilla</button>
           <button class="tema-menu-opcion op-mover-jerarquia">↕️ Mover de jerarquía</button>
-          <button class="tema-menu-opcion eliminar op-eliminar">🗑 Eliminar tema</button>
+          <button class="tema-menu-opcion eliminar op-eliminar"><svg viewBox="0 0 200 200" style="width:16px;height:16px;flex-shrink:0;"><use href="#icono-eliminar-svg"/></svg>Eliminar tema</button>
         </div>
       `;
       const menuFlotante = row.querySelector(".tema-menu-flotante");
@@ -7779,8 +7890,8 @@
         <div class="orbsy-detalle-tiempo">${tiempoRestanteOrbsy(orbsy)} · ${escapeHtml(nombreCreador(orbsy.ownerId))}</div>
         <h2 class="orbsy-detalle-titulo">${escapeHtml(orbsy.titulo)}</h2>
         ${orbsy.descripcion ? `<p class="orbsy-detalle-descripcion">${escapeHtml(orbsy.descripcion)}</p>` : ""}
-        ${uidActual ? `<button type="button" id="guardarOrbsyGaleriaBtn" class="orbsy-guardar-btn">💾 Guardar en tu galería de Orbsis</button>` : ""}
-        ${esDueno ? `<button type="button" id="eliminarOrbsyBtn" class="orbsy-eliminar-btn">🗑 Eliminar Orbsy</button>` : ""}
+        ${uidActual ? `<button type="button" id="guardarOrbsyGaleriaBtn" class="orbsy-guardar-btn"><svg viewBox="0 0 200 200"><use href="#icono-guardar-svg"/></svg>Guardar en tu galería de Orbsis</button>` : ""}
+        ${esDueno ? `<button type="button" id="eliminarOrbsyBtn" class="orbsy-eliminar-btn"><svg viewBox="0 0 200 200"><use href="#icono-eliminar-svg"/></svg>Eliminar Orbsy</button>` : ""}
         <div class="orbsy-detalle-separador"></div>
         <div class="orbsy-comentarios-lista" id="orbsyComentariosLista"></div>
         <div class="orbsy-comentario-form">
@@ -7937,7 +8048,7 @@
         descripcion: orbsy.descripcion || "",
         guardadoEn: serverTimestamp()
       });
-      mostrarAvisoToast("💾 Guardado en tu galería de Orbsis", "#39ff8c");
+      mostrarAvisoToast("Guardado en tu galería de Orbsis", "#39ff8c");
     } catch (e) {
       alert("No se pudo guardar el Orbsy: " + e.message);
     }
@@ -8041,8 +8152,8 @@
         ${item.imagenId ? `<h2 class="orbsy-detalle-titulo">${escapeHtml(item.titulo)}</h2>` : ""}
         ${item.descripcion ? `<p class="orbsy-detalle-descripcion">${escapeHtml(item.descripcion)}</p>` : ""}
         <div style="display:flex;gap:8px;margin-top:18px;">
-          <button type="button" id="compartirOrbsyGaleriaBtn" class="orbsy-guardar-btn" style="flex:1;margin-top:0;">🔗 Compartir</button>
-          <button type="button" id="eliminarOrbsyGaleriaBtn" class="orbsy-eliminar-btn" style="flex:1;margin-top:0;">🗑 Eliminar</button>
+          <button type="button" id="compartirOrbsyGaleriaBtn" class="orbsy-guardar-btn" style="flex:1;margin-top:0;"><svg viewBox="0 0 200 200"><use href="#icono-compartir-svg"/></svg>Compartir</button>
+          <button type="button" id="eliminarOrbsyGaleriaBtn" class="orbsy-eliminar-btn" style="flex:1;margin-top:0;"><svg viewBox="0 0 200 200"><use href="#icono-eliminar-svg"/></svg>Eliminar</button>
         </div>
       </div>
     `;
@@ -8178,8 +8289,8 @@
         ${sol.imagenId ? `<h2 class="orbsy-detalle-titulo">${escapeHtml(sol.titulo)}</h2>` : ""}
         ${sol.descripcion ? `<p class="orbsy-detalle-descripcion">${escapeHtml(sol.descripcion)}</p>` : ""}
         <div style="display:flex;gap:8px;margin-top:18px;">
-          <button type="button" id="aceptarSolicitudOrbsyDetalleBtn" class="orbsy-guardar-btn" style="flex:1;margin-top:0;">Aceptar y guardar</button>
-          <button type="button" id="rechazarSolicitudOrbsyDetalleBtn" class="orbsy-eliminar-btn" style="flex:1;margin-top:0;">Rechazar</button>
+          <button type="button" id="aceptarSolicitudOrbsyDetalleBtn" class="orbsy-guardar-btn" style="flex:1;margin-top:0;"><svg viewBox="0 0 200 200"><use href="#icono-aceptar-svg"/></svg>Aceptar y guardar</button>
+          <button type="button" id="rechazarSolicitudOrbsyDetalleBtn" class="orbsy-eliminar-btn" style="flex:1;margin-top:0;"><svg viewBox="0 0 200 200"><use href="#icono-rechazar-svg"/></svg>Rechazar</button>
         </div>
       </div>
     `;
@@ -8198,7 +8309,7 @@
       });
       await deleteDoc(doc(db, "solicitudesOrbsysGaleria", sol.id));
       if (cerrarDetalle) cerrarOrbsysGaleriaDetalle();
-      mostrarAvisoToast("💾 Guardado en tu galería de Orbsis", "#39ff8c");
+      mostrarAvisoToast("Guardado en tu galería de Orbsis", "#39ff8c");
     } catch (e) {
       alert("No se pudo aceptar la solicitud: " + e.message);
     }
