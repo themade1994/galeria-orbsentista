@@ -1291,10 +1291,13 @@
     font-size:1.2rem;
   }
   #coleccionHeaderInfo p{
-    color:var(--text-sec);
-    font-size:0.82rem;
-    font-style:italic;
-    margin-top:2px;
+    color:var(--text);
+    font-size:0.88rem;
+    font-style:normal;
+    font-weight:400;
+    line-height:1.5;
+    margin-top:4px;
+    opacity:0.92;
   }
   select#inputColeccionAsignada{
     width:100%;
@@ -1674,6 +1677,8 @@
     .franja-fragmentos{ grid-template-columns:repeat(1, 1fr); }
   }
   .franja-casilla{
+    position:relative;
+    overflow:hidden;
     background:#0c0c10;
     border-radius:10px;
     padding:16px 14px;
@@ -1687,23 +1692,46 @@
     border:1px solid var(--color-casilla, var(--turquesa));
     box-shadow:0 0 18px -8px var(--color-casilla, var(--turquesa));
   }
+  .franja-fondo-img{
+    position:absolute;
+    inset:-12px;
+    width:calc(100% + 24px);
+    height:calc(100% + 24px);
+    object-fit:cover;
+    filter:blur(7px) brightness(0.62) saturate(1.15);
+    z-index:0;
+  }
+  .franja-overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(6,6,9,0.28), rgba(6,6,9,0.55));
+    z-index:0;
+  }
   .franja-usuario{
+    position:relative;
+    z-index:1;
     font-family:'IBM Plex Mono',monospace;
     font-size:0.68rem;
     letter-spacing:0.06em;
     text-transform:uppercase;
     color:var(--color-casilla, var(--accent));
     align-self:flex-start;
+    text-shadow:0 1px 5px rgba(0,0,0,0.75);
   }
   .franja-texto{
+    position:relative;
+    z-index:1;
     color:#fff;
     font-size:0.85rem;
     line-height:1.4;
     flex:1;
     display:flex;
     align-items:center;
+    text-shadow:0 1px 5px rgba(0,0,0,0.75);
   }
   .franja-pie{
+    position:relative;
+    z-index:1;
     width:100%;
     display:flex;
     align-items:center;
@@ -2855,6 +2883,12 @@
       <circle cx="100" cy="88" r="12" fill="#9b7cf6"/>
       <path d="M 100 108 L 88 132 L 112 132 Z" fill="#9b7cf6"/>
     </g>
+    <!-- Ícono del badge "más info de este perfil": un planeta con su anillo,
+         para no confundirse con un símbolo de advertencia -->
+    <g id="icono-perfilinfo-svg">
+      <circle cx="100" cy="100" r="30" fill="currentColor"/>
+      <ellipse cx="100" cy="100" rx="70" ry="22" fill="none" stroke="currentColor" stroke-width="10" transform="rotate(-20 100 100)"/>
+    </g>
   </defs>
 </svg>
 
@@ -3081,7 +3115,7 @@
 <header id="headerColecciones" style="display:none;">
   <button id="backToGaleriasBtn" style="position:absolute;left:16px;top:16px;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:6px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">← Galerías</button>
   <h1 id="tituloGaleriaHeader" aria-label="Galería"></h1>
-  <div id="firmaGaleriaHeader" style="text-align:center;font-style:italic;font-size:0.8rem;color:var(--text-sec);margin-top:2px;"></div>
+  <div id="firmaGaleriaHeader" style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;font-style:normal;color:var(--turquesa);margin-top:6px;"></div>
 </header>
 
 <main>
@@ -3219,6 +3253,10 @@
       <textarea id="inputFragmentoGaleria" maxlength="250" placeholder="Ej: Un lugar para pensar distinto."></textarea>
       <div style="text-align:right;font-size:0.7rem;color:var(--text-sec);margin-top:-6px;margin-bottom:8px;"><span id="contadorFragmentoGaleria">0</span>/250</div>
 
+      <label>Imagen de portada para este fragmento (opcional)</label>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Si no la pones, el fragmento usa la misma portada de la galería.</p>
+      <input type="text" id="inputFragmentoImagenGaleria" placeholder="https://drive.google.com/file/d/.../view">
+
       <div style="display:flex;gap:8px;">
         <button id="crearGaleriaBtn" style="flex:1;">Crear galería</button>
         <button id="cancelarEdicionGaleriaBtn" style="display:none;flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:0 14px;border-radius:9px;">Cancelar</button>
@@ -3265,6 +3303,10 @@
       <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Un texto corto que invite a otros a revisar esta colección. Aparece en la franja de fragmentos de orbSY.</p>
       <textarea id="inputFragmentoColeccion" maxlength="250" placeholder="Ej: ¿Y si la resignación no es rendirse?"></textarea>
       <div style="text-align:right;font-size:0.7rem;color:var(--text-sec);margin-top:-6px;margin-bottom:8px;"><span id="contadorFragmentoColeccion">0</span>/250</div>
+
+      <label>Imagen de portada para este fragmento (opcional)</label>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Si no la pones, el fragmento usa la misma portada de la colección.</p>
+      <input type="text" id="inputFragmentoImagenColeccion" placeholder="https://drive.google.com/file/d/.../view">
 
       <div style="display:flex;gap:8px;">
         <button id="crearColeccionBtn" style="flex:1;">Crear colección</button>
@@ -3323,6 +3365,10 @@
       <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Un texto corto que invite a otros a revisar esta publicación. Aparece en la franja de fragmentos de orbSY.</p>
       <textarea id="inputFragmentoLibro" maxlength="250" placeholder="Ej: Lo que nadie te cuenta sobre empezar de nuevo."></textarea>
       <div style="text-align:right;font-size:0.7rem;color:var(--text-sec);margin-top:-6px;margin-bottom:8px;"><span id="contadorFragmentoLibro">0</span>/250</div>
+
+      <label>Imagen de portada para este fragmento (opcional)</label>
+      <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:6px;">Si no la pones, el fragmento usa la misma portada de esta publicación.</p>
+      <input type="text" id="inputFragmentoImagenLibro" placeholder="https://drive.google.com/file/d/.../view">
 
       <div style="display:flex;gap:8px;margin-top:16px;">
         <button id="publishBtn" style="flex:1;">Publicar</button>
@@ -3493,7 +3539,7 @@
       <div id="coleccionHeaderInfo">
         <h2 id="coleccionDetalleTitulo"></h2>
         <p id="coleccionDetalleFrase"></p>
-        <div id="firmaColeccionDetalle" style="font-style:italic;font-size:0.78rem;color:var(--text-sec);margin-top:-6px;margin-bottom:10px;"></div>
+        <div id="firmaColeccionDetalle" style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;font-style:normal;color:var(--turquesa);margin-top:6px;margin-bottom:10px;"></div>
         <button id="abrirDiccionarioBtn" class="boton-orbita auto" style="display:none;">📖 Diccionario de Referencias</button>
       </div>
     </div>
@@ -3687,7 +3733,7 @@
       <span class="notas-texto-corto">N</span>
     </button>
   </div>
-  <div id="firmaLectorBar" style="text-align:center;font-style:italic;font-size:0.72rem;color:var(--text-sec);padding:3px 10px;border-bottom:1px solid var(--border);"></div>
+  <div id="firmaLectorBar" style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;letter-spacing:0.07em;text-transform:uppercase;font-weight:700;font-style:normal;color:var(--turquesa);padding:5px 10px;border-bottom:1px solid var(--border);"></div>
   <div id="progresoLectorBar" style="display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);align-items:center;flex-wrap:wrap;">
     <button type="button" id="marcarComprendidoBtn" style="flex:1;min-width:110px;padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">✓ Comprendido</button>
     <button type="button" id="marcarCongelarBtn" style="flex:1;min-width:110px;padding:7px 6px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;">❄ Congelar</button>
@@ -4443,6 +4489,7 @@
     document.getElementById("inputColeccionAsignada").value = libro.coleccionId || "";
     document.getElementById("inputFragmentoLibro").value = libro.fragmento || "";
     document.getElementById("contadorFragmentoLibro").textContent = String((libro.fragmento || "").length);
+    document.getElementById("inputFragmentoImagenLibro").value = libro.fragmentoImagenId ? `https://drive.google.com/file/d/${libro.fragmentoImagenId}/view` : "";
 
     const recursosOriginales = recursosDeLibro(libro);
     recursosBuilder = recursosOriginales.map(r => {
@@ -4508,6 +4555,7 @@
     document.getElementById("inputPortada").value = "";
     document.getElementById("inputFragmentoLibro").value = "";
     document.getElementById("contadorFragmentoLibro").textContent = "0";
+    document.getElementById("inputFragmentoImagenLibro").value = "";
     recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
     renderRecursosBuilder();
     preguntasBuilder = [];
@@ -4548,6 +4596,8 @@
 
     const portadaId = extraerIdDrive(portadaUrl);
     const fragmento = document.getElementById("inputFragmentoLibro").value.trim().slice(0, 250);
+    const fragmentoImagenUrl = document.getElementById("inputFragmentoImagenLibro").value.trim();
+    const fragmentoImagenId = fragmentoImagenUrl ? extraerIdDrive(fragmentoImagenUrl) : "";
     const preguntasReflexion = preguntasBuilder.map(p => p.trim()).filter(p => p !== "");
     const terminosValidos = inputAgregarDiccionario.checked
       ? diccionarioBuilder.map(par => ({ termino: par.termino.trim(), definicion: par.definicion.trim() })).filter(par => par.termino !== "" && par.definicion !== "")
@@ -4592,7 +4642,8 @@
       preguntasReflexion,
       coleccionId: coleccionSeleccionada,
       terminosReferencia: terminosValidos.map(par => par.termino),
-      fragmento
+      fragmento,
+      fragmentoImagenId
     };
 
     try {
@@ -4608,6 +4659,7 @@
         document.getElementById("inputPortada").value = "";
         document.getElementById("inputFragmentoLibro").value = "";
         document.getElementById("contadorFragmentoLibro").textContent = "0";
+        document.getElementById("inputFragmentoImagenLibro").value = "";
         recursosBuilder = [{ tipo: "texto", etiqueta: "", enlace: "", fuente: "drive" }];
         renderRecursosBuilder();
         preguntasBuilder = [];
@@ -4764,6 +4816,7 @@
     document.getElementById("inputEsGaleriaNoticias").checked = !!gal.esNoticias;
     document.getElementById("inputFragmentoGaleria").value = gal.fragmento || "";
     document.getElementById("contadorFragmentoGaleria").textContent = String((gal.fragmento || "").length);
+    document.getElementById("inputFragmentoImagenGaleria").value = gal.fragmentoImagenId ? `https://drive.google.com/file/d/${gal.fragmentoImagenId}/view` : "";
     crearGaleriaBtn.textContent = "Guardar cambios";
     cancelarEdicionGaleriaBtn.style.display = "block";
     tallerContenido.style.display = "block";
@@ -4780,6 +4833,7 @@
     document.getElementById("inputEsGaleriaNoticias").checked = false;
     document.getElementById("inputFragmentoGaleria").value = "";
     document.getElementById("contadorFragmentoGaleria").textContent = "0";
+    document.getElementById("inputFragmentoImagenGaleria").value = "";
     crearGaleriaBtn.textContent = "Crear galería";
     cancelarEdicionGaleriaBtn.style.display = "none";
   }
@@ -4801,13 +4855,15 @@
     const esNoticias = document.getElementById("inputEsGaleriaNoticias").checked;
     const ownerIdAsignado = esGeneral ? null : uidActual;
     const fragmento = document.getElementById("inputFragmentoGaleria").value.trim().slice(0, 250);
+    const fragmentoImagenUrl = document.getElementById("inputFragmentoImagenGaleria").value.trim();
+    const fragmentoImagenId = fragmentoImagenUrl ? extraerIdDrive(fragmentoImagenUrl) : "";
 
     crearGaleriaBtn.disabled = true;
     crearGaleriaBtn.textContent = galeriaEnEdicionId ? "Guardando..." : "Creando...";
 
     try {
       if (galeriaEnEdicionId) {
-        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId, ownerId: ownerIdAsignado, esNoticias, fragmento });
+        await updateDoc(doc(db, "galerias", galeriaEnEdicionId), { nombre, imagenId, fondoId, ownerId: ownerIdAsignado, esNoticias, fragmento, fragmentoImagenId });
         cancelarEdicionGaleria();
       } else {
         await addDoc(galeriasCol, {
@@ -4817,6 +4873,7 @@
           ownerId: ownerIdAsignado,
           esNoticias,
           fragmento,
+          fragmentoImagenId,
           fecha: serverTimestamp()
         });
         document.getElementById("inputNombreGaleria").value = "";
@@ -4826,6 +4883,7 @@
         document.getElementById("inputEsGaleriaNoticias").checked = false;
         document.getElementById("inputFragmentoGaleria").value = "";
         document.getElementById("contadorFragmentoGaleria").textContent = "0";
+        document.getElementById("inputFragmentoImagenGaleria").value = "";
       }
     } catch (e) {
       alert("Error al guardar la galería: " + e.message);
@@ -4871,6 +4929,7 @@
     document.getElementById("inputClaveColeccion").style.display = col.clave ? "block" : "none";
     document.getElementById("inputFragmentoColeccion").value = col.fragmento || "";
     document.getElementById("contadorFragmentoColeccion").textContent = String((col.fragmento || "").length);
+    document.getElementById("inputFragmentoImagenColeccion").value = col.fragmentoImagenId ? `https://drive.google.com/file/d/${col.fragmentoImagenId}/view` : "";
     crearColeccionBtn.textContent = "Guardar cambios";
     cancelarEdicionColeccionBtn.style.display = "block";
     tallerContenido.style.display = "block";
@@ -4889,6 +4948,7 @@
     document.getElementById("inputClaveColeccion").style.display = "none";
     document.getElementById("inputFragmentoColeccion").value = "";
     document.getElementById("contadorFragmentoColeccion").textContent = "0";
+    document.getElementById("inputFragmentoImagenColeccion").value = "";
     crearColeccionBtn.textContent = "Crear colección";
     cancelarEdicionColeccionBtn.style.display = "none";
   }
@@ -4919,6 +4979,8 @@
     const imagenId = extraerIdDrive(imagenUrl);
     const fondoId = fondoUrl ? extraerIdDrive(fondoUrl) : "";
     const fragmento = document.getElementById("inputFragmentoColeccion").value.trim().slice(0, 250);
+    const fragmentoImagenUrl = document.getElementById("inputFragmentoImagenColeccion").value.trim();
+    const fragmentoImagenId = fragmentoImagenUrl ? extraerIdDrive(fragmentoImagenUrl) : "";
 
     crearColeccionBtn.disabled = true;
     crearColeccionBtn.textContent = coleccionEnEdicionId ? "Guardando..." : "Creando...";
@@ -4930,7 +4992,8 @@
       imagenId,
       fondoId,
       clave: protegida ? clave : "",
-      fragmento
+      fragmento,
+      fragmentoImagenId
     };
 
     try {
@@ -4948,6 +5011,7 @@
         document.getElementById("inputClaveColeccion").style.display = "none";
         document.getElementById("inputFragmentoColeccion").value = "";
         document.getElementById("contadorFragmentoColeccion").textContent = "0";
+        document.getElementById("inputFragmentoImagenColeccion").value = "";
       }
     } catch (e) {
       alert("Error al guardar la colección: " + e.message);
@@ -5148,13 +5212,17 @@
   function abrirPerfilDescripcion(u) {
     document.getElementById("perfilDescripcionNombre").textContent = u.nombre || "Perfil";
     const cuerpo = document.getElementById("perfilDescripcionCuerpo");
-    const campos = [["Categoría", u.genero], ["Estilo", u.estilo], ["Esencia", u.esencia]];
-    const conContenido = campos.filter(([_, v]) => v && v.trim());
+    const campos = [
+      { etiqueta: "Categoría", valor: u.genero, color: "var(--turquesa)", rgb: "34,211,196" },
+      { etiqueta: "Estilo", valor: u.estilo, color: "var(--verde)", rgb: "57,255,140" },
+      { etiqueta: "Esencia", valor: u.esencia, color: "var(--violeta)", rgb: "155,124,246" }
+    ];
+    const conContenido = campos.filter(c => c.valor && c.valor.trim());
     cuerpo.innerHTML = conContenido.length > 0
-      ? conContenido.map(([etiqueta, valor]) => `
-          <div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--turquesa);margin-bottom:4px;">${etiqueta}</div>
-            <div style="font-size:0.9rem;line-height:1.5;${etiqueta === "Esencia" ? "font-style:italic;font-family:'Fraunces',serif;" : ""}">${escapeHtml(valor)}</div>
+      ? conContenido.map(c => `
+          <div style="background:rgba(${c.rgb},0.08);border:1px solid rgba(${c.rgb},0.35);border-left:3px solid ${c.color};border-radius:10px;padding:12px 14px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:${c.color};margin-bottom:4px;font-weight:700;">${c.etiqueta}</div>
+            <div style="font-size:0.9rem;line-height:1.5;${c.etiqueta === "Esencia" ? "font-style:italic;font-family:'Fraunces',serif;" : ""}">${escapeHtml(c.valor)}</div>
           </div>
         `).join("")
       : `<p style="color:var(--text-sec);font-size:0.85rem;">Este perfil todavía no agregó su descripción.</p>`;
@@ -5188,7 +5256,7 @@
       tile.innerHTML = `
         <div class="perfil-tile-img" style="--color-galaxia:${colorHex};">
           <img src="${imagenDirecta(u.imagenId)}" data-alt-src="${imagenAlternativa(u.imagenId)}" data-tried-alt="0" alt="${escapeHtml(u.nombre || "Perfil")}" loading="lazy" onerror="manejarErrorImagen(this)">
-          <div class="perfil-descripcion-badge" title="Ver descripción del perfil">i</div>
+          <div class="perfil-descripcion-badge" title="Ver descripción del perfil"><svg viewBox="0 0 200 200" style="width:15px;height:15px;"><use href="#icono-perfilinfo-svg"/></svg></div>
         </div>
         <div class="galeria-tile-nombre">${escapeHtml(u.nombre || "Sin nombre")}</div>
       `;
@@ -5415,13 +5483,13 @@
   function obtenerFragmentosDisponibles() {
     const items = [];
     libros.forEach(l => {
-      if (l.fragmento && l.fragmento.trim()) items.push({ tipo: "libro", refId: l.id, texto: l.fragmento.trim(), ownerId: l.ownerId, ref: l });
+      if (l.fragmento && l.fragmento.trim()) items.push({ tipo: "libro", refId: l.id, texto: l.fragmento.trim(), ownerId: l.ownerId, ref: l, imagenId: l.fragmentoImagenId || l.portadaId || "" });
     });
     colecciones.forEach(c => {
-      if (c.fragmento && c.fragmento.trim()) items.push({ tipo: "coleccion", refId: c.id, texto: c.fragmento.trim(), ownerId: c.ownerId, ref: c });
+      if (c.fragmento && c.fragmento.trim()) items.push({ tipo: "coleccion", refId: c.id, texto: c.fragmento.trim(), ownerId: c.ownerId, ref: c, imagenId: c.fragmentoImagenId || c.imagenId || "" });
     });
     galerias.forEach(g => {
-      if (g.fragmento && g.fragmento.trim()) items.push({ tipo: "galeria", refId: g.id, texto: g.fragmento.trim(), ownerId: g.ownerId, ref: g });
+      if (g.fragmento && g.fragmento.trim()) items.push({ tipo: "galeria", refId: g.id, texto: g.fragmento.trim(), ownerId: g.ownerId, ref: g, imagenId: g.fragmentoImagenId || g.imagenId || "" });
     });
     return items;
   }
@@ -5564,6 +5632,10 @@
       casilla.className = "franja-casilla";
       casilla.style.setProperty("--color-casilla", PALETA_FRANJA[i % PALETA_FRANJA.length]);
       casilla.innerHTML = `
+        ${item.imagenId ? `
+          <img class="franja-fondo-img" src="${imagenDirecta(item.imagenId)}" data-alt-src="${imagenAlternativa(item.imagenId)}" data-tried-alt="0" alt="" loading="lazy" onerror="manejarErrorFondoDecorativo(this)">
+          <div class="franja-overlay"></div>
+        ` : ""}
         <div class="franja-usuario">${escapeHtml(nombreCreador(item.ownerId))}</div>
         <div class="franja-texto">${escapeHtml(item.texto)}</div>
         <div class="franja-pie">
@@ -6297,6 +6369,21 @@
           <text x='50%' y='50%' fill='#94a3b8' font-size='16' text-anchor='middle' font-family='sans-serif'>Portada no disponible</text>
         </svg>`
       );
+    }
+  };
+
+  // Para imágenes puramente decorativas (como el fondo difuminado de un
+  // fragmento): si falla, se oculta en vez de mostrar un cartel de "no
+  // disponible" — la casilla simplemente vuelve a su fondo oscuro plano.
+  window.manejarErrorFondoDecorativo = function (img) {
+    if (img.dataset.triedAlt === "0") {
+      img.dataset.triedAlt = "1";
+      img.src = img.dataset.altSrc;
+    } else {
+      img.onerror = null;
+      img.style.display = "none";
+      const overlay = img.nextElementSibling;
+      if (overlay && overlay.classList.contains("franja-overlay")) overlay.style.display = "none";
     }
   };
 
