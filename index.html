@@ -1869,6 +1869,27 @@
     aspect-ratio:4/5;
     object-fit:cover;
   }
+  .orbsy-detalle-sin-imagen{
+    width:100%;
+    max-width:520px;
+    aspect-ratio:4/5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto;
+    padding:30px;
+    box-sizing:border-box;
+    background:#e9e9ee;
+    background-image:radial-gradient(ellipse at 30% 20%, rgba(0,0,0,0.05), transparent 60%);
+  }
+  .orbsy-detalle-sin-imagen-titulo{
+    color:#17171c;
+    font-family:'Fraunces', serif;
+    font-size:1.5rem;
+    font-weight:600;
+    line-height:1.35;
+    text-align:center;
+  }
   .orbsy-detalle-cuerpo{
     max-width:520px;
     margin:0 auto;
@@ -2737,7 +2758,7 @@
     <button class="indice-cerrar" id="cerrarHerramientasBtn">✕</button>
   </div>
 
-  <div id="herramientasMenu" style="padding:10px;">
+  <div id="herramientasMenu" style="padding:10px;flex:1;overflow-y:auto;">
     <div class="herramienta-item" id="abrirNotasGuardadasBtn">
       <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#meteorito-icono"/></svg>
       <div>
@@ -8013,9 +8034,11 @@
       return;
     }
     cont.innerHTML = `
-      ${item.imagenId ? `<img class="orbsy-detalle-img" src="${imagenDirecta(item.imagenId)}" data-alt-src="${imagenAlternativa(item.imagenId)}" data-tried-alt="0" alt="" onerror="manejarErrorImagen(this)">` : ""}
+      ${item.imagenId
+        ? `<img class="orbsy-detalle-img" src="${imagenDirecta(item.imagenId)}" data-alt-src="${imagenAlternativa(item.imagenId)}" data-tried-alt="0" alt="" onerror="manejarErrorImagen(this)">`
+        : `<div class="orbsy-detalle-sin-imagen"><div class="orbsy-detalle-sin-imagen-titulo">${escapeHtml(item.titulo)}</div></div>`}
       <div class="orbsy-detalle-cuerpo">
-        <h2 class="orbsy-detalle-titulo">${escapeHtml(item.titulo)}</h2>
+        ${item.imagenId ? `<h2 class="orbsy-detalle-titulo">${escapeHtml(item.titulo)}</h2>` : ""}
         ${item.descripcion ? `<p class="orbsy-detalle-descripcion">${escapeHtml(item.descripcion)}</p>` : ""}
         <div style="display:flex;gap:8px;margin-top:18px;">
           <button type="button" id="compartirOrbsyGaleriaBtn" class="orbsy-guardar-btn" style="flex:1;margin-top:0;">🔗 Compartir</button>
@@ -8147,10 +8170,12 @@
   function renderPrevisualizacionSolicitudOrbsy(sol) {
     const cont = document.getElementById("orbsysGaleriaDetalleContenido");
     cont.innerHTML = `
-      ${sol.imagenId ? `<img class="orbsy-detalle-img" src="${imagenDirecta(sol.imagenId)}" data-alt-src="${imagenAlternativa(sol.imagenId)}" data-tried-alt="0" alt="" onerror="manejarErrorImagen(this)">` : ""}
+      ${sol.imagenId
+        ? `<img class="orbsy-detalle-img" src="${imagenDirecta(sol.imagenId)}" data-alt-src="${imagenAlternativa(sol.imagenId)}" data-tried-alt="0" alt="" onerror="manejarErrorImagen(this)">`
+        : `<div class="orbsy-detalle-sin-imagen"><div class="orbsy-detalle-sin-imagen-titulo">${escapeHtml(sol.titulo)}</div></div>`}
       <div class="orbsy-detalle-cuerpo">
         <div class="orbsy-detalle-tiempo">Te lo comparte ${escapeHtml(sol.deNombre || "Alguien")}</div>
-        <h2 class="orbsy-detalle-titulo">${escapeHtml(sol.titulo)}</h2>
+        ${sol.imagenId ? `<h2 class="orbsy-detalle-titulo">${escapeHtml(sol.titulo)}</h2>` : ""}
         ${sol.descripcion ? `<p class="orbsy-detalle-descripcion">${escapeHtml(sol.descripcion)}</p>` : ""}
         <div style="display:flex;gap:8px;margin-top:18px;">
           <button type="button" id="aceptarSolicitudOrbsyDetalleBtn" class="orbsy-guardar-btn" style="flex:1;margin-top:0;">Aceptar y guardar</button>
