@@ -3304,8 +3304,19 @@
   <div id="correspondenciaVaciaMsg" class="empty-msg" style="display:none;padding:20px;">Todavía no tenés ninguna carta. Podés escribirle a un autor desde su perfil o desde una publicación, colección o galería.</div>
 </div>
 
+<!-- PÁGINA COMPLETA: ORBSYS DE HOY DE UN PERFIL -->
+<div id="perfilOrbsysHoyVista" style="display:none;position:fixed;inset:0;background:#0e0e12;z-index:9540;flex-direction:column;">
+  <div class="modal-bar">
+    <button id="cerrarPerfilOrbsysHoyBtn">← Volver</button>
+    <div id="perfilOrbsysHoyTitulo">Orbsys de hoy</div>
+    <span></span>
+  </div>
+  <p style="font-size:0.75rem;color:var(--text-sec);padding:12px 14px 6px;margin:0;">Todo lo que observó en las últimas 24 horas. Se van borrando solas a medida que cumplen su tiempo.</p>
+  <div id="perfilOrbsysHoyGrid" class="orbsys-galeria-grid" style="padding:0 14px 16px;overflow-y:auto;flex:1;"></div>
+</div>
+
 <!-- MODAL: REDACTAR UNA CARTA NUEVA -->
-<div id="cartaComponerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+<div id="cartaComponerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:10000;align-items:center;justify-content:center;padding:20px;">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;padding:22px;max-height:85vh;overflow-y:auto;">
     <h3 style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:4px;">Carta a <span id="cartaComponerDestinatario"></span></h3>
     <div id="cartaComponerFuenteTag" class="carta-fuente-tag" style="display:none;"></div>
@@ -3321,7 +3332,7 @@
 </div>
 
 <!-- MODAL: HILO DE UNA CARTA (leer + responder) -->
-<div id="cartaHiloModal" style="display:none;position:fixed;inset:0;background:#0e0e12;z-index:9560;flex-direction:column;">
+<div id="cartaHiloModal" style="display:none;position:fixed;inset:0;background:#0e0e12;z-index:10000;flex-direction:column;">
   <div class="modal-bar">
     <button id="cerrarCartaHiloBtn">← Volver</button>
     <div id="cartaHiloNombre">Carta</div>
@@ -3740,6 +3751,7 @@
     <button id="backToPerfilesBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:7px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;margin-bottom:14px;">← Perfiles</button>
     <button id="abrirBiografiaBtn" class="boton-orbita auto" style="display:none;margin-left:8px;">📖 Biografía y Diccionario de Referencias</button>
     <button id="seguirPerfilBtn" class="boton-orbita color-turquesa auto" style="display:none;margin-left:8px;">＋ Seguir</button>
+    <button id="verOrbsysHoyBtn" class="boton-orbita auto" style="display:none;margin-left:8px;"></button>
 
     <div class="galerias-eyebrow">Tus galerías</div>
     <div id="loadingMsgGalerias" class="empty-msg">Cargando...</div>
@@ -5963,6 +5975,8 @@
     btnSeguir.style.display = puedeSeguir ? "inline-block" : "none";
     if (puedeSeguir) actualizarBotonSeguir();
 
+    actualizarBotonOrbsysHoy();
+
     const coleccionesGeneral = coleccionesDeGaleria(ID_GALERIA_GENERAL);
     const librosGeneral = librosDeColeccion(ID_GENERAL);
     // El cajón "General" (sin dueño claro) solo se muestra en el enlace genérico,
@@ -5987,6 +6001,62 @@
       const imagenGeneral = coleccionesGeneral[0]?.imagenId || librosGeneral[0]?.portadaId || "";
       galeriasGrid.appendChild(crearTarjetaGaleria(ID_GALERIA_GENERAL, "General", imagenGeneral));
     }
+  }
+
+  // ---------- "Orbsys de hoy" de un perfil: sus observaciones activas, en vivo ----------
+  function actualizarBotonOrbsysHoy() {
+    const btn = document.getElementById("verOrbsysHoyBtn");
+    if (!btn) return;
+    if (!uidPerfilObjetivo || uidPerfilObjetivo === ID_PERFIL_GENERAL || typeof orbsysActivos !== "function") {
+      btn.style.display = "none";
+      return;
+    }
+    const cantidad = orbsysActivos().filter(o => o.ownerId === uidPerfilObjetivo).length;
+    if (cantidad === 0) {
+      btn.style.display = "none";
+      return;
+    }
+    btn.style.display = "inline-block";
+    btn.innerHTML = `<svg viewBox="0 0 200 200" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"><use href="#icono-observar-svg"/></svg>Orbsys de hoy (${cantidad})`;
+  }
+
+  document.getElementById("verOrbsysHoyBtn").addEventListener("click", () => {
+    if (!uidPerfilObjetivo) return;
+    document.getElementById("perfilOrbsysHoyTitulo").textContent = "Orbsys de " + nombrePerfil(uidPerfilObjetivo);
+    renderPerfilOrbsysHoyGrid();
+    document.getElementById("perfilOrbsysHoyVista").style.display = "flex";
+  });
+  document.getElementById("cerrarPerfilOrbsysHoyBtn").addEventListener("click", () => {
+    document.getElementById("perfilOrbsysHoyVista").style.display = "none";
+  });
+
+  function renderPerfilOrbsysHoyGrid() {
+    const grid = document.getElementById("perfilOrbsysHoyGrid");
+    if (!grid || !uidPerfilObjetivo) return;
+    const activos = orbsysActivos().filter(o => o.ownerId === uidPerfilObjetivo);
+    if (activos.length === 0) {
+      document.getElementById("perfilOrbsysHoyVista").style.display = "none";
+      return;
+    }
+    grid.innerHTML = "";
+    activos.forEach(orbsy => {
+      const carta = document.createElement("div");
+      carta.className = "orbsys-galeria-carta";
+      if (orbsy.imagenId) {
+        carta.innerHTML = `
+          <img class="orbsys-galeria-carta-img" src="${imagenDirecta(orbsy.imagenId)}" data-alt-src="${imagenAlternativa(orbsy.imagenId)}" data-tried-alt="0" alt="" loading="lazy" onerror="manejarErrorImagen(this)">
+          <div class="orbsys-galeria-carta-degradado"></div>
+          <div class="orbsys-galeria-carta-titulo">${escapeHtml(orbsy.titulo)}</div>
+        `;
+      } else {
+        carta.innerHTML = `<div class="orbsys-galeria-carta-sin-imagen"><div class="orbsys-galeria-carta-titulo-grande">${escapeHtml(orbsy.titulo)}</div></div>`;
+      }
+      carta.addEventListener("click", () => {
+        document.getElementById("perfilOrbsysHoyVista").style.display = "none";
+        abrirOrbsy(orbsy.id);
+      });
+      grid.appendChild(carta);
+    });
   }
 
   function crearTarjetaGaleria(id, nombre, imagenId) {
@@ -8107,6 +8177,9 @@
     orbsys = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     if (typeof renderOrbsysDeck === "function") renderOrbsysDeck();
     if (typeof renderOrbsyDetalle === "function") renderOrbsyDetalle();
+    if (typeof actualizarBotonOrbsysHoy === "function") actualizarBotonOrbsysHoy();
+    const vistaHoy = document.getElementById("perfilOrbsysHoyVista");
+    if (vistaHoy && vistaHoy.style.display !== "none" && typeof renderPerfilOrbsysHoyGrid === "function") renderPerfilOrbsysHoyGrid();
   }, (error) => {
     console.error("Error al leer orbsys:", error);
   });
