@@ -800,6 +800,10 @@
     grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));
     gap:22px 14px;
   }
+  #galeriasGrid.galerias-grid{
+    grid-template-columns:repeat(auto-fill, minmax(148px, 1fr));
+    gap:20px 16px;
+  }
   .galeria-tile{
     display:flex;
     flex-direction:column;
@@ -809,30 +813,22 @@
   }
   .galeria-tile-img{
     position:relative;
-    width:96px;
-    height:96px;
-    border-radius:50%;
+    width:100%;
+    aspect-ratio:1/1;
+    border-radius:18px;
     margin-bottom:10px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    box-shadow:0 0 16px -6px var(--verde);
+    transition:box-shadow .15s ease;
   }
   .galeria-tile-img img{
     width:100%;
     height:100%;
     object-fit:cover;
     display:block;
-    border-radius:50%;
   }
-  .galeria-tile-img::after{
-    content:"";
-    position:absolute;
-    inset:-5px;
-    border-radius:50%;
-    border:2px solid var(--verde);
-    border-top-color:transparent;
-    border-right-color:transparent;
-    transform:rotate(-35deg);
-    pointer-events:none;
-  }
-  .galeria-tile:active .galeria-tile-img::after{ border-color:var(--accent); border-top-color:transparent; border-right-color:transparent; }
+  .galeria-tile:active .galeria-tile-img{ box-shadow:0 0 16px -4px var(--accent); }
 
   /* Círculos de perfil (galaxias), mismo patrón pero con color elegido por cada usuario */
   .perfil-tile-img{
@@ -3669,9 +3665,8 @@
       <p style="font-size:0.75rem;color:var(--text-sec);margin-bottom:14px;">Una observación del día. Se borra junto a sus comentarios en 24 horas.</p>
       <label style="font-size:0.75rem;color:var(--text-sec);">Título (obligatorio)</label>
       <input type="text" id="inputTituloOrbsy" maxlength="80" placeholder="Ej: La luna que ya nadie mira" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.85rem;margin:6px 0 12px;">
-      <label style="font-size:0.75rem;color:var(--text-sec);">Imagen o GIF (opcional, enlace de Drive)</label>
-      <input type="text" id="inputImagenOrbsy" placeholder="https://drive.google.com/..." style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.85rem;margin:6px 0 4px;">
-      <p style="font-size:0.68rem;color:var(--text-sec);margin:0 0 12px;line-height:1.4;">Un GIF corto (tipo sticker, ~10 segundos) funciona igual que una foto: pegá el enlace de Drive. El formato GIF no puede tener sonido — es justo la idea: capturar el instante, sin ruido.</p>
+      <label style="font-size:0.75rem;color:var(--text-sec);">Imagen (opcional, enlace de Drive)</label>
+      <input type="text" id="inputImagenOrbsy" placeholder="https://drive.google.com/..." style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.85rem;margin:6px 0 12px;">
       <label style="font-size:0.75rem;color:var(--text-sec);">Descripción (opcional)</label>
       <textarea id="inputDescripcionOrbsy" maxlength="600" placeholder="Comparte la observación o reflexión, si quieres..." style="width:100%;min-height:100px;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:#0e0e13;color:var(--text);font-size:0.85rem;margin:6px 0 2px;resize:vertical;"></textarea>
       <div style="text-align:right;font-size:0.7rem;color:var(--text-sec);margin-bottom:14px;"><span id="contadorDescripcionOrbsy">0</span>/600</div>
@@ -8669,13 +8664,15 @@
   let cartas = [];
   let cartaMensajesPorHilo = {};
   let unsubscribeCartas = null;
-  let unsubscribeCartaHiloActual = null; // suscripción SOLO del hilo abierto (no de toda la colección)
+  let unsubscribeCartaMensajes = null;
   let cartaComponerDestino = null; // { uid, nombre, fuente }
   let cartaHiloAbiertoId = null;
 
   function suscribirCorrespondencia() {
     if (typeof unsubscribeCartas === "function") { unsubscribeCartas(); unsubscribeCartas = null; }
+    if (typeof unsubscribeCartaMensajes === "function") { unsubscribeCartaMensajes(); unsubscribeCartaMensajes = null; }
     cartas = [];
+    cartaMensajesPorHilo = {};
     if (!uidActual) { renderCorrespondenciaLista(); actualizarBadgeCorrespondencia(); return; }
     const q = query(cartasCol, where("participantes", "array-contains", uidActual));
     unsubscribeCartas = onSnapshot(q, (snapshot) => {
@@ -8684,27 +8681,17 @@
       actualizarBadgeCorrespondencia();
       if (cartaHiloAbiertoId && !cartas.some(c => c.id === cartaHiloAbiertoId)) cerrarCartaHilo();
     }, (error) => console.error("Error al leer la correspondencia:", error));
-  }
-
-  // Suscribe los mensajes de UN SOLO hilo (el que está abierto), no de toda
-  // la colección — antes se leía cartaMensajes entera de una, y si la regla
-  // de Firestore no lo permitía, la lectura fallaba en silencio (consola,
-  // sin avisar) y el hilo se veía vacío aunque el mensaje sí se había enviado.
-  function suscribirMensajesDeHilo(cartaId) {
-    if (typeof unsubscribeCartaHiloActual === "function") { unsubscribeCartaHiloActual(); unsubscribeCartaHiloActual = null; }
-    const q = query(cartaMensajesCol, where("cartaId", "==", cartaId));
-    unsubscribeCartaHiloActual = onSnapshot(q, (snapshot) => {
-      const mensajes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      mensajes.sort((a, b) => (a.fecha?.seconds || 0) - (b.fecha?.seconds || 0));
-      cartaMensajesPorHilo[cartaId] = mensajes;
-      renderCartaHiloMensajes(cartaId);
-    }, (error) => {
-      console.error("Error al leer los mensajes de esta carta:", error);
-      const cont = document.getElementById("cartaHiloMensajes");
-      if (cont && cartaHiloAbiertoId === cartaId) {
-        cont.innerHTML = `<p style="color:#f87171;font-size:0.8rem;text-align:center;padding:20px 0;">No se pudieron cargar los mensajes: ${escapeHtml(error.message)}</p>`;
-      }
-    });
+    unsubscribeCartaMensajes = onSnapshot(cartaMensajesCol, (snapshot) => {
+      const agrupado = {};
+      snapshot.docs.forEach(d => {
+        const m = { id: d.id, ...d.data() };
+        if (!agrupado[m.cartaId]) agrupado[m.cartaId] = [];
+        agrupado[m.cartaId].push(m);
+      });
+      Object.values(agrupado).forEach(lista => lista.sort((a, b) => (a.fecha?.seconds || 0) - (b.fecha?.seconds || 0)));
+      cartaMensajesPorHilo = agrupado;
+      if (cartaHiloAbiertoId) renderCartaHiloMensajes(cartaHiloAbiertoId);
+    }, (error) => console.error("Error al leer los mensajes de correspondencia:", error));
   }
 
   function actualizarBadgeCorrespondencia() {
@@ -8860,7 +8847,6 @@
   function abrirCartaHilo(cartaId) {
     cartaHiloAbiertoId = cartaId;
     document.getElementById("cartaHiloModal").style.display = "flex";
-    document.getElementById("cartaHiloMensajes").innerHTML = `<p style="color:var(--text-sec);font-size:0.82rem;text-align:center;padding:20px 0;">Cargando mensajes...</p>`;
     const carta = cartas.find(c => c.id === cartaId);
     if (carta) {
       document.getElementById("cartaHiloNombre").textContent = otroParticipante(carta).nombre;
@@ -8875,10 +8861,9 @@
         updateDoc(doc(db, "cartas", cartaId), { noLeidoPara: (carta.noLeidoPara || []).filter(uid => uid !== uidActual) }).catch(() => {});
       }
     }
-    suscribirMensajesDeHilo(cartaId);
+    renderCartaHiloMensajes(cartaId);
   }
   function cerrarCartaHilo() {
-    if (typeof unsubscribeCartaHiloActual === "function") { unsubscribeCartaHiloActual(); unsubscribeCartaHiloActual = null; }
     cartaHiloAbiertoId = null;
     document.getElementById("cartaHiloModal").style.display = "none";
   }
