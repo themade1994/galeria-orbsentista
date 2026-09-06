@@ -1827,7 +1827,7 @@
       radial-gradient(ellipse at 88% 10%, rgba(57,255,140,0.10), transparent 55%),
       var(--card);
     border-bottom:1px solid var(--border);
-    padding:12px clamp(10px,3vw,24px) 22px;
+    padding:20px clamp(10px,3vw,24px) 22px;
     margin-bottom:20px;
   }
   .orbsys-deck-wrap.oculta{ display:none; }
@@ -1849,6 +1849,12 @@
     transform:translate(calc(var(--offset,0) * 8px), calc(var(--offset,0) * -8px)) rotate(calc(var(--offset,0) * 2deg));
     transition:transform .25s ease;
     box-shadow:0 10px 30px -12px rgba(0,0,0,0.6);
+  }
+  @media (max-width:640px){
+    .orbsys-deck-wrap{ padding-top:16px; }
+    .orbsys-carta{
+      transform:translate(calc(var(--offset,0) * 5px), calc(var(--offset,0) * -5px)) rotate(calc(var(--offset,0) * 1.4deg));
+    }
   }
   .orbsys-carta-img{
     width:100%;
@@ -5847,7 +5853,10 @@
   let _reposicionarFranjaTimeout = null;
   window.addEventListener("resize", () => {
     clearTimeout(_reposicionarFranjaTimeout);
-    _reposicionarFranjaTimeout = setTimeout(() => { renderFranjaFragmentos(); }, 200);
+    _reposicionarFranjaTimeout = setTimeout(() => {
+      renderFranjaFragmentos();
+      if (typeof renderOrbsysDeck === "function") renderOrbsysDeck();
+    }, 200);
   });
 
   // Colores insignia de orbSY, uno distinto por casilla (se repiten en ciclo si hiciera falta)
@@ -7408,7 +7417,7 @@
       item.className = "nota-guardada-item";
       item.innerHTML = `
         <div class="nota-guardada-titulo">${escapeHtml(esq.nombre)}</div>
-        <div class="nota-guardada-preview">${esq.tipo === "piramidal" ? "Piramidal" : esq.tipo === "jerarquico" ? "Jerárquico" : esq.tipo === "araneae" ? "Araneae" : "Anatómico"} · ${totalTemas} tema${totalTemas === 1 ? "" : "s"}</div>
+        <div class="nota-guardada-preview">${esq.tipo === "piramidal" ? "Piramidal" : esq.tipo === "jerarquico" ? "Jerárquico" : esq.tipo === "araneae" ? "Araneae" : esq.tipo === "libre" ? "Libre" : "Anatómico"} · ${totalTemas} tema${totalTemas === 1 ? "" : "s"}</div>
         <div class="nota-guardada-controles">
           <button class="abrir-plantilla">Abrir</button>
           <button class="renombrar">Cambiar título</button>
@@ -8210,6 +8219,14 @@
     return `Se borra en ${Math.max(1, minutos)} min`;
   }
 
+  // En celular, 3 cartas apiladas terminan asomándose sobre la etiqueta de
+  // arriba (el desplazamiento entre cartas es en píxeles fijos, y en una
+  // pantalla chica esa misma cantidad de píxeles pesa proporcionalmente
+  // mucho más). En pantallas grandes 3 se ve bien; en celular, 2.
+  function maxCartasOrbsysDeck() {
+    return window.innerWidth <= 640 ? 2 : 3;
+  }
+
   function renderOrbsysDeck() {
     const cont = document.getElementById("orbsysDeck");
     if (!cont) return;
@@ -8230,7 +8247,7 @@
     if (abrirBtn) abrirBtn.disabled = false;
     if (siguienteBtn) siguienteBtn.disabled = activos.length < 2;
 
-    const maxApiladas = Math.min(3, activos.length);
+    const maxApiladas = Math.min(maxCartasOrbsysDeck(), activos.length);
     for (let i = maxApiladas - 1; i >= 0; i--) {
       const idx = (orbsysIndiceFrente + i) % activos.length;
       const orbsy = activos[idx];
@@ -8741,15 +8758,13 @@
   let cartas = [];
   let cartaMensajesPorHilo = {};
   let unsubscribeCartas = null;
-  let unsubscribeCartaMensajes = null;
+  let unsubscribeCartaHiloActual = null; // suscripción SOLO del hilo abierto (no de toda la colección)
   let cartaComponerDestino = null; // { uid, nombre, fuente }
   let cartaHiloAbiertoId = null;
 
   function suscribirCorrespondencia() {
     if (typeof unsubscribeCartas === "function") { unsubscribeCartas(); unsubscribeCartas = null; }
-    if (typeof unsubscribeCartaMensajes === "function") { unsubscribeCartaMensajes(); unsubscribeCartaMensajes = null; }
     cartas = [];
-    cartaMensajesPorHilo = {};
     if (!uidActual) { renderCorrespondenciaLista(); actualizarBadgeCorrespondencia(); return; }
     const q = query(cartasCol, where("participantes", "array-contains", uidActual));
     unsubscribeCartas = onSnapshot(q, (snapshot) => {
@@ -8758,17 +8773,32 @@
       actualizarBadgeCorrespondencia();
       if (cartaHiloAbiertoId && !cartas.some(c => c.id === cartaHiloAbiertoId)) cerrarCartaHilo();
     }, (error) => console.error("Error al leer la correspondencia:", error));
-    unsubscribeCartaMensajes = onSnapshot(cartaMensajesCol, (snapshot) => {
-      const agrupado = {};
-      snapshot.docs.forEach(d => {
-        const m = { id: d.id, ...d.data() };
-        if (!agrupado[m.cartaId]) agrupado[m.cartaId] = [];
-        agrupado[m.cartaId].push(m);
-      });
-      Object.values(agrupado).forEach(lista => lista.sort((a, b) => (a.fecha?.seconds || 0) - (b.fecha?.seconds || 0)));
-      cartaMensajesPorHilo = agrupado;
-      if (cartaHiloAbiertoId) renderCartaHiloMensajes(cartaHiloAbiertoId);
-    }, (error) => console.error("Error al leer los mensajes de correspondencia:", error));
+  }
+
+  // Suscribe los mensajes de UN SOLO hilo (el que está abierto), no de toda
+  // la colección. Antes se leía cartaMensajes entera de una sola vez: como
+  // la regla de Firestore necesita un get() al documento padre de "cartas"
+  // por cada mensaje para validar que sos participante, leer TODA la
+  // colección (mensajes de todos los pares de usuarios, no solo los tuyos)
+  // es fràgil — cualquier documento problemático en medio puede tirar abajo
+  // el listener completo, en silencio, y por eso a algunos les funcionaba
+  // "por suerte" y a otros no. Filtrando por cartaId, cada quien solo pide
+  // los mensajes del hilo puntual que tiene abierto.
+  function suscribirMensajesDeHilo(cartaId) {
+    if (typeof unsubscribeCartaHiloActual === "function") { unsubscribeCartaHiloActual(); unsubscribeCartaHiloActual = null; }
+    const q = query(cartaMensajesCol, where("cartaId", "==", cartaId));
+    unsubscribeCartaHiloActual = onSnapshot(q, (snapshot) => {
+      const mensajes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      mensajes.sort((a, b) => (a.fecha?.seconds || 0) - (b.fecha?.seconds || 0));
+      cartaMensajesPorHilo[cartaId] = mensajes;
+      renderCartaHiloMensajes(cartaId);
+    }, (error) => {
+      console.error("Error al leer los mensajes de esta carta:", error);
+      const cont = document.getElementById("cartaHiloMensajes");
+      if (cont && cartaHiloAbiertoId === cartaId) {
+        cont.innerHTML = `<p style="color:#f87171;font-size:0.8rem;text-align:center;padding:20px 0;">No se pudieron cargar los mensajes: ${escapeHtml(error.message)}</p>`;
+      }
+    });
   }
 
   function actualizarBadgeCorrespondencia() {
@@ -8924,6 +8954,7 @@
   function abrirCartaHilo(cartaId) {
     cartaHiloAbiertoId = cartaId;
     document.getElementById("cartaHiloModal").style.display = "flex";
+    document.getElementById("cartaHiloMensajes").innerHTML = `<p style="color:var(--text-sec);font-size:0.82rem;text-align:center;padding:20px 0;">Cargando mensajes...</p>`;
     const carta = cartas.find(c => c.id === cartaId);
     if (carta) {
       document.getElementById("cartaHiloNombre").textContent = otroParticipante(carta).nombre;
@@ -8938,9 +8969,10 @@
         updateDoc(doc(db, "cartas", cartaId), { noLeidoPara: (carta.noLeidoPara || []).filter(uid => uid !== uidActual) }).catch(() => {});
       }
     }
-    renderCartaHiloMensajes(cartaId);
+    suscribirMensajesDeHilo(cartaId);
   }
   function cerrarCartaHilo() {
+    if (typeof unsubscribeCartaHiloActual === "function") { unsubscribeCartaHiloActual(); unsubscribeCartaHiloActual = null; }
     cartaHiloAbiertoId = null;
     document.getElementById("cartaHiloModal").style.display = "none";
   }
