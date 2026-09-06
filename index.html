@@ -882,6 +882,25 @@
     transition:transform .12s ease;
   }
   .perfil-descripcion-badge:active{ transform:scale(0.88); }
+  .perfil-carta-badge{
+    position:absolute;
+    bottom:-8px;
+    left:-4px;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:#14141a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    border:2px solid var(--bg);
+    box-shadow:0 0 10px -2px rgba(155,124,246,0.55);
+    z-index:2;
+    transition:transform .12s ease;
+  }
+  .perfil-carta-badge svg{ width:14px; height:14px; }
+  .perfil-carta-badge:active{ transform:scale(0.88); }
 
   .galeria-tile-nombre{
     font-size:0.78rem;
@@ -5449,6 +5468,7 @@
         <div class="perfil-tile-img" style="--color-galaxia:${colorHex};">
           <img src="${imagenDirecta(u.imagenId)}" data-alt-src="${imagenAlternativa(u.imagenId)}" data-tried-alt="0" alt="${escapeHtml(u.nombre || "Perfil")}" loading="lazy" onerror="manejarErrorImagen(this)">
           <div class="perfil-descripcion-badge" title="Ver descripción del perfil"><svg viewBox="0 0 200 200" style="width:15px;height:15px;"><use href="#icono-perfilinfo-svg"/></svg></div>
+          ${u.id !== uidActual ? `<div class="perfil-carta-badge" title="Carta al autor"><svg viewBox="0 0 200 200"><use href="#icono-carta-svg"/></svg></div>` : ""}
         </div>
         <div class="galeria-tile-nombre">${escapeHtml(u.nombre || "Sin nombre")}</div>
       `;
@@ -5457,6 +5477,13 @@
         e.stopPropagation();
         abrirPerfilDescripcion(u);
       });
+      const cartaBadge = tile.querySelector(".perfil-carta-badge");
+      if (cartaBadge) {
+        cartaBadge.addEventListener("click", (e) => {
+          e.stopPropagation();
+          abrirCartaComponer(u.id, u.nombre, null);
+        });
+      }
       perfilesGrid.appendChild(tile);
     });
 
