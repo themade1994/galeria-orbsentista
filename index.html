@@ -2057,6 +2057,93 @@
   }
   .orbsy-comentario-form button:disabled{ opacity:0.4; cursor:default; }
 
+  .btn-carta-autor{
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    padding:4px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    vertical-align:middle;
+    margin-left:6px;
+  }
+  .btn-carta-autor svg{ width:17px; height:17px; }
+  .btn-carta-autor:active{ transform:scale(0.88); }
+
+  /* CORRESPONDENCIA (cartas al autor) */
+  .carta-fila{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 10px;
+    border-bottom:1px solid var(--border);
+    cursor:pointer;
+    text-align:left;
+    background:none;
+    width:100%;
+  }
+  .carta-fila:active{ background:#1a1a22; }
+  .carta-fila-punto{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--turquesa);
+    flex-shrink:0;
+    box-shadow:0 0 6px var(--turquesa);
+  }
+  .carta-fila-cuerpo{ flex:1; min-width:0; }
+  .carta-fila-nombre{ font-size:0.85rem; font-weight:600; color:var(--text); }
+  .carta-fila-preview{
+    font-size:0.78rem;
+    color:var(--text-sec);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-top:2px;
+  }
+  .carta-fila-fecha{ font-size:0.68rem; color:var(--text-sec); flex-shrink:0; }
+  .carta-fuente-tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.66rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--violeta);
+    background:rgba(155,124,246,0.1);
+    border:1px solid rgba(155,124,246,0.35);
+    border-radius:6px;
+    padding:4px 9px;
+    margin-bottom:12px;
+  }
+  .carta-mensaje{
+    max-width:88%;
+    padding:10px 13px;
+    border-radius:12px;
+    margin-bottom:10px;
+    font-size:0.85rem;
+    line-height:1.5;
+    white-space:pre-wrap;
+  }
+  .carta-mensaje.mio{
+    margin-left:auto;
+    background:rgba(34,211,196,0.14);
+    border:1px solid rgba(34,211,196,0.3);
+  }
+  .carta-mensaje.otro{
+    margin-right:auto;
+    background:var(--superficie);
+    border:1px solid var(--border);
+  }
+  .carta-mensaje-meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.64rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--text-sec);
+    margin-bottom:5px;
+  }
+
   .orbsy-guardar-btn{
     margin-top:14px;
     background:var(--turquesa);
@@ -2928,6 +3015,18 @@
       <circle cx="100" cy="100" r="30" fill="currentColor"/>
       <ellipse cx="100" cy="100" rx="70" ry="22" fill="none" stroke="currentColor" stroke-width="10" transform="rotate(-20 100 100)"/>
     </g>
+    <!-- Ícono de Carta al autor: un sobre delineado con los 3 colores de
+         orbSY difuminados entre sí, sin relleno — para marcarlo como una
+         función insignia, distinta de los íconos de una sola tinta -->
+    <linearGradient id="cartaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3c4"/>
+      <stop offset="50%" stop-color="#39ff8c"/>
+      <stop offset="100%" stop-color="#9b7cf6"/>
+    </linearGradient>
+    <g id="icono-carta-svg">
+      <rect x="40" y="56" width="120" height="88" rx="10" fill="none" stroke="url(#cartaGrad)" stroke-width="7"/>
+      <path d="M 46 62 L 100 104 L 154 62" fill="none" stroke="url(#cartaGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
   </defs>
 </svg>
 
@@ -2990,6 +3089,13 @@
       <div>
         <div style="font-size:0.85rem;font-weight:600;">orbSYS galería</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Orbsis que guardaste, en forma de galería</div>
+      </div>
+    </div>
+    <div class="herramienta-item" id="abrirCorrespondenciaBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-carta-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Correspondencia<span id="correspondenciaBadge" style="display:none;background:var(--verde);color:#0e0e12;font-size:0.62rem;font-weight:700;border-radius:8px;padding:1px 6px;margin-left:6px;"></span></div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Cartas que enviaste y recibiste</div>
       </div>
     </div>
     <div class="herramienta-item" id="abrirCafeAbiertoBtn">
@@ -3148,6 +3254,51 @@
   </div>
   <div id="orbsysGaleriaGrid" class="orbsys-galeria-grid" style="padding:0 14px 16px;overflow-y:auto;flex:1;"></div>
   <div id="orbsysGaleriaVaciaMsg" class="empty-msg" style="display:none;padding:20px;"></div>
+</div>
+
+<!-- PÁGINA COMPLETA: CORRESPONDENCIA (bandeja de cartas al autor) -->
+<div id="correspondenciaVista" style="display:none;position:fixed;inset:0;background:#0e0e12;z-index:9540;flex-direction:column;">
+  <div class="modal-bar">
+    <button id="cerrarCorrespondenciaVistaBtn">← Volver</button>
+    <div>Correspondencia</div>
+    <span></span>
+  </div>
+  <p style="font-size:0.75rem;color:var(--text-sec);padding:12px 14px 6px;margin:0;">Cartas privadas entre perfiles — solo vos y la otra persona pueden leerlas. Se ordenan por la más reciente.</p>
+  <div id="correspondenciaLista" style="overflow-y:auto;flex:1;"></div>
+  <div id="correspondenciaVaciaMsg" class="empty-msg" style="display:none;padding:20px;">Todavía no tenés ninguna carta. Podés escribirle a un autor desde su perfil o desde una publicación, colección o galería.</div>
+</div>
+
+<!-- MODAL: REDACTAR UNA CARTA NUEVA -->
+<div id="cartaComponerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9997;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;padding:22px;max-height:85vh;overflow-y:auto;">
+    <h3 style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:4px;">Carta a <span id="cartaComponerDestinatario"></span></h3>
+    <div id="cartaComponerFuenteTag" class="carta-fuente-tag" style="display:none;"></div>
+    <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:12px;">Un espacio para escribir con calma — no un comentario público. Solo la otra persona podrá leerla.</p>
+    <textarea id="cartaComponerTexto" maxlength="1800" placeholder="Escribí tu impresión, tu punto de vista, lo que quieras compartirle..." style="width:100%;min-height:160px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.88rem;line-height:1.5;resize:vertical;"></textarea>
+    <div style="text-align:right;font-size:0.7rem;color:var(--text-sec);margin-top:4px;"><span id="cartaComponerContador">0</span>/1800</div>
+    <p id="cartaComponerError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:6px;"></p>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button id="cartaComponerCancelar" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-sec);padding:10px;border-radius:8px;cursor:pointer;">Cancelar</button>
+      <button id="cartaComponerEnviar" style="flex:1;background:var(--accent);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">Enviar carta</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: HILO DE UNA CARTA (leer + responder) -->
+<div id="cartaHiloModal" style="display:none;position:fixed;inset:0;background:#0e0e12;z-index:9560;flex-direction:column;">
+  <div class="modal-bar">
+    <button id="cerrarCartaHiloBtn">← Volver</button>
+    <div id="cartaHiloNombre">Carta</div>
+    <button id="eliminarCartaHiloBtn" style="background:transparent;border:none;color:#f87171;font-size:0.75rem;cursor:pointer;">Eliminar</button>
+  </div>
+  <div style="padding:14px 16px 0;">
+    <div id="cartaHiloFuenteTag" class="carta-fuente-tag" style="display:none;"></div>
+  </div>
+  <div id="cartaHiloMensajes" style="flex:1;overflow-y:auto;padding:6px 16px 16px;"></div>
+  <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;">
+    <textarea id="cartaHiloRespuesta" maxlength="1800" placeholder="Responder..." style="flex:1;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.85rem;resize:none;min-height:42px;max-height:120px;"></textarea>
+    <button id="cartaHiloResponderBtn" style="background:var(--accent);border:none;color:#fff;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:600;flex-shrink:0;">Enviar</button>
+  </div>
 </div>
 
 
@@ -3866,6 +4017,7 @@
     doc,
     onSnapshot,
     query,
+    where,
     orderBy,
     serverTimestamp,
     Timestamp
@@ -4170,6 +4322,7 @@
       renderAdminListaLibros();
     }
     renderSolicitudes();
+    if (typeof suscribirCorrespondencia === "function") suscribirCorrespondencia();
   });
 
   // Firma persistente: recuerda desde qué perfil se entró, visible en toda la app
@@ -5249,7 +5402,7 @@
   });
 
   function abrirPerfilDescripcion(u) {
-    document.getElementById("perfilDescripcionNombre").textContent = u.nombre || "Perfil";
+    document.getElementById("perfilDescripcionNombre").innerHTML = escapeHtml(u.nombre || "Perfil") + botonCartaHTML(u.id, u.nombre);
     const cuerpo = document.getElementById("perfilDescripcionCuerpo");
     const campos = [
       { etiqueta: "Categoría", valor: u.genero, color: "var(--turquesa)", rgb: "34,211,196" },
@@ -5833,7 +5986,7 @@
     tituloGaleriaHeaderEl.setAttribute("aria-label", nombre);
     document.getElementById("buscadorInput").value = "";
     const galeriaActual = galerias.find(g => g.id === id);
-    document.getElementById("firmaGaleriaHeader").textContent = "De " + nombreCreador(galeriaActual ? galeriaActual.ownerId : null);
+    document.getElementById("firmaGaleriaHeader").innerHTML = "De " + escapeHtml(nombreCreador(galeriaActual ? galeriaActual.ownerId : null)) + botonCartaHTML(galeriaActual ? galeriaActual.ownerId : null, nombreCreador(galeriaActual ? galeriaActual.ownerId : null), galeriaActual ? { tipo: "galeria", id: galeriaActual.id, nombre: nombre } : null);
     aplicarFondo(vistaColeccionesEl, galeriaActual ? galeriaActual.fondoId : "");
     aplicarFiltro();
     renderFranjaFragmentos();
@@ -5941,7 +6094,7 @@
     renderColeccionDetalle(id);
 
     const coleccionActual = colecciones.find(c => c.id === id);
-    document.getElementById("firmaColeccionDetalle").textContent = "De " + nombreCreador(coleccionActual ? coleccionActual.ownerId : null);
+    document.getElementById("firmaColeccionDetalle").innerHTML = "De " + escapeHtml(nombreCreador(coleccionActual ? coleccionActual.ownerId : null)) + botonCartaHTML(coleccionActual ? coleccionActual.ownerId : null, nombreCreador(coleccionActual ? coleccionActual.ownerId : null), coleccionActual ? { tipo: "coleccion", id: coleccionActual.id, nombre: nombre } : null);
 
     const libroConTerminos = libros.some(l => l.coleccionId === id && Array.isArray(l.terminosReferencia) && l.terminosReferencia.length > 0);
     document.getElementById("abrirDiccionarioBtn").style.display = libroConTerminos ? "inline-block" : "none";
@@ -8460,6 +8613,303 @@
     }
   }
 
+  // ================= CORRESPONDENCIA (cartas al autor) =================
+  // A diferencia de los comentarios públicos, una carta es privada entre
+  // dos perfiles: solo sus dos participantes pueden leerla (así lo exigen
+  // las reglas de Firestore). Un hilo ("carta") vive en /cartas y cada
+  // mensaje individual del intercambio vive en /cartaMensajes, enlazado
+  // por cartaId — el mismo patrón que ya usamos para orbsysComentarios.
+  const cartasCol = collection(db, "cartas");
+  const cartaMensajesCol = collection(db, "cartaMensajes");
+  let cartas = [];
+  let cartaMensajesPorHilo = {};
+  let unsubscribeCartas = null;
+  let unsubscribeCartaMensajes = null;
+  let cartaComponerDestino = null; // { uid, nombre, fuente }
+  let cartaHiloAbiertoId = null;
+
+  function suscribirCorrespondencia() {
+    if (typeof unsubscribeCartas === "function") { unsubscribeCartas(); unsubscribeCartas = null; }
+    if (typeof unsubscribeCartaMensajes === "function") { unsubscribeCartaMensajes(); unsubscribeCartaMensajes = null; }
+    cartas = [];
+    cartaMensajesPorHilo = {};
+    if (!uidActual) { renderCorrespondenciaLista(); actualizarBadgeCorrespondencia(); return; }
+    const q = query(cartasCol, where("participantes", "array-contains", uidActual));
+    unsubscribeCartas = onSnapshot(q, (snapshot) => {
+      cartas = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderCorrespondenciaLista();
+      actualizarBadgeCorrespondencia();
+      if (cartaHiloAbiertoId && !cartas.some(c => c.id === cartaHiloAbiertoId)) cerrarCartaHilo();
+    }, (error) => console.error("Error al leer la correspondencia:", error));
+    unsubscribeCartaMensajes = onSnapshot(cartaMensajesCol, (snapshot) => {
+      const agrupado = {};
+      snapshot.docs.forEach(d => {
+        const m = { id: d.id, ...d.data() };
+        if (!agrupado[m.cartaId]) agrupado[m.cartaId] = [];
+        agrupado[m.cartaId].push(m);
+      });
+      Object.values(agrupado).forEach(lista => lista.sort((a, b) => (a.fecha?.seconds || 0) - (b.fecha?.seconds || 0)));
+      cartaMensajesPorHilo = agrupado;
+      if (cartaHiloAbiertoId) renderCartaHiloMensajes(cartaHiloAbiertoId);
+    }, (error) => console.error("Error al leer los mensajes de correspondencia:", error));
+  }
+
+  function actualizarBadgeCorrespondencia() {
+    const badge = document.getElementById("correspondenciaBadge");
+    if (!badge) return;
+    const noLeidas = cartas.filter(c => (c.noLeidoPara || []).includes(uidActual)).length;
+    badge.style.display = noLeidas > 0 ? "inline-block" : "none";
+    badge.textContent = String(noLeidas);
+  }
+
+  function otroParticipante(carta) {
+    const otroUid = (carta.participantes || []).find(uid => uid !== uidActual);
+    return { uid: otroUid, nombre: carta.nombres ? (carta.nombres[otroUid] || "Alguien") : "Alguien" };
+  }
+
+  // ---------- Abrir el formulario para escribir una carta nueva ----------
+  function abrirCartaComponer(uidDestino, nombreDestino, fuente) {
+    if (!uidActual) { alert("Necesitas iniciar sesión (Admin) para escribir cartas."); return; }
+    if (uidDestino === uidActual) { alert("No podés escribirte una carta a vos mismo."); return; }
+    cartaComponerDestino = { uid: uidDestino, nombre: nombreDestino || "este perfil", fuente: fuente || null };
+    document.getElementById("cartaComponerDestinatario").textContent = cartaComponerDestino.nombre;
+    document.getElementById("cartaComponerTexto").value = "";
+    document.getElementById("cartaComponerContador").textContent = "0";
+    document.getElementById("cartaComponerError").style.display = "none";
+    const fuenteTag = document.getElementById("cartaComponerFuenteTag");
+    if (fuente) {
+      fuenteTag.textContent = "Sobre: " + fuente.nombre;
+      fuenteTag.style.display = "inline-block";
+    } else {
+      fuenteTag.style.display = "none";
+    }
+    document.getElementById("cartaComponerModal").style.display = "flex";
+  }
+  window.abrirCartaComponer = abrirCartaComponer;
+
+  document.getElementById("cartaComponerTexto").addEventListener("input", (e) => {
+    document.getElementById("cartaComponerContador").textContent = String(e.target.value.length);
+  });
+  document.getElementById("cartaComponerCancelar").addEventListener("click", () => {
+    document.getElementById("cartaComponerModal").style.display = "none";
+    cartaComponerDestino = null;
+  });
+  document.getElementById("cartaComponerEnviar").addEventListener("click", async () => {
+    const texto = document.getElementById("cartaComponerTexto").value.trim();
+    const errorEl = document.getElementById("cartaComponerError");
+    if (!texto) {
+      errorEl.textContent = "Escribí algo antes de enviar la carta.";
+      errorEl.style.display = "block";
+      return;
+    }
+    if (!cartaComponerDestino) return;
+    try {
+      const nombreMio = nombrePerfil(uidActual);
+      const existente = cartas.find(c =>
+        (c.participantes || []).includes(cartaComponerDestino.uid) &&
+        (c.participantes || []).includes(uidActual)
+      );
+      let cartaId = existente ? existente.id : null;
+      if (!cartaId) {
+        const nuevaCarta = await addDoc(cartasCol, {
+          participantes: [uidActual, cartaComponerDestino.uid],
+          nombres: { [uidActual]: nombreMio, [cartaComponerDestino.uid]: cartaComponerDestino.nombre },
+          fuente: cartaComponerDestino.fuente || null,
+          fechaCreacion: serverTimestamp(),
+          fechaUltimoMensaje: serverTimestamp(),
+          ultimoMensajeTexto: texto,
+          ultimoMensajeAutorUid: uidActual,
+          noLeidoPara: [cartaComponerDestino.uid]
+        });
+        cartaId = nuevaCarta.id;
+      } else {
+        await updateDoc(doc(db, "cartas", cartaId), {
+          fechaUltimoMensaje: serverTimestamp(),
+          ultimoMensajeTexto: texto,
+          ultimoMensajeAutorUid: uidActual,
+          noLeidoPara: [cartaComponerDestino.uid]
+        });
+      }
+      await addDoc(cartaMensajesCol, {
+        cartaId,
+        autorUid: uidActual,
+        autorNombre: nombreMio,
+        texto,
+        fecha: serverTimestamp()
+      });
+      document.getElementById("cartaComponerModal").style.display = "none";
+      cartaComponerDestino = null;
+      mostrarAvisoToast("Carta enviada", "#39ff8c");
+    } catch (e) {
+      errorEl.textContent = "No se pudo enviar la carta: " + e.message;
+      errorEl.style.display = "block";
+    }
+  });
+
+  // ---------- Bandeja de correspondencia ----------
+  const correspondenciaVista = document.getElementById("correspondenciaVista");
+  document.getElementById("abrirCorrespondenciaBtn").addEventListener("click", () => {
+    cerrarHerramientas();
+    correspondenciaVista.style.display = "flex";
+    renderCorrespondenciaLista();
+  });
+  document.getElementById("cerrarCorrespondenciaVistaBtn").addEventListener("click", () => {
+    correspondenciaVista.style.display = "none";
+  });
+
+  function renderCorrespondenciaLista() {
+    const lista = document.getElementById("correspondenciaLista");
+    const vacioMsg = document.getElementById("correspondenciaVaciaMsg");
+    if (!lista) return;
+    if (!uidActual) {
+      lista.innerHTML = "";
+      lista.style.display = "none";
+      vacioMsg.textContent = "Necesitas iniciar sesión (Admin) para ver tu correspondencia.";
+      vacioMsg.style.display = "block";
+      return;
+    }
+    const ordenadas = [...cartas].sort((a, b) => (b.fechaUltimoMensaje?.seconds || 0) - (a.fechaUltimoMensaje?.seconds || 0));
+    if (ordenadas.length === 0) {
+      lista.innerHTML = "";
+      lista.style.display = "none";
+      vacioMsg.style.display = "block";
+      return;
+    }
+    lista.style.display = "block";
+    vacioMsg.style.display = "none";
+    lista.innerHTML = ordenadas.map(c => {
+      const otro = otroParticipante(c);
+      const noLeida = (c.noLeidoPara || []).includes(uidActual);
+      const fecha = c.fechaUltimoMensaje?.seconds ? new Date(c.fechaUltimoMensaje.seconds * 1000).toLocaleDateString() : "";
+      return `
+        <button type="button" class="carta-fila" data-carta-id="${c.id}">
+          ${noLeida ? `<span class="carta-fila-punto"></span>` : `<span style="width:8px;"></span>`}
+          <div class="carta-fila-cuerpo">
+            <div class="carta-fila-nombre">${escapeHtml(otro.nombre)}</div>
+            <div class="carta-fila-preview">${escapeHtml(c.ultimoMensajeTexto || "")}</div>
+          </div>
+          <div class="carta-fila-fecha">${fecha}</div>
+        </button>
+      `;
+    }).join("");
+    lista.querySelectorAll(".carta-fila").forEach(fila => {
+      fila.addEventListener("click", () => abrirCartaHilo(fila.dataset.cartaId));
+    });
+  }
+
+  // ---------- Hilo de una carta ----------
+  function abrirCartaHilo(cartaId) {
+    cartaHiloAbiertoId = cartaId;
+    document.getElementById("cartaHiloModal").style.display = "flex";
+    const carta = cartas.find(c => c.id === cartaId);
+    if (carta) {
+      document.getElementById("cartaHiloNombre").textContent = otroParticipante(carta).nombre;
+      const fuenteTag = document.getElementById("cartaHiloFuenteTag");
+      if (carta.fuente) {
+        fuenteTag.textContent = "Sobre: " + carta.fuente.nombre;
+        fuenteTag.style.display = "inline-block";
+      } else {
+        fuenteTag.style.display = "none";
+      }
+      if ((carta.noLeidoPara || []).includes(uidActual)) {
+        updateDoc(doc(db, "cartas", cartaId), { noLeidoPara: (carta.noLeidoPara || []).filter(uid => uid !== uidActual) }).catch(() => {});
+      }
+    }
+    renderCartaHiloMensajes(cartaId);
+  }
+  function cerrarCartaHilo() {
+    cartaHiloAbiertoId = null;
+    document.getElementById("cartaHiloModal").style.display = "none";
+  }
+  document.getElementById("cerrarCartaHiloBtn").addEventListener("click", cerrarCartaHilo);
+
+  function renderCartaHiloMensajes(cartaId) {
+    if (cartaHiloAbiertoId !== cartaId) return;
+    const cont = document.getElementById("cartaHiloMensajes");
+    const mensajes = cartaMensajesPorHilo[cartaId] || [];
+    if (mensajes.length === 0) {
+      cont.innerHTML = `<p style="color:var(--text-sec);font-size:0.82rem;text-align:center;padding:20px 0;">Todavía no hay mensajes en esta carta.</p>`;
+      return;
+    }
+    cont.innerHTML = mensajes.map(m => {
+      const mio = m.autorUid === uidActual;
+      const fecha = m.fecha?.seconds ? new Date(m.fecha.seconds * 1000).toLocaleString() : "Enviando...";
+      return `
+        <div class="carta-mensaje ${mio ? "mio" : "otro"}">
+          <div class="carta-mensaje-meta">${escapeHtml(m.autorNombre)} · ${fecha}</div>
+          ${escapeHtml(m.texto)}
+        </div>
+      `;
+    }).join("");
+    cont.scrollTop = cont.scrollHeight;
+  }
+
+  document.getElementById("cartaHiloResponderBtn").addEventListener("click", async () => {
+    const textarea = document.getElementById("cartaHiloRespuesta");
+    const texto = textarea.value.trim();
+    if (!texto || !cartaHiloAbiertoId) return;
+    const carta = cartas.find(c => c.id === cartaHiloAbiertoId);
+    if (!carta) return;
+    const otro = otroParticipante(carta);
+    try {
+      const nombreMio = nombrePerfil(uidActual);
+      await addDoc(cartaMensajesCol, {
+        cartaId: cartaHiloAbiertoId,
+        autorUid: uidActual,
+        autorNombre: nombreMio,
+        texto,
+        fecha: serverTimestamp()
+      });
+      await updateDoc(doc(db, "cartas", cartaHiloAbiertoId), {
+        fechaUltimoMensaje: serverTimestamp(),
+        ultimoMensajeTexto: texto,
+        ultimoMensajeAutorUid: uidActual,
+        noLeidoPara: [otro.uid]
+      });
+      textarea.value = "";
+    } catch (e) {
+      alert("No se pudo enviar la respuesta: " + e.message);
+    }
+  });
+
+  document.getElementById("eliminarCartaHiloBtn").addEventListener("click", async () => {
+    if (!cartaHiloAbiertoId) return;
+    if (!confirm("¿Eliminar esta carta? Se borra para los dos perfiles, junto con todos sus mensajes, y no se puede deshacer.")) return;
+    const cartaId = cartaHiloAbiertoId;
+    try {
+      const mensajes = cartaMensajesPorHilo[cartaId] || [];
+      await Promise.all(mensajes.map(m => deleteDoc(doc(db, "cartaMensajes", m.id))));
+      await deleteDoc(doc(db, "cartas", cartaId));
+      cerrarCartaHilo();
+    } catch (e) {
+      alert("No se pudo eliminar la carta: " + e.message);
+    }
+  });
+
+  // ---------- Botón "Carta al autor", reutilizable desde cualquier lugar ----------
+  // Se usa delegación de eventos porque este botón se inserta dinámicamente
+  // en varios puntos (perfil, publicación, colección, galería) cuyo HTML se
+  // regenera seguido.
+  function botonCartaHTML(uidDestino, nombreDestino, fuente) {
+    if (!uidDestino || uidDestino === uidActual) return "";
+    const attrsFuente = fuente
+      ? ` data-fuente-tipo="${escapeHtml(fuente.tipo)}" data-fuente-id="${escapeHtml(fuente.id)}" data-fuente-nombre="${escapeHtml(fuente.nombre)}"`
+      : "";
+    return `<button type="button" class="btn-carta-autor" data-uid="${uidDestino}" data-nombre="${escapeHtml(nombreDestino || "")}"${attrsFuente} title="Carta al autor"><svg viewBox="0 0 200 200"><use href="#icono-carta-svg"/></svg></button>`;
+  }
+  window.botonCartaHTML = botonCartaHTML;
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".btn-carta-autor");
+    if (!btn) return;
+    const uidDestino = btn.dataset.uid;
+    const nombreDestino = btn.dataset.nombre || "Perfil";
+    const fuente = btn.dataset.fuenteTipo
+      ? { tipo: btn.dataset.fuenteTipo, id: btn.dataset.fuenteId, nombre: btn.dataset.fuenteNombre }
+      : null;
+    abrirCartaComponer(uidDestino, nombreDestino, fuente);
+  });
+
   // Refleja en los 3 botones del lector el estado guardado del recurso/publicación actual
   function todosLosRecursosComprendidos(libroId, recursos) {
     const p = progresoDeLibro(libroId);
@@ -9137,7 +9587,7 @@
       ? `${tituloPublicacion} — ${recurso.etiqueta}`
       : tituloPublicacion;
     const libroDelRecurso = libros.find(l => l.id === libroId);
-    document.getElementById("firmaLectorBar").textContent = "De " + nombreCreador(libroDelRecurso ? libroDelRecurso.ownerId : null);
+    document.getElementById("firmaLectorBar").innerHTML = "De " + escapeHtml(nombreCreador(libroDelRecurso ? libroDelRecurso.ownerId : null)) + botonCartaHTML(libroDelRecurso ? libroDelRecurso.ownerId : null, nombreCreador(libroDelRecurso ? libroDelRecurso.ownerId : null), libroDelRecurso ? { tipo: "libro", id: libroDelRecurso.id, nombre: tituloPublicacion } : null);
 
     reflexionToggleBtn.style.display = preguntasReflexionActuales.length > 0 ? "inline-block" : "none";
     reflexionToggleBtn.textContent = preguntasReflexionActuales.length > 1 ? `🪞 Reflexión (${preguntasReflexionActuales.length})` : "🪞 Reflexión";
