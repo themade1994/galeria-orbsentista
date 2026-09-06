@@ -2111,6 +2111,23 @@
     flex-shrink:0;
     box-shadow:0 0 6px var(--turquesa);
   }
+  .carta-fila-avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    object-fit:cover;
+    flex-shrink:0;
+  }
+  .carta-fila-avatar-vacio{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--superficie);
+    color:var(--text-sec);
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1rem;
+  }
   .carta-fila-cuerpo{ flex:1; min-width:0; }
   .carta-fila-nombre{ font-size:0.85rem; font-weight:600; color:var(--text); }
   .carta-fila-preview{
@@ -8806,14 +8823,20 @@
     vacioMsg.style.display = "none";
     lista.innerHTML = ordenadas.map(c => {
       const otro = otroParticipante(c);
+      const otroPerfil = usuarios.find(u => u.id === otro.uid);
       const noLeida = (c.noLeidoPara || []).includes(uidActual);
       const fecha = c.fechaUltimoMensaje?.seconds ? new Date(c.fechaUltimoMensaje.seconds * 1000).toLocaleDateString() : "";
+      const fuiYoElUltimo = c.ultimoMensajeAutorUid === uidActual;
+      const previewTexto = (fuiYoElUltimo ? "Tú: " : "") + (c.ultimoMensajeTexto || "");
       return `
         <button type="button" class="carta-fila" data-carta-id="${c.id}">
-          ${noLeida ? `<span class="carta-fila-punto"></span>` : `<span style="width:8px;"></span>`}
+          ${noLeida ? `<span class="carta-fila-punto"></span>` : `<span style="width:8px;flex-shrink:0;"></span>`}
+          ${otroPerfil && otroPerfil.imagenId
+            ? `<img class="carta-fila-avatar" src="${imagenDirecta(otroPerfil.imagenId)}" data-alt-src="${imagenAlternativa(otroPerfil.imagenId)}" data-tried-alt="0" alt="" onerror="manejarErrorFondoDecorativo(this)">`
+            : `<div class="carta-fila-avatar carta-fila-avatar-vacio">${escapeHtml((otro.nombre || "?").charAt(0).toUpperCase())}</div>`}
           <div class="carta-fila-cuerpo">
             <div class="carta-fila-nombre">${escapeHtml(otro.nombre)}</div>
-            <div class="carta-fila-preview">${escapeHtml(c.ultimoMensajeTexto || "")}</div>
+            <div class="carta-fila-preview" style="${fuiYoElUltimo ? "color:var(--text-sec);" : "color:var(--text);font-weight:600;"}">${escapeHtml(previewTexto)}</div>
           </div>
           <div class="carta-fila-fecha">${fecha}</div>
         </button>
