@@ -3305,9 +3305,9 @@
     <div>Correspondencia</div>
     <span></span>
   </div>
-  <p style="font-size:0.75rem;color:var(--text-sec);padding:12px 14px 6px;margin:0;">Cartas privadas entre perfiles — solo vos y la otra persona pueden leerlas. Se ordenan por la más reciente.</p>
+  <p style="font-size:0.75rem;color:var(--text-sec);padding:12px 14px 6px;margin:0;">Cartas privadas entre perfiles — solo tú y la otra persona pueden leerlas. Se ordenan por la más reciente.</p>
   <div id="correspondenciaLista" style="overflow-y:auto;flex:1;"></div>
-  <div id="correspondenciaVaciaMsg" class="empty-msg" style="display:none;padding:20px;">Todavía no tenés ninguna carta. Podés escribirle a un autor desde su perfil o desde una publicación, colección o galería.</div>
+  <div id="correspondenciaVaciaMsg" class="empty-msg" style="display:none;padding:20px;">Todavía no tienes ninguna carta. Puedes escribirle a un autor desde su perfil o desde una publicación, colección o galería.</div>
 </div>
 
 <!-- PÁGINA COMPLETA: ORBSYS DE HOY DE UN PERFIL -->
@@ -3327,7 +3327,7 @@
     <h3 style="font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:4px;">Carta a <span id="cartaComponerDestinatario"></span></h3>
     <div id="cartaComponerFuenteTag" class="carta-fuente-tag" style="display:none;"></div>
     <p style="font-size:0.78rem;color:var(--text-sec);margin-bottom:12px;">Un espacio para escribir con calma — no un comentario público. Solo la otra persona podrá leerla.</p>
-    <textarea id="cartaComponerTexto" maxlength="1800" placeholder="Escribí tu impresión, tu punto de vista, lo que quieras compartirle..." style="width:100%;min-height:160px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.88rem;line-height:1.5;resize:vertical;"></textarea>
+    <textarea id="cartaComponerTexto" maxlength="1800" placeholder="Escribe tu impresión, tu punto de vista, lo que quieras compartirle..." style="width:100%;min-height:160px;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--superficie);color:var(--text);font-size:0.88rem;line-height:1.5;resize:vertical;"></textarea>
     <div style="text-align:right;font-size:0.7rem;color:var(--text-sec);margin-top:4px;"><span id="cartaComponerContador">0</span>/1800</div>
     <p id="cartaComponerError" style="color:#f87171;font-size:0.78rem;display:none;margin-top:6px;"></p>
     <div style="display:flex;gap:8px;margin-top:14px;">
@@ -3638,7 +3638,7 @@
 
         <div style="background:var(--superficie);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
           <p style="font-size:0.78rem;font-weight:600;margin-bottom:2px;">Modo de cuenta: <span id="modoActualTexto" style="color:var(--accent);">Creador</span></p>
-          <p style="font-size:0.73rem;color:var(--text-sec);margin-bottom:10px;" id="modoActualDescripcion">Tenés acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.</p>
+          <p style="font-size:0.73rem;color:var(--text-sec);margin-bottom:10px;" id="modoActualDescripcion">Tienes acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.</p>
           <button type="button" id="cambiarModoCuentaBtn" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-size:0.78rem;cursor:pointer;">Cambiar a modo Espectador</button>
         </div>
 
@@ -3890,7 +3890,7 @@
     <div id="esqueletoModalTitulo"></div>
     <button id="verAparienciaEsqueletoBtn" style="background:transparent;border:1px solid var(--turquesa);color:var(--turquesa);padding:8px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;">Ver apariencia</button>
   </div>
-  <div id="avisoConectandoEsqueleto" style="display:none;text-align:center;font-size:0.74rem;color:#facc15;background:rgba(250,204,21,0.08);border-bottom:1px solid rgba(250,204,21,0.3);padding:7px;"><svg viewBox="0 0 200 200" style="width:15px;height:15px;flex-shrink:0;vertical-align:-3px;margin-right:5px;"><use href="#icono-conectar-svg"/></svg>Modo conectar activo — tocá otra casilla para unirla. Tocá de nuevo el botón de enlace para apagarlo.</div>
+  <div id="avisoConectandoEsqueleto" style="display:none;text-align:center;font-size:0.74rem;color:#facc15;background:rgba(250,204,21,0.08);border-bottom:1px solid rgba(250,204,21,0.3);padding:7px;"><svg viewBox="0 0 200 200" style="width:15px;height:15px;flex-shrink:0;vertical-align:-3px;margin-right:5px;"><use href="#icono-conectar-svg"/></svg>Modo conectar activo — toca otra casilla para unirla. Toca de nuevo el botón de enlace para apagarlo.</div>
   <div style="flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:24px 12px;">
     <svg id="esqueletoSvg" viewBox="0 0 260 340" style="width:min(90vw, 320px);height:auto;"></svg>
   </div>
@@ -3899,7 +3899,7 @@
 <!-- POPUP: elegir color de línea al conectar dos casillas (modelo Libre) -->
 <div id="colorLineaOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9800;align-items:center;justify-content:center;">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;max-width:260px;width:90%;text-align:center;">
-    <p style="font-size:0.82rem;color:var(--text-sec);margin-bottom:14px;">Elegí el color de la línea que conecta estas casillas</p>
+    <p style="font-size:0.82rem;color:var(--text-sec);margin-bottom:14px;">Elige el color de la línea que conecta estas casillas</p>
     <div style="display:flex;justify-content:center;gap:12px;margin-bottom:14px;">
       <button class="color-linea-opcion" data-color="#ffffff" style="width:34px;height:34px;border-radius:50%;background:#ffffff;border:2px solid #444;cursor:pointer;"></button>
       <button class="color-linea-opcion" data-color="#22d3c4" style="width:34px;height:34px;border-radius:50%;background:#22d3c4;border:2px solid #444;cursor:pointer;"></button>
@@ -5016,7 +5016,7 @@
 
       modoActualTexto.textContent = "Espectador";
       modoActualTexto.style.color = "#22d3c4";
-      modoActualDescripcion.textContent = "Podés leer, guardar referencias y seguir perfiles. El Taller no está disponible en este modo.";
+      modoActualDescripcion.textContent = "Puedes leer, guardar referencias y seguir perfiles. El Taller no está disponible en este modo.";
       cambiarModoCuentaBtn.textContent = "Cambiar a modo Creador";
     } else {
       tallerPestanas.style.display = "flex";
@@ -5027,7 +5027,7 @@
       }
       modoActualTexto.textContent = "Creador";
       modoActualTexto.style.color = "var(--accent)";
-      modoActualDescripcion.textContent = "Tenés acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.";
+      modoActualDescripcion.textContent = "Tienes acceso completo: Taller, Notas, Plantillas, Historial y Seguidos.";
       cambiarModoCuentaBtn.textContent = "Cambiar a modo Espectador";
     }
   }
@@ -7080,7 +7080,7 @@
       .sort((a, b) => (a.perfilSeguidoNombre || "").localeCompare(b.perfilSeguidoNombre || "", "es", { sensitivity: "base" }));
 
     if (mios.length === 0) {
-      seguidosLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Todavía no seguís a nadie. Cuando visites el perfil de alguien, tocá "＋ Seguir" para agregarlo aquí.</div>`;
+      seguidosLista.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-sec);font-size:0.82rem;">Todavía no sigues a nadie. Cuando visites el perfil de alguien, toca "＋ Seguir" para agregarlo aquí.</div>`;
       return;
     }
     seguidosLista.innerHTML = "";
@@ -7694,6 +7694,12 @@
     if (conexionSeleccionadaIndice === null) return;
     const indice = conexionSeleccionadaIndice;
     cerrarAccionesConexion();
+    // Borrar una conexión también apaga el modo conectar si estaba prendido:
+    // si no, la casilla que habías armado queda "atascada" en ese estado
+    // (no reacciona al tocarla) y la otra casilla actúa como si la línea
+    // borrada siguiera existiendo.
+    conectandoDesde = null;
+    actualizarAvisoConectando();
     const conexiones = (esqueletoActual.conexiones || []).filter((_, i) => i !== indice);
     guardarConexionesYNucleo(conexiones, esqueletoActual.nucleo || null).then(() => renderConstelacion(esqueletoActual));
   });
@@ -7701,6 +7707,8 @@
     if (conexionSeleccionadaIndice === null) return;
     const indice = conexionSeleccionadaIndice;
     cerrarAccionesConexion();
+    conectandoDesde = null;
+    actualizarAvisoConectando();
     const nuevoColor = await pedirColorLinea();
     if (!nuevoColor) return;
     const conexiones = [...(esqueletoActual.conexiones || [])];
@@ -8778,7 +8786,7 @@
   // Suscribe los mensajes de UN SOLO hilo (el que está abierto), no de toda
   // la colección. Antes se leía cartaMensajes entera de una sola vez: como
   // la regla de Firestore necesita un get() al documento padre de "cartas"
-  // por cada mensaje para validar que sos participante, leer TODA la
+  // por cada mensaje para validar que eres participante, leer TODA la
   // colección (mensajes de todos los pares de usuarios, no solo los tuyos)
   // es fràgil — cualquier documento problemático en medio puede tirar abajo
   // el listener completo, en silencio, y por eso a algunos les funcionaba
@@ -8817,7 +8825,7 @@
   // ---------- Abrir el formulario para escribir una carta nueva ----------
   function abrirCartaComponer(uidDestino, nombreDestino, fuente) {
     if (!uidActual) { alert("Necesitas iniciar sesión (Admin) para escribir cartas."); return; }
-    if (uidDestino === uidActual) { alert("No podés escribirte una carta a vos mismo."); return; }
+    if (uidDestino === uidActual) { alert("No puedes escribirte una carta a ti mismo."); return; }
     cartaComponerDestino = { uid: uidDestino, nombre: nombreDestino || "este perfil", fuente: fuente || null };
     document.getElementById("cartaComponerDestinatario").textContent = cartaComponerDestino.nombre;
     document.getElementById("cartaComponerTexto").value = "";
@@ -8845,7 +8853,7 @@
     const texto = document.getElementById("cartaComponerTexto").value.trim();
     const errorEl = document.getElementById("cartaComponerError");
     if (!texto) {
-      errorEl.textContent = "Escribí algo antes de enviar la carta.";
+      errorEl.textContent = "Escribe algo antes de enviar la carta.";
       errorEl.style.display = "block";
       return;
     }
