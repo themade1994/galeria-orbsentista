@@ -3044,6 +3044,19 @@
       <circle cx="100" cy="88" r="12" fill="#9b7cf6"/>
       <path d="M 100 108 L 88 132 L 112 132 Z" fill="#9b7cf6"/>
     </g>
+    <!-- Ícono de Kiosco Café: portada de revista con su badge de precio,
+         en guinda propio de esa app (distinto del resto de la paleta) -->
+    <g id="icono-kiosco-svg">
+      <linearGradient id="kioscoGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#8a2140" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#8a2140" stop-opacity="0.6"/>
+      </linearGradient>
+      <rect x="62" y="52" width="76" height="100" rx="4" fill="url(#kioscoGrad)" stroke="#8a2140" stroke-width="6"/>
+      <line x1="72" y1="94" x2="128" y2="94" stroke="#8a2140" stroke-width="4" opacity="0.6"/>
+      <line x1="72" y1="108" x2="118" y2="108" stroke="#8a2140" stroke-width="4" opacity="0.4"/>
+      <line x1="72" y1="122" x2="122" y2="122" stroke="#8a2140" stroke-width="4" opacity="0.4"/>
+      <circle cx="126" cy="66" r="14" fill="#8a2140"/>
+    </g>
     <!-- Ícono del badge "más info de este perfil": un planeta con su anillo,
          para no confundirse con un símbolo de advertencia -->
     <g id="icono-perfilinfo-svg">
@@ -3158,6 +3171,13 @@
       <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-poker-svg"/></svg>
       <div>
         <div style="font-size:0.85rem;font-weight:600;">Póker Café</div>
+        <div style="font-size:0.72rem;color:var(--text-sec);">Abre en una pestaña nueva</div>
+      </div>
+    </div>
+    <div class="herramienta-item" id="abrirKioscoCafeBtn">
+      <svg viewBox="0 0 200 200" style="width:26px;height:26px;flex-shrink:0;"><use href="#icono-kiosco-svg"/></svg>
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;">Kiosco Café</div>
         <div style="font-size:0.72rem;color:var(--text-sec);">Abre en una pestaña nueva</div>
       </div>
     </div>
@@ -7376,6 +7396,9 @@
   });
   document.getElementById("abrirPokerCafeBtn").addEventListener("click", () => {
     window.open("https://themade1994.github.io/poker-cafe/", "_blank");
+  });
+  document.getElementById("abrirKioscoCafeBtn").addEventListener("click", () => {
+    window.open("https://themade1994.github.io/kiosco-cafe/", "_blank");
   });
   document.getElementById("crearEsqueletoBtn").addEventListener("click", () => {
     if (!uidActual) {
